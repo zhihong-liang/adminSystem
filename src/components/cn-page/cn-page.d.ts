@@ -48,7 +48,7 @@ declare namespace CnPage {
     /**
      * 搜索组件参数
      */
-    search?: Omit<SearchProps, 'model'>
+    search?: Omit<SearchProps, 'model' | 'onSearch' | 'onReset'>
     /**
      * 工具组件参数
      */
