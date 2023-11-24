@@ -71,6 +71,9 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
       const res2 = props.transformResponse ? props.transformResponse(res) : res
       data.value = res2.list
       total.value = res2.total
+    }).catch((err: any) => {
+      // 这里可以做一些错误提示
+      console.log('table component action error', err)
     })
     .finally(() => {
       loading.value = false
