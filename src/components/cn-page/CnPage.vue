@@ -73,7 +73,7 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
       total.value = res2.total
     }).catch((err: any) => {
       // 这里可以做一些错误提示
-      console.log('table component action error', err)
+      console.log('cn-page component action error', err)
     })
     .finally(() => {
       loading.value = false

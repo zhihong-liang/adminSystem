@@ -8,7 +8,7 @@ import CnPage from '@/components/cn-page/CnPage.vue'
 
 const props = reactive<CnPage.Props>({
   params: {},
-  action: () => Promise.reject(),
+  action: () => Promise.reject('暂无接口'),
   search: {
     items: [
       { label: '区划名称', prop: 'name', component: 'input' },
