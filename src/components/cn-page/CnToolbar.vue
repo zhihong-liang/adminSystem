@@ -3,7 +3,7 @@ defineProps(['items']);
 </script>
 
 <template>
-  <div>
+  <div v-if="items.length">
     <el-button v-for="(item, index) in items" v-bind="item" :key="index">
       {{ item.label }}
     </el-button>

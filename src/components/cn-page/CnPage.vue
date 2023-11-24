@@ -11,7 +11,7 @@
     <CnTable v-bind="table" :data="data">
       <template
         v-for="(column, index) in table?.columns.filter(
-          (item: CnPage.TableProps['columns'][0]) => item.slot
+          (item: CnPage.TableColumnProps) => item.slot
         )"
         v-slot:[column.slot]="slotProps"
         :key="index"
@@ -71,7 +71,8 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
       const res2 = props.transformResponse ? props.transformResponse(res) : res
       data.value = res2.list
       total.value = res2.total
-    }).catch((err: any) => {
+    })
+    .catch((err: any) => {
       // 这里可以做一些错误提示
       console.log('cn-page component action error', err)
     })
