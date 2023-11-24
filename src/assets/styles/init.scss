@@ -1,0 +1,221 @@
+@for $i from 1 through 5 {
+  h#{$i} {
+    margin: 0;
+  }
+
+  .flex-#{$i} {
+    flex: #{$i};
+  }
+}
+
+.clearfix {
+  &:before &:after {
+    content: "";
+    display: table;
+  }
+
+  &:after {
+    clear: both;
+  }
+}
+
+.text {
+  &-left {
+    text-align: left;
+  }
+
+  &-center {
+    text-align: center;
+  }
+
+  &-right {
+    text-align: right;
+  }
+
+  &-nowrap {
+    white-space: nowrap;
+  }
+}
+
+.inline {
+  display: inline;
+
+  &-block {
+    display: inline-block;
+  }
+}
+
+.block {
+  display: block;
+
+  &-center {
+    margin: 0 auto;
+  }
+}
+
+.ofh {
+  overflow: hidden;
+}
+
+.ofa {
+  overflow: auto;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+.flex {
+  display: flex;
+
+  &-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  &-between {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  &-around {
+    display: flex;
+    justify-content: space-around;
+  }
+
+  &-wrap {
+    flex-wrap: wrap;
+  }
+
+  &-column {
+    flex-direction: column;
+  }
+}
+
+.wd {
+  &-full {
+    width: 100%;
+  }
+
+  &-half {
+    width: 50%;
+  }
+}
+
+.cp {
+  cursor: pointer;
+}
+
+.hg {
+  &-full {
+    height: 100%;
+  }
+
+  &-half {
+    height: 50%;
+  }
+}
+
+// 边距
+$baseLen: 5px;
+$mainMap: (xs: ($baseLen*.5), sm: $baseLen, md: ($baseLen*2), lg: ($baseLen*3), xl: ($baseLen*4), xxl: ($baseLen*6), xxxl: ($baseLen*8), xxxxl: ($baseLen*10), auto: auto, "0": 0);
+$pmMap: (m: margin, p: padding);
+$positionMap: (l: left, r: right, t: top, b: bottom);
+
+@each $k,
+$v in $pmMap {
+
+  @each $mk,
+  $mv in $mainMap {
+    .#{$k}-#{$mk} {
+      #{$v}: $mv !important;
+    }
+
+    .#{$k}v-#{$mk} {
+      #{$v}-top: $mv !important;
+      #{$v}-bottom: $mv !important;
+    }
+
+    .#{$k}h-#{$mk} {
+      #{$v}-left: $mv !important;
+      #{$v}-right: $mv !important;
+    }
+
+    @each $pk,
+    $pv in $positionMap {
+      .#{$k}#{$pk}-#{$mk} {
+        #{$v}-#{$pv}: $mv !important;
+      }
+    }
+  }
+}
+
+// 背景/字体颜色
+$color-primary: #409EFF;
+$color-secondary: #909399;
+$color-warning: #f5992f;
+$color-success: #67C23A;
+$color-error: #F56C6C;
+$color-danger: #960000;
+$color-white: #FFF;
+$color-black: #000;
+$color-gray: #f7f7f7;
+$colorMap: (primary: $color-primary, white: $color-white, black: $color-black, success: $color-success, warning: $color-warning, error: $color-error, info: $color-secondary, gray: $color-gray, danger: $color-danger);
+
+@each $k,
+$v in $colorMap {
+  .text-#{"" + $k} {
+    color: $v;
+  }
+
+  .bg-#{"" + $k} {
+    background-color: $v;
+  }
+}
+
+.cn-dialog{
+  &:not(.is-draggable){
+    max-height: calc(100% - 40px);
+    margin: 20px auto;
+    display: flex;
+    flex-direction: column;
+    .el-dialog__body{
+      flex: 1;
+      overflow: auto;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+    }
+  }
+}
+
+.el-input__prefix-inner{
+  align-items: center;
+}
+
+.cn-dialog{
+  &.el-dialog {
+    max-height: calc(100% - 100px);
+    // margin: 50px auto !important;
+    display: flex;
+    flex-direction: column;
+    .el-dialog__body {
+      flex: 1;
+      overflow: auto;
+    }
+  }
+}
+
+
+.el-button.is-link:not(.is-disabled){
+  color: var(--system-primary-color);
+}
+
+.tool-tip{
+  max-width: 500px;
+}
+
+.fs-sm{
+  font-size: .8em;
+}

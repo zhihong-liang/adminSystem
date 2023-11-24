@@ -1,6 +1,12 @@
 <script setup lang="ts">
+
 </script>
 
 <template>
-  Home
+  <div class="home">
+    home
+  </div>
 </template>
+
+<style scoped>
+</style>
