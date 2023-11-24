@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 axios.interceptors.response.use(
-  ({ data }: { data: Res<any> }) => {
-    if (data.code === 200) return data.data
+  ({ data }) => {
+    if (data.code === 200) return data
     return Promise.reject(data)
   },
   (err) => {
@@ -21,6 +21,9 @@ export type ListReq = {
   size?: number
 }
 
+/**
+ * mock 接口，用于 demo 页面
+ */
 export interface User {
   id: number
   avatar: string
@@ -31,4 +34,11 @@ export interface User {
   height: number
   weight: number
 }
-export const getUsers = (params: ListReq): Promise<ListRes<User>> => axios.get('/users', { params })
+export const getUsers = (params: ListReq): Promise<Res<ListRes<User>>> =>
+  axios.get('/users', { params })
+
+/**
+ * 获取字典，demo 接口，后续替换成后端接口
+ */
+export const getDictionary = (params: string[]): Promise<any> =>
+  axios.get('/dictionary', { params })

@@ -196,12 +196,9 @@ declare namespace CnPage {
   interface FormItemRadioProps extends FormItemProps {
     component: 'radio'
     props?: ExtractPropTypes<typeof ElRadioGroup> & {
-      options: RadioOptionProps[]
+      options: OptionProps[]
       type?: 'button'
     }
-  }
-  interface RadioOptionProps extends Omit<OptionProps, 'value'> {
-    value: string | number | boolean
   }
 
   /**

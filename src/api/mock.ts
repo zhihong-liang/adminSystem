@@ -29,10 +29,30 @@ Mock.mock(/^\/users/, 'get', (options) => {
   }
   const start = (page - 1) * size
   const end = start + +size
-  const rows = data.list.filter((v: { realname: string }) => realname ? v.realname.includes(realname) : true)
+  const rows = data.list.filter((v: { realname: string }) =>
+    realname ? v.realname.includes(realname) : true
+  )
   return {
     code: 200,
     data: { list: rows.slice(start, end), total: rows.length },
+    message: 'success'
+  }
+})
+
+Mock.mock(/^\/dictionary/, 'get', (options) => {
+  const data: Record<string, any> = {}
+  if (options.type === 'GET') {
+    const sp = new URLSearchParams(options.url.split('?')[1])
+    if (sp.get('0')) {
+      data.SEX = [
+        { label: '男', value: 0 },
+        { label: '女', value: 1 }
+      ]
+    }
+  }
+  return {
+    code: 200,
+    data,
     message: 'success'
   }
 })

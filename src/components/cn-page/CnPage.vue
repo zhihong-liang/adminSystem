@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { computed, onBeforeMount, ref, watch } from 'vue'
-import type { ListRes } from '@/api'
+import type { Res, ListRes } from '@/api'
 import CnSearch from './CnSearch.vue'
 import CnToolbar from './CnToolbar.vue'
 import CnTable from './CnTable.vue'
@@ -67,8 +67,8 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
   const params = props.transformRequest ? props.transformRequest(props.params) : props.params
   props
     .action({ page: page.value, size: size.value, ...params })
-    .then((res: ListRes) => {
-      const res2 = props.transformResponse ? props.transformResponse(res) : res
+    .then((res: Res<ListRes>) => {
+      const res2 = props.transformResponse ? props.transformResponse(res.data) : res.data
       data.value = res2.list
       total.value = res2.total
     })

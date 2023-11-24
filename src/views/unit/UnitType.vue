@@ -7,6 +7,7 @@
 import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
+import { useDelete } from '@/hooks/useConfirm';
 
 const dialogRef = ref()
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -36,7 +37,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
 
 const props = reactive<CnPage.Props>({
   params: {},
-  action: () => Promise.reject('暂无接口'),
+  action: () => Promise.resolve({ data: { list: [{}], total: 1 } }),
   search: {
     items: [{ label: '单位类型', prop: 'type', component: 'input' }]
   },
@@ -60,7 +61,17 @@ const props = reactive<CnPage.Props>({
       {
         label: '操作',
         prop: 'action',
-        buttons: [{ label: '上移' }, { label: '下移' }, { label: '编辑' }, { label: '删除' }]
+        buttons: [
+          { label: '上移', type: 'primary' },
+          { label: '下移', type: 'success' },
+          { label: '编辑', type: 'warning' },
+          { label: '删除', type: 'danger', onClick: () => {
+            useDelete({
+              action: () => Promise.reject({ message: '删除失败' }),
+              success: () => {}
+            })
+          } }
+        ]
       }
     ]
   }

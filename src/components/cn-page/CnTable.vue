@@ -35,6 +35,7 @@ export default {
                       ElButton,
                       {
                         ...button,
+                        size: 'small',
                         onClick: (evt) => button.onClick && button.onClick(params, evt)
                       },
                       () => button.label

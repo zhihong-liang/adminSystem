@@ -14,5 +14,7 @@ const local = computed(() => zhCn)
   </el-config-provider>
 </template>
 
-<style lang="scss" scoped>
+<style lang="scss">
+@import "element-plus/theme-chalk/src/message.scss";
+@import "element-plus/theme-chalk/src/message-box.scss";
 </style>
