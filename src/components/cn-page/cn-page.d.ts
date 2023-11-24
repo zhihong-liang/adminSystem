@@ -16,7 +16,8 @@ import type {
   DatePickerProps as ElDatePickerProps,
   CascaderProps as ElCascaderProps,
   CascaderOption as ElCascaderOption,
-  ButtonProps as ElButtonProps
+  ButtonProps as ElButtonProps,
+  DialogProps as ElDialogProps
 } from 'element-plus'
 
 declare namespace CnPage {
@@ -48,7 +49,7 @@ declare namespace CnPage {
     /**
      * 搜索组件参数
      */
-    search?: Omit<SearchProps, 'model'>
+    search?: Omit<SearchProps, 'model' | 'onSearch' | 'onReset'>
     /**
      * 工具组件参数
      */
@@ -85,7 +86,7 @@ declare namespace CnPage {
    * 操作模块
    */
   interface ToolbarProps<Row = Record<string, any>> {
-    items: ToolbarButtonProps<Row>[];
+    items: ToolbarButtonProps<Row>[]
   }
   type ToolbarButtonProps<Row = Record<string, any>> = ButtonProps<Row>
 
@@ -93,8 +94,11 @@ declare namespace CnPage {
    * 表格模块
    */
   interface TableProps<T = Record<string, any>> extends ElTableProps<T> {
-    columns: Partial<ElTableColumnCtx<T> & { slot: string; dict: string, buttons: ButtonProps<T>[] }>[]
+    columns: TableColumnProps<T>[]
   }
+  type TableColumnProps<T = Record<string, any>> = Partial<
+    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[] }
+  >
 
   /**
    * 分页模块
@@ -224,8 +228,17 @@ declare namespace CnPage {
   /**
    * 自定义插槽
    */
-  interface FormItemSlotProps extends FormItemProps {
+  interface FormItemSlotProps extends Omit<FormItemProps, 'prop'> {
     component: 'slot'
+    prop: string
+  }
+
+  /**
+   * 对话框
+   */
+  type DialogProps = Partial<ElDialogProps> & {
+    formProps?: FormProps
+    onSubmit?: () => void
   }
 }
 
