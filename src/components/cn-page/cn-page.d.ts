@@ -57,7 +57,7 @@ declare namespace CnPage {
     /**
      * 列表组件参数
      */
-    table?: Omit<TableProps<Row>, 'data'>
+    table: Omit<TableProps<Row>, 'data'>
     /**
      * 分页组件参数
      */

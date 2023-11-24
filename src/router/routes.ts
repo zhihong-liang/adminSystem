@@ -32,6 +32,12 @@ export default [
         path: '/unit/type',
         name: 'unitType',
         component: () => import('../views/unit/UnitType.vue')
+      },
+      {
+        // 系统管理 - 单位管理 - 单位管理
+        path: '/unit/list',
+        name: 'unitList',
+        component: () => import('../views/unit/UnitList.vue')
       }
     ]
   },

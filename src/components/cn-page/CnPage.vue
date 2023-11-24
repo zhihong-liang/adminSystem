@@ -47,7 +47,7 @@ const props = defineProps([
 const inited = ref(false)
 const loading = ref(true)
 const data = ref<any[]>([])
-const showPagination = computed(() => !!props.pagination)
+const showPagination = computed(() => props.pagination !== false)
 const page = ref(1)
 const size = ref(10)
 const total = ref(0)
