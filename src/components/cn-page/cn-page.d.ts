@@ -17,7 +17,8 @@ import type {
   CascaderProps as ElCascaderProps,
   CascaderOption as ElCascaderOption,
   ButtonProps as ElButtonProps,
-  DialogProps as ElDialogProps
+  DialogProps as ElDialogProps,
+  formProps
 } from 'element-plus'
 
 declare namespace CnPage {
@@ -234,6 +235,7 @@ declare namespace CnPage {
    * 对话框
    */
   type DialogProps = Partial<ElDialogProps> & {
+    [key: string]: any
     formProps?: FormProps
     onSubmit?: () => void
   }

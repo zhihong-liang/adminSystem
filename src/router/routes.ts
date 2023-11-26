@@ -6,7 +6,7 @@ export default [
   {
     path: '/login',
     name: '登录',
-    component: Login,
+    component: Login
   },
   {
     path: '/',
@@ -38,7 +38,19 @@ export default [
         path: '/unit/list',
         name: 'unitList',
         component: () => import('../views/unit/UnitList.vue')
+      },
+      {
+        // 事项列表
+        path: '/matterList',
+        name: 'matterList',
+        component: () => import('../views/matter-list/MatterList.vue')
+      },
+      {
+        // 事项标签管理
+        path: '/matterLabel',
+        name: 'matterLabel',
+        component: () => import('../views/matter-label/MatterLabel.vue')
       }
     ]
-  },
+  }
 ]
