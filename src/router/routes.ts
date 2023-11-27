@@ -1,6 +1,5 @@
 import Login from '../views/login/index.vue'
 import BaseLayout from '../layout/index.vue'
-import HomeView from '../views/HomeView.vue'
 
 export default [
   {
@@ -15,11 +14,13 @@ export default [
     children: [
       {
         path: '/home',
-        component: HomeView,
-        meta: {
-          title: '首页',
-          roles: ['user', 'admin']
-        }
+        name: 'homeView',
+        component: () => import('../views/HomeView.vue')
+      },
+      {
+        path: '/log',
+        name: 'logManage',
+        component: () => import('../views/log/index.vue')
       },
       {
         // 系统管理 - 区划管理

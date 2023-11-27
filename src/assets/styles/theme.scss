@@ -7,16 +7,17 @@
     --system-logo-color: #f1f1f1;
     --system-logo-background: #0b396f;
 
-    // 菜单颜色相关
-    --system-menu-text-color: #fff;
-    --system-menu-background: #0b396f;
-    --system-menu-children-background: #092e59;
-    --system-menu-submenu-active-color: #fff;
-    --system-menu-hover-background: #409eff;
+    // slider颜色相关
+    --system-slider-background-color: #00388B;
+    --system-slider-text-color: #fff;
+    --system-slider-background: #002477;
+    --system-slider-children-background: #092e59;
+    --system-slider-submenu-active-color: #fff;
+    --system-slider-hover-background: #409eff;
 
     // header区域
-    --system-header-background: #fff;
-    --system-header-text-color: #000;
+    --system-header-background: linear-gradient(0.25turn, var(--system-slider-background-color), var(--system-slider-background));
+    --system-header-text-color: #fff;
     --system-header-breadcrumb-text-color: #666;
     --system-header-item-hover-color: #409eff;
     --system-header-border-color: #d8dce5;

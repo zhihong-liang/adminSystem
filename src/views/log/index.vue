@@ -1,8 +1,6 @@
 <template>
-  <!-- <CnPage v-bind="PageProps"></CnPage> -->
-  <div>
-    <CnSearch />
-    <h2>log页面</h2>
+  <div class="logManage-root">
+    log页面
   </div>
 </template>
 
