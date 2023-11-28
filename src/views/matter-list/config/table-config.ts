@@ -1,8 +1,11 @@
-export default function getTableConfig(editClickCb: (params: any) => void): CnPage.TableProps {
+import type { tableActionType } from './type'
+export default function getTableConfig(
+  editClickCb: (params: any, handle: tableActionType) => void
+): CnPage.TableProps {
   return {
     data: [],
     columns: [
-      { label: '粤智助事项编码', prop: 'itemId' },
+      { label: '粤智助事项编码', prop: 'itemId', slot: 'itemId' },
       { label: '事项别名', prop: 'rename' },
       { label: '事项名称', prop: 'name' },
       { label: '业务部门', prop: 'department' },
@@ -17,7 +20,7 @@ export default function getTableConfig(editClickCb: (params: any) => void): CnPa
             label: '编辑',
             type: 'text',
             onClick: (params: any) => {
-              editClickCb(params)
+              editClickCb(params, 'edit')
             }
           }
         ]

@@ -1,6 +1,6 @@
-import type { handleType } from './type'
+import type { tollbarActionType } from './type'
 export default function getTollbarConifg(
-  clickCb: (handle: handleType) => void
+  clickCb: (handle: tollbarActionType) => void
 ): CnPage.ToolbarProps {
   return {
     items: [

@@ -1,1 +1,5 @@
-export type handleType = 'add' | 'label' | 'export'
+export type tollbarActionType = 'add' | 'label' | 'export'
+
+export type tableActionType = 'detail' | 'edit'
+
+export type tabsActivateName = 'basicInfo' | 'configInfo'

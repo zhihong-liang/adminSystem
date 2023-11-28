@@ -1,6 +1,9 @@
 <template>
-  <div class="matter-list">
+  <div class="matter-label">
     <CnPage v-bind="props">
+      <template #itemId="{ row }">
+        <el-button type="text" @click="setDialogConfig('detail', row)">{{ row.id }}</el-button>
+      </template>
       <template #status="{ row }">
         <span>{{ row.id }}</span>
       </template>
@@ -25,7 +28,7 @@ import getDialogConfig from './config/dialog-config'
 
 import type { handleType } from './config/type'
 
-// import { getUsers } from '@/api'
+import { getUsers } from '@/api'
 
 // const init: Promise<void> = new Promise((resolve) =>
 //   setTimeout(() => {
@@ -42,11 +45,11 @@ const props = reactive<CnPage.Props>({
     page: 1,
     size: 10
   },
-  action: () => Promise.reject('暂无数据'),
-  // action: getUsers,
+  // action: () => Promise.reject('暂无数据'),
+  action: getUsers,
   search: searchConfig,
-  toolbar: getTollbarConifg(tollbarClick),
-  table: getTableConfig(handleEdit, deleteClickCb),
+  toolbar: getTollbarConifg(setDialogConfig),
+  table: getTableConfig(setDialogConfig),
   pagination: {
     page: 1,
     size: 10
@@ -59,29 +62,18 @@ function submit() {
 }
 
 // 显示操作弹窗
-function tollbarClick(handle: handleType) {
+function setDialogConfig(handle: handleType, row?: any) {
+  console.log(row)
   const dialogConfig = getDialogConfig(handle, submit)
   for (const key of Object.keys(dialogConfig)) {
     dialogProps[key] = dialogConfig[key]
   }
   dialogRef.value?.open()
 }
-
-// 表单编辑按钮的点击
-function handleEdit(params: any) {
-  console.log(params.row)
-  tollbarClick('edit')
-}
-
-// 表单删除按钮的点击
-function deleteClickCb(params: any) {
-  console.log(params.row)
-  tollbarClick('delete')
-}
 </script>
 
 <style scoped lang="scss">
-.matter-list {
+.matter-label {
   margin: 30px;
   padding: 20px;
   border: 1px solid #ccc;
