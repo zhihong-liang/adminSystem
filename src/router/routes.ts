@@ -16,12 +16,15 @@ export default [
       {
         path: '/home',
         name: 'homeView',
-        component: () => import('../views/HomeView.vue')
+        component: () => import('../views/HomeView.vue'),
+        meta: { requiredAuth: true }
       },
+      // 日志管理
       {
         path: '/log',
         name: 'logManage',
-        component: () => import('../views/log/index.vue')
+        component: () => import('../views/log/index.vue'),
+        meta: { requiredAuth: false }
       },
       {
         // 系统管理 - 区划管理

@@ -56,3 +56,54 @@ Mock.mock(/^\/dictionary/, 'get', (options) => {
     message: 'success'
   }
 })
+
+Mock.mock(/^\/menuList/, 'get', (options) => {
+  let data: Record<string, any> = []
+  if (options.type === 'GET') {
+    // const sp = new URLSearchParams(options.url.split('?')[1])
+
+    data = [
+      {
+        id: 1,
+        parentId: -1,
+        children: [],
+        icon: 'HomeFilled',
+        title: '首页',
+        url: '/screenRules',
+        path: '/home',
+        type: 'menu',
+        description: '',
+        orderNumber: 1
+      },
+      {
+        id: 110,
+        parentId: -1,
+        children: [],
+        icon: 'Histogram',
+        title: '区划管理',
+        url: '/division',
+        path: '/division',
+        type: 'menu',
+        description: '区划管理',
+        orderNumber: 2
+      },
+      {
+        id: 111,
+        parentId: -1,
+        children: [],
+        icon: 'Histogram',
+        title: '日志管理',
+        url: '/logManage',
+        path: '/log',
+        type: 'menu',
+        description: '日志管理',
+        orderNumber: 3
+      }
+    ]
+  }
+  return {
+    code: 200,
+    data,
+    message: 'success'
+  }
+})

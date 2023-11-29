@@ -10,7 +10,7 @@
         :collapse-transition="false"
         :collapse="collapse"
       >
-        <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" />
+        <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" @onClick="handleItemClick" />
       </el-menu>
     </el-scrollbar>
 
@@ -27,70 +27,57 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
+import { getMenuList } from '@/api'
 
-import MenuItem from './item.vue'
+import MenuItem from './menuItem.vue'
 import { ElMenu, ElScrollbar } from 'element-plus'
 
 import type { MenuItemProps } from './type'
 
 const [route, store] = [useRoute(), useHomeStore()]
 
-const { collapse, menuList } = storeToRefs(store)
+const { collapse, menuList, tabList } = storeToRefs(store)
 
-const { updateCollapse, updateMenuList } = store
+const { updateCollapse, updateMenuList, addTabToList } = store
 
 const loading = ref(false)
 
-const activeMenuItem = computed<string>(() => route.path)
+const activeMenuItem = computed(() => route.path)
+
+const handleItemClick = (item: MenuItemProps) => {
+  const { title, path } = item
+  const { name = '' } = route
+  const tab = { name: name as string, title, path }
+  addTabToList(tab)
+}
+
+// tab 组件初始化
+const tabListInit = () => {
+  const { addTabToList } = store
+  const { path = '', name = '' } = route  // 先获取当前路由的tab
+
+  const tabExit = !!tabList.value.find(t => t.path === path)
+
+  // TODO tabList、menuList都不存在该路由的数据，则显示404或跳回首页
+  if (!tabExit) {
+    const exitInMenu = menuList.value.find(item => item.path === path)
+    !!exitInMenu && addTabToList({ title: exitInMenu.title, name: name as string, path})
+  }
+}
 
 const init = () => {
   loading.value = true
 
-  const list: MenuItemProps[] = [
-    {
-      id: 1,
-      parentId: -1,
-      children: [],
-      icon: 'HomeFilled',
-      title: '首页',
-      url: '/screenRules',
-      path: '/home',
-      type: 'menu',
-      description: '',
-      orderNumber: 1
-    },
-    {
-      id: 110,
-      parentId: -1,
-      children: [],
-      icon: 'Histogram',
-      title: '区划管理',
-      url: '/division',
-      path: '/division',
-      type: 'menu',
-      description: '区划管理',
-      orderNumber: 2
-    },
-    {
-      id: 111,
-      parentId: -1,
-      children: [],
-      icon: 'Histogram',
-      title: '日志管理',
-      url: '/logManage',
-      path: '/log',
-      type: 'menu',
-      description: '日志管理',
-      orderNumber: 3
-    }
-  ]
-  setTimeout(() => {
-    updateMenuList(list)
-    loading.value = false
-  }, 1000)
+  getMenuList({ name: 'admin' })
+    .then((res) => {
+      res.data.length && updateMenuList(res.data)
+
+      tabListInit()
+    })
+    .finally(() => (loading.value = false))
 }
 
-onBeforeMount(() => init())
+onBeforeMount(() => !menuList.value.length && init())
 </script>
 
 <style lang="scss" scoped>

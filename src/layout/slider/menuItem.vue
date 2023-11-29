@@ -11,11 +11,11 @@
           <span>{{ menuItem.title }}</span>
         </template>
 
-        <Item v-for="item in menuItem.children" :menu-item="item"></Item>
+        <menu-item v-for="item in menuItem.children" :menu-item="item"></menu-item>
       </el-sub-menu>
     </template>
 
-    <router-link v-else :to="menuItem.path">
+    <router-link v-else :to="menuItem.path" @click="handleRouterLinkClick(menuItem)">
       <el-menu-item :index="menuItem.path.toString()">
         <template v-if="menuItem.icon">
           <el-icon>
@@ -40,8 +40,14 @@ const props = defineProps<{
   menuItem: MenuItemProps
 }>()
 
+const emits = defineEmits(['onClick'])
+
 // 是否为隐藏菜单
 const isHideMenu = computed(() => (!!props.menuItem?.hideMenu ? false : true))
+
+const handleRouterLinkClick = (item: MenuItemProps) => {
+  emits('onClick', item)
+}
 </script>
 
 <style scoped></style>

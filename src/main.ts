@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import * as ELIcons from "@element-plus/icons-vue";
 import App from './App.vue'
 import router from './router'
@@ -17,7 +18,10 @@ for (let iconName in ELIcons) {
     app.component(iconName, (ELIcons as any)[iconName]);
 }
 
-app.use(createPinia())
+const pinia = createPinia()
+pinia.use(piniaPluginPersistedstate)
+
+app.use(pinia)
 app.use(router)
 
 app.mount('#app')

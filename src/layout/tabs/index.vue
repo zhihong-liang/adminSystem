@@ -6,7 +6,6 @@
           v-for="item in tabList"
           :key="item.name"
           :value="item"
-          :active="item.path === currentActiveTabPath"
         />
       </div>
     </el-scrollbar>
@@ -14,14 +13,14 @@
 </template>
 
 <script setup lang="ts">
-import { ElScrollbar } from 'element-plus'
 import { storeToRefs } from 'pinia'
+import { ElScrollbar } from 'element-plus'
 import { useHomeStore } from '@/stores/home'
 
 import TabItem from './tabItem.vue'
 
 const store = useHomeStore()
-const { tabList, currentActiveTabPath } = storeToRefs(store)
+const { tabList } = storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>

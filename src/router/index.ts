@@ -19,8 +19,8 @@ router.beforeEach(() => {
 
 router.afterEach((to, from) => {
   const { updateCurrentActiveTab } = useHomeStore()
-
   if (to.path !== from.path) updateCurrentActiveTab(to.path)
+
   close();
 })
 

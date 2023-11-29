@@ -1,4 +1,4 @@
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 import type { TabItem } from '@/layout/tabs/type'
@@ -21,35 +21,27 @@ export const useHomeStore = defineStore('home', () => {
     // -------slider---------
 
     // -------tabs---------
-    const tabList = ref<TabItem[]>([
-        {
-            name: 'home',
-            title: '首页',
-            path: "/home"
-        },
-        {
-            name: 'division',
-            title: '区划管理',
-            path: "/division"
-        },
-        {
-            name: 'log',
-            title: '日志管理',
-            path: "/log"
-        },
-    ]) // tabs数据列表
+    const tabList = ref<TabItem[]>([]) // tabs数据列表
 
     function addTabToList(tab: TabItem) {
-        const isExit = !!tabList.value.find(t => t.name === tab.name)
+        const isExit = !!tabList.value.find(t => t.path === tab.path)
         if (!isExit) tabList.value.push(tab)
     }
 
+    function updateTabList(list: TabItem[]) {
+        tabList.value = list
+    }
+
     const currentActiveTabPath = ref('')  // 当前激活状态的tab路径
+
+    const getActiveTab = computed(() => currentActiveTabPath.value)
     function updateCurrentActiveTab(path: string) {
         currentActiveTabPath.value = path
     }
 
     // -------tabs---------
 
-    return { collapse, tabList, menuList, currentActiveTabPath, updateCollapse, addTabToList, updateCurrentActiveTab, updateMenuList }
+    return { collapse, tabList, menuList, currentActiveTabPath, getActiveTab, updateCollapse, addTabToList, updateTabList, updateCurrentActiveTab, updateMenuList }
+}, {
+    persist: true
 })

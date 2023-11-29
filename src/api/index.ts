@@ -42,3 +42,6 @@ export const getUsers = (params: ListReq): Promise<Res<ListRes<User>>> =>
  */
 export const getDictionary = (params: string[]): Promise<any> =>
   axios.get('/dictionary', { params })
+
+
+export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', {params})
