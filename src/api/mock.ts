@@ -98,6 +98,18 @@ Mock.mock(/^\/menuList/, 'get', (options) => {
         type: 'menu',
         description: '日志管理',
         orderNumber: 3
+      },
+      {
+        id: 112,
+        parentId: -1,
+        children: [],
+        icon: 'Histogram',
+        title: '菜单管理',
+        url: '/menuManage',
+        path: '/menu',
+        type: 'menu',
+        description: '',
+        orderNumber: 4
       }
     ]
   }

@@ -1,13 +1,15 @@
 <template>
   <div class="content-root">
-
     <div class="container">
       <suspense>
         <RouterView v-slot="{ Component, route }">
           <Transition name="fade-transform" mode="out-in">
-            <keep-alive>
-              <component :is="Component" :key="route.fullPath" />
-            </keep-alive>
+            <!-- 加一层盒子，兼容一些组件有多个根节点，不然不显示 -->
+            <div class="compatible">
+              <keep-alive>
+                <component :is="Component" :key="route.fullPath" />
+              </keep-alive>
+            </div>
           </Transition>
         </RouterView>
 

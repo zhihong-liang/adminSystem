@@ -77,7 +77,7 @@ const init = () => {
     .finally(() => (loading.value = false))
 }
 
-onBeforeMount(() => !menuList.value.length && init())
+onBeforeMount(() => !menuList.value.length ? init() : tabListInit())
 </script>
 
 <style lang="scss" scoped>
