@@ -1,11 +1,12 @@
+import type { handleType } from './type'
+
 export default function getTableConfig(
-  editClickCb: (params: any) => void,
-  deleteClickCb: (params: any) => void
+  tableClickCb: (handleType: handleType, params: any) => void
 ): CnPage.TableProps {
   return {
     data: [],
     columns: [
-      { label: '粤智助事项编码', prop: 'itemId' },
+      { label: '粤智助事项编码', prop: 'itemId', slot: 'itemId' },
       { label: '事项别名', prop: 'rename' },
       { label: '事项名称', prop: 'name' },
       { label: '业务部门', prop: 'department' },
@@ -20,14 +21,14 @@ export default function getTableConfig(
             label: '编辑',
             type: 'text',
             onClick: (params: any) => {
-              editClickCb(params)
+              tableClickCb('edit', params.row)
             }
           },
           {
             label: '删除',
             type: 'text',
             onClick: (params: any) => {
-              deleteClickCb(params)
+              tableClickCb('delete', params.row)
             }
           }
         ]

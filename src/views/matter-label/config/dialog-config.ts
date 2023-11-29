@@ -69,7 +69,7 @@ export default function getDialogConfig(
       },
       onSubmit: submitCb
     }
-  } else {
+  } else if (handleType === 'delete') {
     return {
       title: '删除标签',
       formProps: {
@@ -82,6 +82,23 @@ export default function getDialogConfig(
           }
         ],
         labelWidth: 0
+      },
+      onSubmit: submitCb
+    }
+  } else {
+    return {
+      title: '事项标签详情',
+      formProps: {
+        model: {},
+        labelPosition: 'left',
+        items: [
+          { label: '标签名称', prop: 'name', component: 'input' },
+          { label: '备注', prop: 'remind', component: 'input' },
+          { label: '图标', prop: 'avatar', component: 'input' }
+        ],
+        readonly: true,
+        colSpan: 12,
+        labelWidth: 120
       },
       onSubmit: submitCb
     }

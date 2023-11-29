@@ -1,1 +1,1 @@
-export type handleType = 'add' | 'delete' | 'edit'
+export type handleType = 'add' | 'delete' | 'edit' | 'detail'
