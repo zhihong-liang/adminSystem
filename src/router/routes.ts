@@ -27,6 +27,12 @@ export default [
         meta: { requiredAuth: false }
       },
       {
+        // 系统管理 - 菜单管理
+        path: '/menu',
+        name: 'menu',
+        component: () => import('../views/menu/MenuList.vue')
+      },
+      {
         // 系统管理 - 区划管理
         path: '/division',
         name: 'division',
