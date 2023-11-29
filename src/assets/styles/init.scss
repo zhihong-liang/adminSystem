@@ -65,6 +65,13 @@
   }
 }
 
+// 文本内容超过最大宽度显示省略号
+.truncated {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
 .flex {
   display: flex;
 
@@ -174,15 +181,17 @@ $v in $colorMap {
   }
 }
 
-.cn-dialog{
-  &:not(.is-draggable){
+.cn-dialog {
+  &:not(.is-draggable) {
     max-height: calc(100% - 40px);
     margin: 20px auto;
     display: flex;
     flex-direction: column;
-    .el-dialog__body{
+
+    .el-dialog__body {
       flex: 1;
       overflow: auto;
+
       &::-webkit-scrollbar {
         display: none;
       }
@@ -190,16 +199,17 @@ $v in $colorMap {
   }
 }
 
-.el-input__prefix-inner{
+.el-input__prefix-inner {
   align-items: center;
 }
 
-.cn-dialog{
+.cn-dialog {
   &.el-dialog {
     max-height: calc(100% - 100px);
     // margin: 50px auto !important;
     display: flex;
     flex-direction: column;
+
     .el-dialog__body {
       flex: 1;
       overflow: auto;
@@ -208,14 +218,14 @@ $v in $colorMap {
 }
 
 
-.el-button.is-link:not(.is-disabled){
+.el-button.is-link:not(.is-disabled) {
   color: var(--system-primary-color);
 }
 
-.tool-tip{
+.tool-tip {
   max-width: 500px;
 }
 
-.fs-sm{
+.fs-sm {
   font-size: .8em;
 }

@@ -2,9 +2,17 @@ ul li {
     list-style: none;
 }
 
+a {
+    text-decoration: none;
+    color:#333
+}
+
 #app >.baseLayout >.el-container {
     .el-header {
         padding: 0px;
+    }
+    .el-aside {
+        transition: width 0.3s;
     }
     .el-main {
         padding: 0px;

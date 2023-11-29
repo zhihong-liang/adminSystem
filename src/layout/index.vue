@@ -9,7 +9,7 @@
 
     <el-container class="cn_container ofh">
       <!-- 侧边栏 -->
-      <el-aside>
+      <el-aside :width="finalWidth">
         <Slider />
       </el-aside>
 
@@ -17,8 +17,6 @@
       <el-main class="flex flex-column">
         <!-- tabs组件 -->
         <Tabs />
-
-        <!-- 显示内容组件 -->
         <Content />
       </el-main>
     </el-container>
@@ -26,12 +24,20 @@
 </template>
 
 <script setup lang="ts">
-import { ElContainer, ElHeader, ElAside, ElMain } from 'element-plus'
+import { computed } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useHomeStore } from '@/stores/home'
 
+import { ElContainer, ElHeader, ElAside, ElMain } from 'element-plus'
 import Content from '@/layout/content/index.vue'
 import Slider from '@/layout/slider/index.vue'
 import Header from '@/layout/header/index.vue'
 import Tabs from '@/layout/tabs/index.vue'
+
+const store = useHomeStore()
+const { collapse } = storeToRefs(store)
+
+const finalWidth = computed(() => (collapse.value ? '64px' : '280px'))
 </script>
 
 <style scoped>

@@ -1,88 +1,104 @@
 <template>
-  <div class="home_slider" :style="{ width: 280 }">
+  <div class="home_slider" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)">
     <el-scrollbar>
       <el-menu
-        default-active="1"
         class="layoutMenu"
+        :default-active="activeMenuItem"
         background-color="var(--system-slider-background)"
         text-color="var(--system-slider-text-color)"
-        active-text-color="var(--system-primary-color)"
-        :collapse="isCollapse"
-        @open="handleOpen"
-        @close="handleClose"
+        active-color="var(--system-primary-color)"
+        :collapse-transition="false"
+        :collapse="collapse"
       >
-        <MenuItem v-for="menuItem in menus" :menu-item="menuItem"></MenuItem>
+        <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" />
       </el-menu>
     </el-scrollbar>
+
+    <div class="collapse" @click="updateCollapse">
+      <el-icon>
+        <DArrowLeft :class="collapse ? 'icon_left' : 'icon_right'" />
+      </el-icon>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { ElMenu, ElScrollbar } from 'element-plus'
+import { computed, onBeforeMount, ref } from 'vue'
+import { useHomeStore } from '@/stores/home'
+import { useRoute } from 'vue-router'
+import { storeToRefs } from 'pinia'
+
 import MenuItem from './item.vue'
-import type { ItemProps } from './type'
+import { ElMenu, ElScrollbar } from 'element-plus'
 
-const menus = ref<ItemProps[]>([
-  {
-    id: 1,
-    parentId: -1,
-    children: [],
-    icon: 'HomeFilled',
-    title: '首页',
-    href: '/screenRules',
-    spread: false,
-    path: '/home',
-    code: 'screenRules',
-    type: 'menu',
-    attr1: 'screenRules/index',
-    attr2: '{}',
-    attr3: '{}',
-    description: '',
-    orderNum: 81
-  },
-  {
-    id: 110,
-    parentId: -1,
-    children: [],
-    icon: 'Histogram',
-    title: '区划管理',
-    href: '/division',
-    spread: false,
-    path: '/division',
-    code: 'Division',
-    type: 'menu',
-    description: '区划管理',
-    orderNum: 1
-  },
-  {
-    id: 111,
-    parentId: -1,
-    children: [],
-    icon: 'Histogram',
-    title: '日志管理',
-    href: '/logManage',
-    spread: false,
-    path: '/log',
-    code: 'logManage',
-    type: 'menu',
-    description: '日志管理',
-    orderNum: 1
-  },
-])
+import type { MenuItemProps } from './type'
 
-const isCollapse = computed(() => false)
+const [route, store] = [useRoute(), useHomeStore()]
 
-const handleOpen = () => {}
+const { collapse, menuList } = storeToRefs(store)
 
-const handleClose = () => {}
+const { updateCollapse, updateMenuList } = store
+
+const loading = ref(false)
+
+const activeMenuItem = computed<string>(() => route.path)
+
+const init = () => {
+  loading.value = true
+
+  const list: MenuItemProps[] = [
+    {
+      id: 1,
+      parentId: -1,
+      children: [],
+      icon: 'HomeFilled',
+      title: '首页',
+      url: '/screenRules',
+      path: '/home',
+      type: 'menu',
+      description: '',
+      orderNumber: 1
+    },
+    {
+      id: 110,
+      parentId: -1,
+      children: [],
+      icon: 'Histogram',
+      title: '区划管理',
+      url: '/division',
+      path: '/division',
+      type: 'menu',
+      description: '区划管理',
+      orderNumber: 2
+    },
+    {
+      id: 111,
+      parentId: -1,
+      children: [],
+      icon: 'Histogram',
+      title: '日志管理',
+      url: '/logManage',
+      path: '/log',
+      type: 'menu',
+      description: '日志管理',
+      orderNumber: 3
+    }
+  ]
+  setTimeout(() => {
+    updateMenuList(list)
+    loading.value = false
+  }, 1000)
+}
+
+onBeforeMount(() => init())
 </script>
 
 <style lang="scss" scoped>
 .home_slider {
   background-color: var(--system-slider-background-color);
   height: 100%;
-  width: 300px;
+
+  position: relative;
 }
 
 .layoutMenu {
@@ -90,7 +106,8 @@ const handleClose = () => {}
   border: none;
 
   :deep() {
-    .el-menu-item, .el-sub-menu__title {
+    .el-menu-item,
+    .el-sub-menu__title {
       &.is-active {
         background-color: var(--system-primary-color) !important;
         color: var(--system-primary-text-color) !important;
@@ -106,6 +123,31 @@ const handleClose = () => {}
         background-color: var(--system-slider-hover-background) !important;
       }
     }
+  }
+}
+
+.collapse {
+  position: absolute;
+  bottom: 100px;
+  right: 0px;
+
+  width: 35px;
+  height: 35px;
+  line-height: 35px;
+  text-align: center;
+  border-top-left-radius: 18px;
+  border-bottom-left-radius: 18px;
+  cursor: pointer;
+  color: var(--system-primary-text-color);
+  background-color: var(--system-primary-color);
+
+  .icon_left {
+    transform: rotate(180deg);
+    transition: all 0.5s;
+  }
+  .icon_right {
+    transform: rotate(360deg);
+    transition: all 0.5s;
   }
 }
 </style>
