@@ -24,15 +24,16 @@ export interface Res<T = any> {
   message: string
   data: T
 }
-export type ListRes<T = any> = {
+export type ListRes<T = Record<string, any>> = {
   code: string
   rows: T[]
   total: number
   msg: string
 }
-export type ListReq = {
+export type ListReq<T = Record<string, any>> = {
   page?: number
   size?: number
+  obj: T
 }
 
 /**

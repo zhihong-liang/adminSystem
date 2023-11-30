@@ -1,23 +1,22 @@
 import { ElMessage, ElMessageBox } from 'element-plus'
 import type { Res } from '@/api'
 
-interface UseConfirmParams<T = Record<string, any>> {
+interface UseConfirmParams {
   title?: string
   message?: string
-  params?: T
-  action: (params: T) => Promise<Res>
+  action: () => Promise<Res>
   success: () => void
 }
 
 function useConfirm(opts: UseConfirmParams): void {
-  const { message, title = '提示', params = {}, action, success } = opts
+  const { message, title = '提示', action, success } = opts
   ElMessageBox.confirm(message, title, {
     distinguishCancelAndClose: true,
     confirmButtonText: '确定',
     cancelButtonText: '取消'
   })
     .then(() => {
-      action(params)
+      action()
         .then((res) => {
           ElMessage.success(res.message || '操作成功')
           success && success()

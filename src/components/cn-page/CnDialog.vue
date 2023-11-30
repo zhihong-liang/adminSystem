@@ -35,8 +35,8 @@ const props = defineProps({
   appendToBody: { type: Boolean, default: true },
   formProps: { type: Object as PropType<UnwrapNestedRefs<CnPage.FormProps>> },
   action: Function,
-  params: Object
 })
+const emits = defineEmits(['success'])
 
 const slots = ref<CnPage.FormItemSlotProps[]>([])
 watchEffect(() => {
@@ -56,7 +56,9 @@ function handleSubmit() {
     ?.validate()
     .then(() => {
       if (props.action) {
-        props.action(props.params).finally(() => {
+        props.action().then(() => {
+          emits('success')
+        }).finally(() => {
           visible.value = false
         })
       }

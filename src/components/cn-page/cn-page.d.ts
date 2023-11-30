@@ -42,7 +42,7 @@ declare namespace CnPage {
     /**
      * 修改响应数据
      */
-    transformResponse?: (data: Row[]) => Row[]
+    transformResponse?: (data: Res<Row>) => ListRes<Row>
     /**
      * 刷新页面，通常指定一个随机数或时间戳，适用于在新增或编辑操作之前重新请求列表
      */
@@ -264,7 +264,6 @@ declare namespace CnPage {
   } & {
     [key: string]: any
     formProps?: FormProps
-    params?: T
     action?: (params: any) => Promise<any>
   }
 }

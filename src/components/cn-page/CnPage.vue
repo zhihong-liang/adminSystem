@@ -64,9 +64,11 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
   if (currentPage) page.value = currentPage
   if (pageSize) size.value = pageSize
   loading.value = true
-  const params = props.transformRequest ? props.transformRequest(props.params) : props.params
+  const params = props.transformRequest
+    ? props.transformRequest(props.params, page.value, size.value)
+    : { page: page.value, size: size.value, obj: { ...props.params } }
   props
-    .action({ page: page.value, size: size.value, obj: { ...params } })
+    .action(params)
     .then((res: ListRes) => {
       const res2 = props.transformResponse ? props.transformResponse(res) : res
       data.value = res2.rows
