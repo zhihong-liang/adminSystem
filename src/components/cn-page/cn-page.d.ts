@@ -121,8 +121,8 @@ declare namespace CnPage {
   type FormProps = {
     -readonly [K in keyof ElFormProps]?: ElFormProps[K]
   } & {
-    model: ElFormProps['model']
-    items: FormItem[]
+    model: Record<string, any>
+    items: MaybeRef<FormItem[]>
     colSpan?: number
     footerSpan?: number
     readonly?: boolean
@@ -133,12 +133,14 @@ declare namespace CnPage {
    */
   type FormItem =
     | FormItemProps
+    | FormItemSubTitleProps
     | FormItemInputProps
     | FormItemSelectProps
     | FormItemCheckboxProps
     | FormItemRadioProps
     | FormItemDatePickerProps
     | FormItemCascaderProps
+    | FormItemGroupProps
     | FormItemSlotProps
 
   type FormItemProps = {
@@ -153,6 +155,13 @@ declare namespace CnPage {
      */
     dict?: string
     visible?: () => boolean
+  }
+
+  /**
+   * 小标题
+   */
+  interface FormItemSubTitleProps extends FormItemProps {
+    component: 'subtitle',
   }
 
   /**
@@ -197,9 +206,14 @@ declare namespace CnPage {
   interface FormItemRadioProps extends FormItemProps {
     component: 'radio'
     props?: ExtractPropTypes<typeof ElRadioGroup> & {
-      options: OptionProps[]
+      options: RadioOptionProps[]
       type?: 'button'
     }
+  }
+  interface RadioOptionProps {
+    value: string | number | boolean
+    label: string | number
+    disabled?: boolean
   }
 
   /**
@@ -224,6 +238,16 @@ declare namespace CnPage {
   }
 
   /**
+   * 表单组
+   */
+  interface FormItemGroupProps extends FormItemProps {
+    component: 'group',
+    props?: {
+      children: FormItem[]
+    }
+  }
+
+  /**
    * 自定义插槽
    */
   interface FormItemSlotProps extends Omit<FormItemProps, 'prop'> {
@@ -234,10 +258,13 @@ declare namespace CnPage {
   /**
    * 对话框
    */
-  type DialogProps = Partial<ElDialogProps> & {
+  type DialogProps<T = Record<string, any>> = {
+    -readonly [K in keyof ElDialogProps]?: ElDialogProps[K]
+  } & {
     [key: string]: any
     formProps?: FormProps
-    onSubmit?: () => void
+    params?: T
+    action?: (params: any) => Promise<any>
   }
 }
 

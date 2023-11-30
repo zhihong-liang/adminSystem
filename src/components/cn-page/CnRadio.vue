@@ -10,8 +10,11 @@ export default {
     return () => {
       const { type, options, ...rest } = props || {}
       const el = type === 'button' ? ElRadioButton : ElRadio
-      return h(ElRadioGroup, { ...rest }, () =>
-        options?.map((option) => h(el, { ...option, label: option.value }, () => option.label))
+      return h(
+        ElRadioGroup,
+        rest,
+        () =>
+          options?.map((option) => h(el, { ...option, label: option.value }, () => option.label))
       )
     }
   }

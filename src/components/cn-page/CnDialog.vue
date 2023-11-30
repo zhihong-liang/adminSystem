@@ -7,13 +7,9 @@
     @closed="handleClosed"
   >
     <template #default>
-      <slot>
+      <slot v-if="formProps">
         <CnForm v-bind="formProps" ref="formWrapRef">
-          <template
-            v-for="item in slots"
-            v-slot:[item.prop]="slotProps"
-            :key="item.prop"
-          >
+          <template v-for="item in slots" v-slot:[item.prop]="slotProps" :key="item.prop">
             <slot :name="item.prop" v-bind="slotProps" />
           </template>
         </CnForm>
@@ -37,9 +33,10 @@ const props = defineProps({
   destroyOnClose: { type: Boolean, default: true },
   closeOnClickModal: { type: Boolean, default: false },
   appendToBody: { type: Boolean, default: true },
-  formProps: { type: Object as PropType<UnwrapNestedRefs<CnPage.FormProps>> }
+  formProps: { type: Object as PropType<UnwrapNestedRefs<CnPage.FormProps>> },
+  action: Function,
+  params: Object
 })
-const emits = defineEmits(['submit'])
 
 const slots = ref<CnPage.FormItemSlotProps[]>([])
 watchEffect(() => {
@@ -58,8 +55,11 @@ function handleSubmit() {
   formWrapRef.value?.formRef
     ?.validate()
     .then(() => {
-      emits('submit')
-      visible.value = false
+      if (props.action) {
+        props.action(props.params).finally(() => {
+          visible.value = false
+        })
+      }
     })
     .catch(() => {})
 }

@@ -6,7 +6,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, defineEmits, defineProps, ref, watchEffect } from 'vue'
+import { computed, ref, watchEffect } from 'vue'
 import useDictionary from '@/hooks/useDictionary'
 import CnSelect from './CnSelect.vue'
 import CnCheckbox from './CnCheckbox.vue'

@@ -27,6 +27,12 @@ export default [
         meta: { requiredAuth: false }
       },
       {
+        // 系统管理 - 用户管理
+        path: '/user',
+        name: 'user',
+        component: () => import('../views/user/UserList.vue')
+      },
+      {
         // 系统管理 - 菜单管理
         path: '/menu',
         name: 'menu',
