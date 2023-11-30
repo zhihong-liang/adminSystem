@@ -4,8 +4,8 @@
       v-if="inited"
       v-bind="search"
       :model="params"
-      @search="handleQuery"
-      @reset="handleQuery"
+      @search="handleQuery()"
+      @reset="handleQuery()"
     />
     <CnToolbar v-bind="toolbar" />
     <CnTable v-bind="table" :data="data">
@@ -25,7 +25,7 @@
 
 <script lang="ts" setup>
 import { computed, onBeforeMount, ref, watch } from 'vue'
-import type { Res, ListRes } from '@/api'
+import type { ListRes } from '@/api'
 import CnSearch from './CnSearch.vue'
 import CnToolbar from './CnToolbar.vue'
 import CnTable from './CnTable.vue'
@@ -66,10 +66,10 @@ const handleQuery = (currentPage?: number, pageSize?: number) => {
   loading.value = true
   const params = props.transformRequest ? props.transformRequest(props.params) : props.params
   props
-    .action({ page: page.value, size: size.value, ...params })
-    .then((res: Res<ListRes>) => {
-      const res2 = props.transformResponse ? props.transformResponse(res.data) : res.data
-      data.value = res2.list
+    .action({ page: page.value, size: size.value, obj: { ...params } })
+    .then((res: ListRes) => {
+      const res2 = props.transformResponse ? props.transformResponse(res) : res
+      data.value = res2.rows
       total.value = res2.total
     })
     .catch((err: any) => {

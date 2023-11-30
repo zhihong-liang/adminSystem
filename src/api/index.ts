@@ -1,8 +1,17 @@
 import axios from 'axios'
 
+axios.interceptors.request.use(
+  (config) => {
+    config.headers.Authorization = window.sessionStorage.getItem('token')
+    return config
+  },
+  (err) => {
+    return err
+  }
+)
 axios.interceptors.response.use(
   ({ data }) => {
-    if (data.code === 200) return data
+    if (data.code === '200') return data
     return Promise.reject(data)
   },
   (err) => {
@@ -11,11 +20,16 @@ axios.interceptors.response.use(
 )
 
 export interface Res<T = any> {
-  code: number
+  code: string
   message: string
   data: T
 }
-export type ListRes<T = any> = { list: T[]; total: number }
+export type ListRes<T = any> = {
+  code: string
+  rows: T[]
+  total: number
+  msg: string
+}
 export type ListReq = {
   page?: number
   size?: number
@@ -38,10 +52,18 @@ export const getUsers = (params: ListReq): Promise<Res<ListRes<User>>> =>
   axios.get('/users', { params })
 
 /**
+ * 登录
+ */
+interface Login {
+  userName: string
+  password: string
+}
+export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/logon', data)
+
+/**
  * 获取字典，demo 接口，后续替换成后端接口
  */
 export const getDictionary = (params: string[]): Promise<any> =>
   axios.get('/dictionary', { params })
 
-
-export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', {params})
+export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })

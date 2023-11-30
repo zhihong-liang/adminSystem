@@ -239,6 +239,7 @@ declare namespace CnPage {
 
   /**
    * 表单组
+   * TODO
    */
   interface FormItemGroupProps extends FormItemProps {
     component: 'group',

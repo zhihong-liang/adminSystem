@@ -8,6 +8,7 @@ import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { useDelete } from '@/hooks/useConfirm';
+import { getUnitTypeList } from '@/api/admin'
 
 const dialogRef = ref()
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -37,9 +38,9 @@ const dialogProps = reactive<CnPage.DialogProps>({
 
 const props = reactive<CnPage.Props>({
   params: {},
-  action: () => Promise.resolve({ data: { list: [{}], total: 1 } }),
+  action: getUnitTypeList,
   search: {
-    items: [{ label: '单位类型', prop: 'type', component: 'input' }]
+    items: [{ label: '单位类型', prop: 'unitTypeName', component: 'input' }]
   },
   toolbar: {
     items: [
@@ -55,8 +56,8 @@ const props = reactive<CnPage.Props>({
   table: {
     columns: [
       { type: 'index', label: '序号', width: 60 },
-      { label: '单位类型', prop: 'type' },
-      { label: '使用单位数', prop: 'count' },
+      { label: '单位类型', prop: 'unitTypeName' },
+      { label: '使用单位数', prop: 'unitCount' },
       { label: '创建时间', prop: 'createTime' },
       {
         label: '操作',
