@@ -1,19 +1,22 @@
-export type MenuItemProps = {
+export type Menu = {
     // 字段还没确定，可更改，最终解释权是后台给的接口
-    id: number,
-    path: string,
-    parentId?: number,
-    title?: string,
-    filePath?: string,
-    children?: MenuItemProps[],
-    icon?: string,
-    url?: string,
-    authCode?: string,
-    route?: string,
-    type?: string,
+    id?: number,
+    code?: string,
+    component?: string,
+    createTime?: string
+    createUser?: string,
     description?: string,
-    orderNumber?: number,
-    hideMenu?: boolean,
-    parentPaths?: string[],
-    Component?: any
+    icon?: string,
+    name?: string
+    params?: Object,
+    parentId?: number,
+    path?: string,
+    perms?: string,
+    sort?: number
+    status?: string,
+    type?: string,
+    updateTime?: string,
+    updateUser?: string,
+    visible?: string
+    childList?: Menu[]
 }

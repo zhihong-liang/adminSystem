@@ -1,21 +1,17 @@
 <template>
-  <div style="height: 100vh" class="baseLayout">
+  <div class="baseLayout">
     <el-container style="flex: none">
-      <!-- 头部 -->
       <el-header height="70px">
         <Header />
       </el-header>
     </el-container>
 
     <el-container class="cn_container ofh">
-      <!-- 侧边栏 -->
       <el-aside :width="finalWidth">
         <Slider />
       </el-aside>
 
-      <!-- 内容 -->
       <el-main class="flex flex-column">
-        <!-- tabs组件 -->
         <Tabs />
         <Content />
       </el-main>
@@ -44,5 +40,7 @@ const finalWidth = computed(() => (collapse.value ? '64px' : '280px'))
 .baseLayout {
   display: flex;
   flex-direction: column;
+
+  height: 100vh;
 }
 </style>

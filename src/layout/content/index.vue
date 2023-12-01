@@ -1,22 +1,17 @@
 <template>
   <div class="content-root">
-    <div class="container">
-      <suspense>
-        <RouterView v-slot="{ Component, route }">
-          <Transition name="fade-transform" mode="out-in">
-            <!-- 加一层盒子，兼容一些组件有多个根节点，不然不显示 -->
-            <div class="compatible">
-              <keep-alive>
-                <component :is="Component" :key="route.fullPath" />
-              </keep-alive>
-            </div>
-          </Transition>
-        </RouterView>
+    <!-- TODO 还有个面包屑组件，弄完菜单再搞 -->
 
-        <template #fallback>
-          <div v-loading>加载中...</div>
-        </template>
-      </suspense>
+    <div class="container">
+      <RouterView v-slot="{ Component, route }">
+        <Transition name="fade-transform" mode="out-in">
+          <!-- <keep-alive> -->
+            <div :key="route.path"> <!-- 解决没有根节点的组件与 transition 组件冲突的bug -->
+              <component :is="Component" :key="route.fullPath" />
+            </div>
+          <!-- </keep-alive> -->
+        </Transition>
+      </RouterView>
     </div>
   </div>
 </template>

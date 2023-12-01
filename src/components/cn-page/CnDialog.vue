@@ -41,7 +41,9 @@ const emits = defineEmits(['success'])
 const slots = ref<CnPage.FormItemSlotProps[]>([])
 watchEffect(() => {
   if (props.formProps) {
-    slots.value = props.formProps.items.filter(v => v.component === 'slot') as CnPage.FormItemSlotProps[]
+    slots.value = props.formProps.items.filter(
+      (v) => v.component === 'slot'
+    ) as CnPage.FormItemSlotProps[]
   }
 })
 
@@ -60,6 +62,7 @@ function handleSubmit() {
           emits('success')
         }).finally(() => {
           visible.value = false
+          loading.value = false
         })
       }
     })

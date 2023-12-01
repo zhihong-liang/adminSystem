@@ -98,7 +98,7 @@ declare namespace CnPage {
     columns: TableColumnProps<T>[]
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
-    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[] }
+    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icon: ElIcon }
   >
 
   /**

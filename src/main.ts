@@ -4,6 +4,7 @@ import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import * as ELIcons from "@element-plus/icons-vue";
 import App from './App.vue'
 import router from './router'
+import moment from 'moment'
 
 import './api/mock'
 
@@ -11,6 +12,8 @@ import 'normalize.css/normalize.css'  // 初始化样式
 import 'element-plus/dist/index.css'  // 引入element-plus的样式
 import './assets/styles/index.scss'   // 自定义样式
 import 'nprogress/nprogress.css';
+
+moment.locale('zh-cn')
 
 const app = createApp(App)
 

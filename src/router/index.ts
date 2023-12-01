@@ -18,8 +18,11 @@ router.beforeEach(() => {
 })
 
 router.afterEach((to, from) => {
-  const { updateCurrentActiveTab } = useHomeStore()
-  if (to.path !== from.path) updateCurrentActiveTab(to.path)
+  // const { updateActiveTab } = useHomeStore()
+
+  // if (to.path !== from.path) {
+  //   updateActiveTab(to.meta.id as number)
+  // }
 
   close();
 })

@@ -1,7 +1,7 @@
 <template>
   <router-link :to="value.path">
     <div :class="['tab-item-root', isActive ? 'active' : '']">
-      <div class="tab-item-title mr-md truncated">{{ value.title }}</div>
+      <div class="tab-item-title mr-md truncated">{{ value.name }}</div>
       <el-icon size="12px" @click.prevent="handleCloseTab"><Close /></el-icon>
     </div>
   </router-link>
@@ -21,10 +21,10 @@ const props = defineProps<{
 }>()
 
 const [router, store] = [useRouter(), useHomeStore()]
-const { tabList, getActiveTab } = storeToRefs(store)
+const { tabList, activeTab } = storeToRefs(store)
 const { updateTabList } = store
 
-const isActive = computed(() => getActiveTab.value === props.value.path)
+const isActive = computed(() => activeTab.value === props.value.id)
 
 const handleCloseTab = () => {
   if (tabList.value.length <= 1) return

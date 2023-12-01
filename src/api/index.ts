@@ -1,4 +1,5 @@
 import axios from 'axios'
+import type { Menu } from '@/layout/slider/type'
 
 axios.interceptors.request.use(
   (config) => {
@@ -67,4 +68,21 @@ export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/lo
 export const getDictionary = (params: string[]): Promise<any> =>
   axios.get('/dictionary', { params })
 
-export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
+// export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
+
+
+/**
+ * 菜单管理
+ */
+const menuBasePath = '/api/admin/sys/sysMenu'
+export const addMenu = (params: Menu): Promise<any> => axios.post(menuBasePath + '/add', params)
+
+export const editMenu = (params: Menu): Promise<any> => axios.put(menuBasePath + '/edit', params)
+
+export const removeMenu = (params: Record<'ids', string>): Promise<any> => axios.delete(menuBasePath + `/remove/${params.ids}`)
+
+// 查询菜单树
+export const getMenuList = (params: Menu): Promise<Res<Menu[]>> => axios.post(menuBasePath + '/tree', params)
+
+// 查询菜单列表
+export const checkMenuList = (params: ListReq<Menu>): Promise<any> => axios.post(menuBasePath + '/list', params)

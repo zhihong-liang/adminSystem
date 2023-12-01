@@ -10,7 +10,7 @@
         :collapse-transition="false"
         :collapse="collapse"
       >
-        <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" @onClick="handleItemClick" />
+        <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" />
       </el-menu>
     </el-scrollbar>
 
@@ -27,57 +27,74 @@ import { computed, onBeforeMount, ref } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { getMenuList } from '@/api'
+import { ElMessage } from 'element-plus'
 
 import MenuItem from './menuItem.vue'
 import { ElMenu, ElScrollbar } from 'element-plus'
 
-import type { MenuItemProps } from './type'
+import type { Menu } from './type'
 
 const [route, store] = [useRoute(), useHomeStore()]
 
 const { collapse, menuList, tabList } = storeToRefs(store)
 
-const { updateCollapse, updateMenuList, addTabToList } = store
+const { updateCollapse, updateMenuList, getMenuList } = store
 
 const loading = ref(false)
 
-const activeMenuItem = computed(() => route.path)
+const activeMenuItem = computed(() => route.path as string)
 
-const handleItemClick = (item: MenuItemProps) => {
-  const { title, path } = item
-  const { name = '' } = route
-  const tab = { name: name as string, title, path }
-  addTabToList(tab)
-}
 
 // tab 组件初始化
 const tabListInit = () => {
   const { addTabToList } = store
-  const { path = '', name = '' } = route  // 先获取当前路由的tab
+  const { path = '', name = '' } = route // 先获取当前路由的tab
 
-  const tabExit = !!tabList.value.find(t => t.path === path)
+  const tabExit = !!tabList.value.find((t) => t.path === path)
 
   // TODO tabList、menuList都不存在该路由的数据，则显示404或跳回首页
   if (!tabExit) {
-    const exitInMenu = menuList.value.find(item => item.path === path)
-    !!exitInMenu && addTabToList({ title: exitInMenu.title, name: name as string, path})
+    const exitInMenu = menuList.value.find((item) => item.path === path)
+    !!exitInMenu && addTabToList({ id: exitInMenu.id, name: name as string, path })
   }
 }
+
+// const formatMenu = (menus: Menu[]): Menu[] => {
+//   const list: Menu[] = []
+
+//   menus.forEach((menu) => {
+//     const { childList = [], status } = menu || {}
+
+//     if (status === '1') {
+//       if (childList.length) {
+//         menu.childList = formatMenu(childList)
+//       }
+//       return list.push(menu)
+//     }
+//   })
+//   return list
+// }
 
 const init = () => {
   loading.value = true
 
-  getMenuList({ name: 'admin' })
-    .then((res) => {
-      res.data.length && updateMenuList(res.data)
-
+  getMenuList()
+    .then((res: Menu[]) => {
+      updateMenuList(res)
       tabListInit()
     })
-    .finally(() => (loading.value = false))
+    .catch(() => {
+      ElMessage.error({message: '请求菜单列表失败', center: true})
+    })
+    .finally(() => {
+      loading.value = false
+    })
 }
 
-onBeforeMount(() => !menuList.value.length ? init() : tabListInit())
+onBeforeMount(() => {
+  // !menuList.value.length ? init() : tabListInit()
+  init()
+})
 </script>
 
 <style lang="scss" scoped>

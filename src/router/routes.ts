@@ -19,24 +19,31 @@ export default [
         component: () => import('../views/HomeView.vue'),
         meta: { requiredAuth: true }
       },
+      // 系统管理子系统
+      {
+        path: '/system',
+        name: 'system',
+        children: [
+          {
+            // 系统管理子系统 - 菜单管理
+            path: '/system/menu',
+            name: 'menu',
+            component: () => import('../views/menu/MenuList.vue')
+          },
+          {
+            // 系统管理 - 用户管理
+            path: '/system/user',
+            name: 'user',
+            component: () => import('../views/user/UserList.vue')
+          },
+        ]
+      },
       // 日志管理
       {
         path: '/log',
         name: 'logManage',
         component: () => import('../views/log/index.vue'),
         meta: { requiredAuth: false }
-      },
-      {
-        // 系统管理 - 用户管理
-        path: '/user',
-        name: 'user',
-        component: () => import('../views/user/UserList.vue')
-      },
-      {
-        // 系统管理 - 菜单管理
-        path: '/menu',
-        name: 'menu',
-        component: () => import('../views/menu/MenuList.vue')
       },
       {
         // 系统管理 - 区划管理

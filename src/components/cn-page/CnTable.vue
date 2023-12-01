@@ -1,6 +1,6 @@
 <script lang="ts">
-import { h, renderSlot } from 'vue'
-import { ElButton, ElTable, ElTableColumn } from 'element-plus'
+import { h, renderSlot, resolveComponent } from 'vue'
+import { ElButton, ElTable, ElTableColumn, ElIcon } from 'element-plus'
 import 'element-plus/es/components/button/style/css'
 import 'element-plus/es/components/table/style/css'
 import useDictionary from '@/hooks/useDictionary'
@@ -40,6 +40,10 @@ export default {
                       },
                       () => button.label
                     )
+                  )
+                } else if (column.icon) {
+                  return h(ElIcon, null, () =>
+                    h(resolveComponent(params.row.icon), { ...column.icon })
                   )
                 }
               }
