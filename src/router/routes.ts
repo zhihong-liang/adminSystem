@@ -35,7 +35,7 @@ export default [
             path: '/system/user',
             name: 'user',
             component: () => import('../views/user/UserList.vue')
-          },
+          }
         ]
       },
       // 日志管理
@@ -64,16 +64,28 @@ export default [
         component: () => import('../views/unit/UnitList.vue')
       },
       {
-        // 事项列表
-        path: '/matterList',
+        // 事项管理 - 事项列表
+        path: '/matter/matterList',
         name: 'matterList',
-        component: () => import('../views/matter-list/MatterList.vue')
+        component: () => import('../views/matter/matter-list/MatterList.vue')
       },
       {
-        // 事项标签管理
-        path: '/matterLabel',
+        // 事项管理 - 事项标签管理
+        path: '/matter/matterLabel',
         name: 'matterLabel',
-        component: () => import('../views/matter-label/MatterLabel.vue')
+        component: () => import('../views/matter/matter-label/MatterLabel.vue')
+      },
+      {
+        // 事项管理 - 业务部门管理
+        path: '/matter/businessUnit',
+        name: 'matterUnit',
+        component: () => import('../views/matter/business-unit/BusinessUnit.vue')
+      },
+      {
+        // 事项管理 - 服务公告管理
+        path: '/matter/serviceBulletin',
+        name: 'serviceBulletin',
+        component: () => import('../views/matter/service-bulletin/ServiceBulletin.vue')
       }
     ]
   }
