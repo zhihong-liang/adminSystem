@@ -102,6 +102,7 @@ defineExpose({ formRef })
 <style lang="scss" scoped>
 :deep(.el-select),
 :deep(.el-cascader),
+:deep(.el-input-number),
 :deep(.el-date-editor),
 :deep(.el-date-editor .el-input__wrapper) {
   width: 100%;

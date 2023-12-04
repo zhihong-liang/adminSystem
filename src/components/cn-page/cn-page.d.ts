@@ -19,7 +19,8 @@ import type {
   ButtonProps as ElButtonProps,
   DialogProps as ElDialogProps,
   formProps,
-  IconProps as ElIconProps
+  IconProps as ElIconProps,
+  InputNumberProps as ElInputNumberProps
 } from 'element-plus'
 
 declare namespace CnPage {
@@ -141,6 +142,7 @@ declare namespace CnPage {
     | FormItemRadioProps
     | FormItemDatePickerProps
     | FormItemCascaderProps
+    | FormItemInputNumberProps
     | FormItemGroupProps
     | FormItemSlotProps
 
@@ -235,6 +237,16 @@ declare namespace CnPage {
     props?: Record<string, unknown> & {
       options: ElCascaderOption[]
       props?: ElCascaderProps
+    }
+  }
+
+  /**
+   * 数字输入框
+   */
+  interface FormItemInputNumberProps extends FormItemProps {
+    component: 'inputnumber'
+    props?: {
+      -readonly [K in keyof ElInputNumberProps]?: ElInputNumberProps[K]
     }
   }
 
