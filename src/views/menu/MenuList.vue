@@ -127,15 +127,15 @@ const props: CnPage.Props = reactive({
       { prop: 'code', label: '编码' },
       { prop: 'path', label: '地址' },
       { prop: 'component', label: '组件' },
-      { prop: 'icon', label: '图标', icon: {} },
+      { prop: 'icon', label: '图标', icons: [{/*props: {}*/ }] }, // show：控制icon的显示？
       { prop: 'description', label: '描述' },
       {
         prop: 'action',
         label: '操作',
         minWidth: 120,
         buttons: [
-          { label: '编辑', type: 'primary', text: 'text', onClick: handleEdit },
-          { label: '删除', type: 'danger', text: 'text', onClick: handleRemove }
+          { label: '编辑', type: 'primary', text: true, onClick: handleEdit },
+          { label: '删除', type: 'danger', text: true, onClick: handleRemove }
         ]
       }
     ],

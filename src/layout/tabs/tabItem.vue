@@ -1,15 +1,15 @@
 <template>
-  <router-link :to="value.path">
-    <div :class="['tab-item-root', isActive ? 'active' : '']">
+  <div :class="['tab-item-root', isActive ? 'active' : '']">
+    <router-link :to="value.path" @click.prevent="handleTabClick">
       <div class="tab-item-title mr-md truncated">{{ value.name }}</div>
-      <el-icon size="12px" @click.prevent="handleCloseTab"><Close /></el-icon>
-    </div>
-  </router-link>
+    </router-link>
+    <el-icon size="12px" @click.stop="handleCloseTab"><Close /></el-icon>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import { useHomeStore } from '@/stores/home';
+import { computed } from 'vue'
+import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import { last } from 'lodash-es'
 import { useRouter } from 'vue-router'
@@ -17,23 +17,31 @@ import { useRouter } from 'vue-router'
 import type { TabItem } from '@/layout/tabs/type'
 
 const props = defineProps<{
-  value: TabItem,
+  value: TabItem
 }>()
+
+const emits = defineEmits(['close'])
 
 const [router, store] = [useRouter(), useHomeStore()]
 const { tabList, activeTab } = storeToRefs(store)
-const { updateTabList } = store
+const { updateTabList, updateActiveTab } = store
 
 const isActive = computed(() => activeTab.value === props.value.id)
+
+const handleTabClick = () => {
+  props.value.id && updateActiveTab(props.value.id)
+}
 
 const handleCloseTab = () => {
   if (tabList.value.length <= 1) return
 
-  const list: TabItem[] = tabList.value.filter(t => t.path !== props.value.path)
-  const lastTab = last(list) as TabItem
-  router.push({path: lastTab.path})
+  const list: TabItem[] = tabList.value.filter((t) => t.path !== props.value.path)
+  const { id, path } = last(list) as TabItem
 
   updateTabList(list)
+  updateActiveTab(id as number)
+
+  router.push({ path })
 }
 </script>
 
@@ -54,9 +62,16 @@ const handleCloseTab = () => {
   &:hover {
     color: var(--system-primary-color);
   }
+  & a:hover {
+    color: var(--system-primary-color);
+  }
 
   &.active {
     color: var(--system-primary-color);
+
+    & a {
+      color: var(--system-primary-color);
+    }
   }
   .tab-item-title {
     font-size: 14px;
