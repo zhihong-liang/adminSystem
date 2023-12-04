@@ -143,6 +143,7 @@ declare namespace CnPage {
     | FormItemDatePickerProps
     | FormItemCascaderProps
     | FormItemInputNumberProps
+    | FormItemAdministrativeDivisionProps
     | FormItemGroupProps
     | FormItemSlotProps
 
@@ -234,7 +235,8 @@ declare namespace CnPage {
    */
   interface FormItemCascaderProps extends FormItemProps {
     component: 'cascader'
-    props?: Record<string, unknown> & {
+    props?: {
+      [key: string]: any
       options: ElCascaderOption[]
       props?: ElCascaderProps
     }
@@ -247,6 +249,17 @@ declare namespace CnPage {
     component: 'inputnumber'
     props?: {
       -readonly [K in keyof ElInputNumberProps]?: ElInputNumberProps[K]
+    }
+  }
+
+  /**
+   * 行政区划
+   */
+  interface FormItemAdministrativeDivisionProps extends FormItemProps {
+    component: 'ad'
+    props?: {
+      [key: string]: any
+      props?: ElCascaderProps
     }
   }
 

@@ -2,6 +2,7 @@
 import { computed, reactive, ref, watchEffect, type PropType, type UnwrapNestedRefs } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CnFormItem from './CnFormItem.vue'
+import CnAdministrativeDivision from './CnAdministrativeDivision.vue'
 
 const props = defineProps({
   model: { type: Object, default: () => ({}) },
@@ -21,6 +22,8 @@ watchEffect(() => {
     if (!item.visible) {
       item.visible = () => true
     }
+
+    if (!item.prop) return
 
     // 把 prop 统一转成字符串，这是给 form 表单校验用的
     const itemProp = Array.isArray(item.prop) ? item.prop.join('.') : item.prop || ''
@@ -44,15 +47,29 @@ watchEffect(() => {
     ) {
       model[last] = []
     }
+
     // 设置组件的双向绑定
-    modelValue[item.prop] = computed({
-      get() {
-        return model[last]
-      },
-      set(val) {
-        model[last] = val
-      }
-    })
+    if (item.component === 'ad') {
+      ;['provinceCode', 'cityCode', 'districtCode', 'streetCode', 'villageCode'].forEach((prop) => {
+        modelValue[prop] = computed({
+          get() {
+            return model[prop]
+          },
+          set(val) {
+            model[prop] = val
+          }
+        })
+      })
+    } else {
+      modelValue[item.prop] = computed({
+        get() {
+          return model[last]
+        },
+        set(val) {
+          model[last] = val
+        }
+      })
+    }
   })
 })
 
@@ -79,6 +96,11 @@ defineExpose({ formRef })
       >
         <el-form-item v-bind="rest" :rules="readonly ? undefined : rest.rules">
           <slot v-if="component === 'slot'" :name="rest.prop" />
+          <CnAdministrativeDivision
+            v-else-if="component === 'ad'"
+            v-bind="props"
+            :model="modelValue"
+          />
           <CnFormItem
             v-else
             v-bind="props"

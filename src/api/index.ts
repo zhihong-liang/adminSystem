@@ -1,9 +1,13 @@
 import axios from 'axios'
 import type { Menu } from '@/layout/slider/type'
-
+import { ElMessage } from 'element-plus'
+import { getToken } from '@/utils/auth'
+import router from '@/router'
+import { start, close } from "@/utils/nprogress"
 axios.interceptors.request.use(
   (config) => {
-    config.headers.Authorization = window.sessionStorage.getItem('token')
+    start()
+    config.headers.Authorization = getToken()
     return config
   },
   (err) => {
@@ -12,10 +16,18 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   ({ data }) => {
-    if (data.code === '200') return data
+    close()
+    if (data.code === '200') {
+      return data
+    }
+    if (data.code === '600') {
+      router.replace('/login')
+    }
+    ElMessage.error(data.message);
     return Promise.reject(data)
   },
   (err) => {
+    close()
     return err
   }
 )
