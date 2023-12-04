@@ -73,6 +73,7 @@ import CryptoJS from 'crypto-js'
 import { login } from '@/api'
 import { useUserStore } from '@/stores'
 import { isRegularExpressionLiteral } from 'typescript'
+import { setToken, clearToken, getToken } from '@/utils/auth'
 const store = useUserStore()
 
 const router = useRouter()
@@ -107,20 +108,17 @@ const handleLogin = async () => {
         userName: form.username,
         password: password
       }).then((res) => {
-        store.token = res.data.accessToken
-        // 把值都存到localStoreage中
+        setToken(res.data.accessToken)
         if (form.remember) {
           localStorage.setItem('userName', form.username)
           localStorage.setItem('password', form.password)
           localStorage.setItem('remember', form.remember ? '1' : '0')
         } else {
-          // 反之清除
           localStorage.removeItem('username')
           localStorage.removeItem('password')
           localStorage.removeItem('remember')
         }
         Message.success('登录成功')
-
         router.push('/home')
       })
     }

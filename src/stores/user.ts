@@ -4,7 +4,7 @@ import { setToken, clearToken, getToken } from '@/utils/auth'
 
 const storeSetup = () => {
 
-  const token = ref('')
+  const token = ref(getToken() || '')
   const userInfo = ref({})
 
   // 重置token
