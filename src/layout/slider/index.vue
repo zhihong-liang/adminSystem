@@ -59,22 +59,6 @@ const tabListInit = () => {
   }
 }
 
-// const formatMenu = (menus: Menu[]): Menu[] => {
-//   const list: Menu[] = []
-
-//   menus.forEach((menu) => {
-//     const { childList = [], status } = menu || {}
-
-//     if (status === '1') {
-//       if (childList.length) {
-//         menu.childList = formatMenu(childList)
-//       }
-//       return list.push(menu)
-//     }
-//   })
-//   return list
-// }
-
 const init = () => {
   loading.value = true
 

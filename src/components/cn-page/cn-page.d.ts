@@ -18,7 +18,8 @@ import type {
   CascaderOption as ElCascaderOption,
   ButtonProps as ElButtonProps,
   DialogProps as ElDialogProps,
-  formProps
+  formProps,
+  IconProps as ElIconProps
 } from 'element-plus'
 
 declare namespace CnPage {
@@ -98,7 +99,7 @@ declare namespace CnPage {
     columns: TableColumnProps<T>[]
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
-    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icon: ElIcon }
+    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icons: ElIconProps<T>[] }
   >
 
   /**

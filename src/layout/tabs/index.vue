@@ -21,6 +21,12 @@ import TabItem from './tabItem.vue'
 
 const store = useHomeStore()
 const { tabList } = storeToRefs(store)
+
+// const handleTabClose = (item) => {
+//   if (tabList.value.length <= 1) return
+//   const list: TabItem[] = tabList.value.filter((t) => t.path !== props.value.path)
+//   const { id, path } = last(list) as TabItem
+// }
 </script>
 
 <style lang="scss" scoped>
