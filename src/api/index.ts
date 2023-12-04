@@ -1,5 +1,6 @@
 import axios from 'axios'
 import type { Menu } from '@/layout/slider/type'
+import { ElMessage } from 'element-plus'
 
 axios.interceptors.request.use(
   (config) => {
@@ -13,6 +14,7 @@ axios.interceptors.request.use(
 axios.interceptors.response.use(
   ({ data }) => {
     if (data.code === '200') return data
+    ElMessage.error(data.message);
     return Promise.reject(data)
   },
   (err) => {
