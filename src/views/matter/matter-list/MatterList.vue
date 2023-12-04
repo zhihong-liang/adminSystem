@@ -1,5 +1,5 @@
 <template>
-  <div class="matter-list">
+  <div>
     <CnPage v-bind="props">
       <template #status="{ row }">
         <span>{{ row.id }}</span>
@@ -56,7 +56,7 @@ const props = reactive<CnPage.Props>({
   // action: () => Promise.reject('暂无数据'),
   action: getUsers,
   search: searchConfig,
-  toolbar: getTollbarConifg(tollbarClick),
+  toolbar: getTollbarConifg(showDialog),
   table: getTableConfig(handleTableActionClick),
   pagination: {
     page: 1,
@@ -88,7 +88,7 @@ function authenticationTypeVisible() {
 }
 
 // 设置tollbar点击弹窗的配置
-function tollbarClick(handle: tollbarActionType) {
+function showDialog(handle: tollbarActionType) {
   const dialogConfig = getTollBarActionDialogConfig(
     handle,
     submit,
@@ -116,10 +116,4 @@ function setTableActionDialogConfig() {
 }
 </script>
 
-<style scoped lang="scss">
-.matter-list {
-  margin: 30px;
-  padding: 20px;
-  border: 1px solid #ccc;
-}
-</style>
+<style scoped lang="scss"></style>
