@@ -1,9 +1,13 @@
 import axios from 'axios'
 import type { Menu } from '@/layout/slider/type'
-
+import { ElMessage } from 'element-plus'
+import { getToken } from '@/utils/auth'
+import router from '@/router'
+import { start, close } from "@/utils/nprogress"
 axios.interceptors.request.use(
   (config) => {
-    config.headers.Authorization = window.sessionStorage.getItem('token')
+    start()
+    config.headers.Authorization = getToken()
     return config
   },
   (err) => {
@@ -12,10 +16,18 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   ({ data }) => {
-    if (data.code === '200') return data
+    close()
+    if (data.code === '200') {
+      return data
+    }
+    if (data.code === '600') {
+      router.replace('/login')
+    }
+    ElMessage.error(data.message);
     return Promise.reject(data)
   },
   (err) => {
+    close()
     return err
   }
 )
@@ -63,10 +75,14 @@ interface Login {
 export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/logon', data)
 
 /**
- * 获取字典，demo 接口，后续替换成后端接口
+ * 获取字典接口
  */
-export const getDictionary = (params: string[]): Promise<any> =>
-  axios.get('/dictionary', { params })
+interface Dict {
+  subtype: string
+  description: string
+}
+export const getDictionary = (typeList: string[]): Promise<Res<Record<string, Dict[]>>> =>
+  axios.post('/api/admin/dict/getOptionsList', typeList)
 
 // export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
 

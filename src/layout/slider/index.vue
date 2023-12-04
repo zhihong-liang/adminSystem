@@ -44,7 +44,6 @@ const loading = ref(false)
 
 const activeMenuItem = computed(() => route.path as string)
 
-
 // tab 组件初始化
 const tabListInit = () => {
   const { addTabToList } = store
@@ -68,7 +67,7 @@ const init = () => {
       tabListInit()
     })
     .catch(() => {
-      ElMessage.error({message: '请求菜单列表失败', center: true})
+      // ElMessage.error({message: '请求菜单列表失败', center: true})
     })
     .finally(() => {
       loading.value = false
