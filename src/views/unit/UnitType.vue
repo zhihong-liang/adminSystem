@@ -5,10 +5,18 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
+import { ElMessage } from 'element-plus'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { useDelete } from '@/hooks/useConfirm'
-import { getUnitTypeList, updateUnitTypeSort, addUnitType, editUnitType, delUnitType, type UnitType } from '@/api/admin'
+import {
+  getUnitTypeList,
+  updateUnitTypeSort,
+  addUnitType,
+  editUnitType,
+  delUnitType,
+  type UnitType
+} from '@/api/admin'
 
 type UnitTypeReq = Partial<Omit<UnitType, 'dataPermissionPolicy'>> & {
   dataPermissionPolicy?: string[]
@@ -74,10 +82,11 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
             onClick: ({ row }) => {
               updateUnitTypeSort('upper', row.id)
                 .then((res) => {
-                  console.log(res)
+                  ElMessage.success(res.message || '操作成功')
+                  props.refresh = Date.now()
                 })
                 .catch((err) => {
-                  console.log(err)
+                  ElMessage.warning(err.message || '操作失败')
                 })
             }
           },
@@ -87,10 +96,11 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
             onClick: ({ row }) => {
               updateUnitTypeSort('below', row.id)
                 .then((res) => {
-                  console.log(res)
+                  ElMessage.success(res.message || '操作成功')
+                  props.refresh = Date.now()
                 })
                 .catch((err) => {
-                  console.log(err)
+                  ElMessage.warning(err.message || '操作失败')
                 })
             }
           },
