@@ -32,7 +32,7 @@ const dialogProps = reactive<CnPage.DialogProps<UnitTypeReq>>({
         label: '数据权限策略',
         prop: 'dataPermissionPolicy',
         component: 'checkbox',
-        props: { options: [{ label: '本单位', value: '1' }] }
+        dict: 'DATA_PERMISSION_POLICY'
       }
     ],
     labelWidth: 120,

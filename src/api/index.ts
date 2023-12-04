@@ -63,10 +63,10 @@ interface Login {
 export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/logon', data)
 
 /**
- * 获取字典，demo 接口，后续替换成后端接口
+ * 获取字典接口
  */
-export const getDictionary = (params: string[]): Promise<any> =>
-  axios.get('/dictionary', { params })
+export const getDictionary = (typeList: string[]): Promise<any> =>
+  axios.post('/api/admin/dict/getOptionsList', typeList)
 
 // export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
 

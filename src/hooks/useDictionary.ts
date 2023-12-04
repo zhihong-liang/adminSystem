@@ -37,7 +37,10 @@ function useDictionary(
       types.length = 0
       getDictionary(newTypes).then((res) => {
         for (const key in res.data) {
-          dict[key].value = res.data[key]
+          dict[key].value = res.data[key].map(v => ({
+            label: v.description,
+            value: v.subtype
+          }))
         }
       })
     }, timeout)
