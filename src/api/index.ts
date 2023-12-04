@@ -65,7 +65,11 @@ export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/lo
 /**
  * 获取字典接口
  */
-export const getDictionary = (typeList: string[]): Promise<any> =>
+interface Dict {
+  subtype: string
+  description: string
+}
+export const getDictionary = (typeList: string[]): Promise<Res<Record<string, Dict[]>>> =>
   axios.post('/api/admin/dict/getOptionsList', typeList)
 
 // export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
