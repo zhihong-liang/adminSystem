@@ -64,6 +64,7 @@ export const useHomeStore = defineStore('home', () => {
 
     // 当前激活状态的tab，跟菜单的id关联
     const activeTab = ref<number | undefined>()
+    const activeTabCpt = computed(() => activeTab.value)
     function updateActiveTab(id: number) {
         activeTab.value = id
     }
@@ -75,6 +76,7 @@ export const useHomeStore = defineStore('home', () => {
         activeTab,
         modules,
         finalMenuList,
+        activeTabCpt,
         getMenuList,
         updateCollapse,
         addTabToList,

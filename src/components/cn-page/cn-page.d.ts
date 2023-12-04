@@ -18,7 +18,9 @@ import type {
   CascaderOption as ElCascaderOption,
   ButtonProps as ElButtonProps,
   DialogProps as ElDialogProps,
-  formProps
+  formProps,
+  IconProps as ElIconProps,
+  InputNumberProps as ElInputNumberProps
 } from 'element-plus'
 
 declare namespace CnPage {
@@ -98,7 +100,7 @@ declare namespace CnPage {
     columns: TableColumnProps<T>[]
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
-    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icon: ElIcon }
+    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icons: ElIconProps<T>[] }
   >
 
   /**
@@ -140,6 +142,7 @@ declare namespace CnPage {
     | FormItemRadioProps
     | FormItemDatePickerProps
     | FormItemCascaderProps
+    | FormItemInputNumberProps
     | FormItemGroupProps
     | FormItemSlotProps
 
@@ -234,6 +237,16 @@ declare namespace CnPage {
     props?: Record<string, unknown> & {
       options: ElCascaderOption[]
       props?: ElCascaderProps
+    }
+  }
+
+  /**
+   * 数字输入框
+   */
+  interface FormItemInputNumberProps extends FormItemProps {
+    component: 'inputnumber'
+    props?: {
+      -readonly [K in keyof ElInputNumberProps]?: ElInputNumberProps[K]
     }
   }
 

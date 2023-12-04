@@ -41,10 +41,12 @@ export default {
                       () => button.label
                     )
                   )
-                } else if (column.icon) {
-                  return h(ElIcon, null, () =>
-                    h(resolveComponent(params.row.icon), { ...column.icon })
-                  )
+                } else if (column.icons) {
+                  return column.icons.map(icon => {
+                    if (params.row.icon) {
+                      return h(ElIcon, null, () => h(resolveComponent(params.row.icon), { ...icon.props }))
+                    }
+                  })
                 }
               }
             }

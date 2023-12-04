@@ -1,6 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { start, close } from '@/utils/nprogress'
-import { useHomeStore } from '@/stores/home'
 import Routes from './routes'
 import Demo from './demo'
 
@@ -17,13 +16,7 @@ router.beforeEach(() => {
   start();
 })
 
-router.afterEach((to, from) => {
-  // const { updateActiveTab } = useHomeStore()
-
-  // if (to.path !== from.path) {
-  //   updateActiveTab(to.meta.id as number)
-  // }
-
+router.afterEach(() => {
   close();
 })
 
