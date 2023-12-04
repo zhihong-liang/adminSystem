@@ -74,6 +74,18 @@ export default [
         path: '/matterLabel',
         name: 'matterLabel',
         component: () => import('../views/matter-label/MatterLabel.vue')
+      },
+      {
+        // 设备列表
+        path: '/device',
+        name: 'device',
+        component: () => import('../views/device/index.vue')
+      },
+      {
+        // 注销设备列表
+        path: '/logOffDevice',
+        name: 'logOffDevice',
+        component: () => import('../views/logOffDevice/index.vue')
       }
     ]
   }
