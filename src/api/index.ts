@@ -3,9 +3,10 @@ import type { Menu } from '@/layout/slider/type'
 import { ElMessage } from 'element-plus'
 import { getToken } from '@/utils/auth'
 import router from '@/router'
-
+import { start, close } from "@/utils/nprogress"
 axios.interceptors.request.use(
   (config) => {
+    start()
     config.headers.Authorization = getToken()
     return config
   },
@@ -15,7 +16,10 @@ axios.interceptors.request.use(
 )
 axios.interceptors.response.use(
   ({ data }) => {
-    if (data.code === '200') return data
+    close()
+    if (data.code === '200') {
+      return data
+    }
     if (data.code === '600') {
       router.replace('/login')
     }
@@ -23,6 +27,7 @@ axios.interceptors.response.use(
     return Promise.reject(data)
   },
   (err) => {
+    close()
     return err
   }
 )

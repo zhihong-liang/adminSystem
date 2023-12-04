@@ -14,6 +14,12 @@ export default [
     redirect: '/home',
     children: [
       {
+        path: '/dict',
+        name: 'dict',
+        component: () => import('../views/sys/dict/index.vue'),
+        meta: { requiredAuth: true }
+      },
+      {
         path: '/home',
         name: 'homeView',
         component: () => import('../views/HomeView.vue'),
