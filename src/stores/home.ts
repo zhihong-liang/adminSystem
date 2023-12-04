@@ -5,6 +5,10 @@ import { getMenuList as queryMenuList } from '@/api'
 import type { TabItem } from '@/layout/tabs/type'
 import type { Menu } from '@/layout/slider/type'
 
+export interface getMenuListPayloadOptions {
+    manual?: boolean // 手动更新，默认自动更新
+}
+
 export const useHomeStore = defineStore('home', () => {
     // -------slider---------
     const collapse = ref(false) // 菜单是否折叠
@@ -12,11 +16,10 @@ export const useHomeStore = defineStore('home', () => {
         collapse.value = !collapse.value
     }
 
-
     const menuList = ref<Menu[]>([])  // 菜单列表
     const finalMenuList = computed(() => menuList.value)
     // 请求菜单列表
-    async function getMenuList(): Promise<Menu[]> {
+    async function getMenuList({ manual = false }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
         const formatMenu = (menus: Menu[]): Menu[] => {
             const list: Menu[] = []
@@ -35,13 +38,20 @@ export const useHomeStore = defineStore('home', () => {
         }
 
         const _res = await queryMenuList({})
+        const { data = [], code } = _res
 
         return new Promise((resolve, reject) => {
-            const { data = [], code } = _res
-            if (code === '200') {
-                resolve(formatMenu(data))
+            if (manual) {
+                if (code === '200') {
+                    resolve(formatMenu(data))
+                }
             } else {
-                reject(_res)
+                if (code === '200') {
+                    updateMenuList(data)
+                    resolve([])
+                } else {
+                    reject(_res)
+                }
             }
         })
     }

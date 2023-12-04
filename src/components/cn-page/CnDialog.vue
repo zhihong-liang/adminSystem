@@ -15,7 +15,6 @@
         </CnForm>
       </slot>
 
-      <!-- 如果不需要form组件，能否自定义? -->
       <slot v-else></slot>
     </template>
 
