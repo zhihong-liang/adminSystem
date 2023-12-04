@@ -7,6 +7,7 @@ import CnRadio from './CnRadio.vue'
 import CnDatePicker from './CnDatePicker.vue'
 import CnCascader from './CnCascader.vue'
 import CnReadonly from './CnReadonly.vue'
+import CnIcon from './CnIcon.vue'
 
 defineProps(['component', 'dict', 'readonly'])
 </script>
@@ -20,4 +21,5 @@ defineProps(['component', 'dict', 'readonly'])
   <CnRadio v-else-if="component === 'radio'" />
   <CnDatePicker v-else-if="component === 'datepicker'" />
   <CnCascader v-else-if="component === 'cascader'" />
+  <CnIcon v-else-if="component === 'icon'" />
 </template>

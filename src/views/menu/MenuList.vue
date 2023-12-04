@@ -1,6 +1,13 @@
 <template>
   <CnPage v-bind="props"></CnPage>
   <CnDialog v-bind="dialogProps" ref="dialogRef" @success="queryMenuList">
+    <template #icon>
+      <el-input v-model="dialogProps.formProps!.model.icon" disabled>
+        <template #append>
+          <el-button @click="() => IconDialogRef?.open()">选择</el-button>
+        </template>
+      </el-input>
+    </template>
     <template #status>
       <el-radio-group v-model="dialogProps.formProps!.model!.status">
         <el-radio label="1" size="large">启用</el-radio>
@@ -8,6 +15,7 @@
       </el-radio-group>
     </template>
   </CnDialog>
+  <IconDialog v-model:value="dialogProps.formProps!.model.icon" ref="IconDialogRef" />
 </template>
 
 <script lang="ts" setup>
@@ -21,6 +29,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
+import IconDialog from './iconsDialog.vue'
 
 import type { Menu } from '@/layout/slider/type'
 
@@ -31,14 +40,6 @@ const { modules } = storeToRefs(store)
 const componentMenu = computed(() =>
   Object.keys(modules.value).map((m) => ({ value: m.replace('..', '') }))
 )
-
-// 模拟数据
-const menuTree = [
-  { title: '首页', sort: 1, id: 1 },
-  { title: '个人中心', sort: 2, id: 2, children: [{ title: '用户详情', sort: 99, id: 99 }] },
-  { title: '设备管理', sort: 3, id: 3 },
-  { title: '农信社特派员', sort: 4, id: 4 }
-]
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps: CnPage.DialogProps = reactive({
@@ -57,7 +58,13 @@ const dialogProps: CnPage.DialogProps = reactive({
           options: componentMenu.value
         }
       },
-      { label: '图标', prop: 'icon', component: 'input' },
+      {
+        label: '图标',
+        prop: 'icon',
+        component: 'slot'
+        // props: { slots: [{ name: 'append', component: 'icon', label: 'Flag' }] },
+        // slots: []
+      },
       {
         label: '父级菜单',
         prop: 'parentId',
@@ -95,6 +102,8 @@ const dialogProps: CnPage.DialogProps = reactive({
   }
 })
 
+const IconDialogRef = ref<InstanceType<typeof CnDialog>>()
+
 const props: CnPage.Props = reactive({
   params: {},
   action: (params) => checkMenuList(params),
@@ -127,7 +136,15 @@ const props: CnPage.Props = reactive({
       { prop: 'code', label: '编码' },
       { prop: 'path', label: '地址' },
       { prop: 'component', label: '组件' },
-      { prop: 'icon', label: '图标', icons: [{/*props: {}*/ }] }, // show：控制icon的显示？
+      {
+        prop: 'icon',
+        label: '图标',
+        icons: [
+          {
+            /*props: {}*/
+          }
+        ]
+      }, // show：控制icon的显示？
       { prop: 'description', label: '描述' },
       {
         prop: 'action',
@@ -151,7 +168,7 @@ function handleTransformResp(res: ListRes) {
 
   if (code !== '200') return ElMessage.error({ message: '查询失败' })
 
-  return { code, total, rows: assembleData(rows as Menu[])}
+  return { code, total, rows: assembleData(rows as Menu[]) }
 }
 
 // 把扁平化的树结构还原
