@@ -52,6 +52,18 @@ export default [
         ]
       },
       {
+        // 日志管理 - 操作日志
+        path: '/log/operation',
+        name: 'OperationLog',
+        component: () => import('../views/log/OperationLog.vue')
+      },
+      {
+        // 日志管理 - 登录日志
+        path: '/log/logging',
+        name: 'LoggingLog',
+        component: () => import('../views/log/LoggingLog.vue')
+      },
+      {
         // 系统管理 - 区划管理
         path: '/division',
         name: 'division',

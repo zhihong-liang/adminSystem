@@ -39,7 +39,8 @@ export const editUnit = (data: Unit): Promise<Res> => axios.put('/api/admin/unit
 // 删除
 export const delUnit = (ids: string): Promise<Res> => axios.delete(`/api/admin/unit/${ids}`)
 // 获取详情
-export const getUnitDetail = (id: Unit['id']): Promise<Res<Unit>> => axios.get(`/api/admin/unit/${id}`)
+export const getUnitDetail = (id: Unit['id']): Promise<Res<Unit>> =>
+  axios.get(`/api/admin/unit/${id}`)
 
 /**
  * 单位类型
@@ -64,3 +65,22 @@ export const addUnitType = (data: UnitType): Promise<Res> => axios.post('/api/ad
 export const editUnitType = (data: UnitType): Promise<Res> => axios.put('/api/admin/unitType', data)
 // 删除
 export const delUnitType = (ids: string): Promise<Res> => axios.delete(`/api/admin/unitType/${ids}`)
+
+/**
+ * 日志管理
+ */
+// 操作日志
+export const getOperationLog = (data: ListReq): Promise<ListRes> =>
+  axios.post('/api/admin/operationLog/getPageList', data)
+// 登录日志
+export interface LoginLog {
+  id?: number
+  loginName?: string
+  userNo?: string
+  loginIp?: string
+  os?: string
+  browser?: string
+  description?: string
+}
+export const getLoginLog = (data: ListReq<LoginLog>): Promise<ListRes<LoginLog>> =>
+  axios.post('/api/admin/loginLog/ajaxList', data)
