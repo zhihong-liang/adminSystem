@@ -14,6 +14,9 @@
           </template>
         </CnForm>
       </slot>
+
+      <!-- 如果不需要form组件，能否自定义? -->
+      <slot v-else></slot>
     </template>
 
     <template #footer>
@@ -76,5 +79,8 @@ function handleClosed() {
 function open() {
   visible.value = true
 }
-defineExpose({ open })
+function close() {
+  visible.value = false
+}
+defineExpose({ open, close })
 </script>

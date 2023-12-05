@@ -11,9 +11,9 @@ NProgress.configure({
 });
 
 export const start = () => {
-	NProgress.start();
+    NProgress.start();
 };
 
 export const close = () => {
-	NProgress.done();
+    NProgress.done();
 };

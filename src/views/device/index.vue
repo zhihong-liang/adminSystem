@@ -1,24 +1,35 @@
 <template>
   <CnPage v-bind="props" />
   <CnDialog ref="dialogRef" v-bind="dialogProps">
-    <template #tabs>
-      <el-radio-group v-model="activeName" @change="setTableActionDialogConfig">
-        <el-radio-button label="basicInfo">基本信息</el-radio-button>
-        <el-radio-button label="configInfo">配置信息</el-radio-button>
-      </el-radio-group>
-    </template>
+    <el-tabs v-model="activeName" class="demo-tabs">
+      <el-tab-pane label="基本信息" name="1">
+        <BasicInfo></BasicInfo>
+      </el-tab-pane>
+      <el-tab-pane label="部署场所" name="2">
+        <DeploymentSite></DeploymentSite>
+      </el-tab-pane>
+      <el-tab-pane label="配置信息" name="3">
+        <ConfigInfo></ConfigInfo>
+      </el-tab-pane>
+    </el-tabs>
   </CnDialog>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
-import CnDialog from '@/components/cn-page/CnDialog.vue'
-import { getTollBarActionDialogConfig, getTableActionConfig } from './config/dialog-config'
+import CnDialog from '@/components/cn-page/CnDialog.vue';
+import BasicInfo from './child/basicInfo.vue';
+import DeploymentSite from './child/deploymentSite.vue';
+import ConfigInfo from './child/configInfo.vue';
+// import { getTollBarActionDialogConfig, getTableActionConfig } from './config/dialog-config';
 // import { getDivisionList } from "@/api/admin";
+const activeName = ref("1")
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
-const dialogProps = reactive<CnPage.DialogProps>({})
+const dialogProps = reactive<CnPage.DialogProps>({
+  title: "设备详情"
+})
 
 
 const props = reactive<CnPage.Props>({
@@ -57,7 +68,7 @@ const props = reactive<CnPage.Props>({
         type: "primary",
         onClick: () => {
           dialogRef.value?.open();
-          dialogProps.action = () => handleSubmit('view')
+          // dialogProps.action = () => handleSubmit('view')
         },
       },
       {

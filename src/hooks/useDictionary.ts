@@ -1,5 +1,6 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import { getDictionary } from '@/api'
+import { getUnitTypeList } from '@/api/admin'
 
 // 定时器
 let timer = 0
@@ -26,7 +27,13 @@ function useDictionary(
   if (typeof type === 'string') {
     if (!dict[type]) {
       dict[type] = ref<CnPage.OptionProps[]>([])
-      types.push(type)
+
+      // 单位类型调单独接口获取
+      if (type === 'UNIT_TYPE') {
+        getUnitTypeDict()
+      } else {
+        types.push(type)
+      }
     }
 
     // 等一下，人齐了才发车
@@ -37,7 +44,10 @@ function useDictionary(
       types.length = 0
       getDictionary(newTypes).then((res) => {
         for (const key in res.data) {
-          dict[key].value = res.data[key]
+          dict[key].value = res.data[key].map(v => ({
+            label: v.description,
+            value: v.subtype
+          }))
         }
       })
     }, timeout)
@@ -57,3 +67,12 @@ function useDictionary(
 }
 
 export default useDictionary
+
+function getUnitTypeDict() {
+  getUnitTypeList({ page: 1, size: 1000, obj: {} }).then(res => {
+    dict['UNIT_TYPE'].value = res.rows.map(v => ({
+      label: v.unitTypeName,
+      value: v.id.toString()
+    }))
+  })
+}

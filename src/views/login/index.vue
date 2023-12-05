@@ -11,21 +11,22 @@
           <el-form
             ref="FormRef"
             :model="form"
+            :rules="rules"
             :style="{ width: '84%' }"
             :label-col-style="{ display: 'none' }"
             :wrapper-col-style="{ flex: 1 }"
           >
             <h3 class="login-form-title">
-              <img class="logo" src="/public/favicon.ico" /><span>LOGO</span>
+              <img class="logo" src="/public/favicon.ico" /><span>自助政务服务平台</span>
             </h3>
-            <el-form-item field="username">
+            <el-form-item prop="username">
               <el-input v-model="form.username" placeholder="账号" clearable>
                 <template #prefix>
                   <el-icon class="el-input__icon"><User /></el-icon>
                 </template>
               </el-input>
             </el-form-item>
-            <el-form-item field="password">
+            <el-form-item prop="password">
               <el-input
                 v-model="form.password"
                 placeholder="密码"
@@ -40,14 +41,13 @@
             </el-form-item>
             <el-form-item>
               <div class="checked_password">
-                <el-checkbox v-model="checked">记住密码</el-checkbox>
+                <el-checkbox v-model="form.remember">记住密码</el-checkbox>
                 <a>忘记密码</a>
               </div>
             </el-form-item>
-
             <el-row>
               <el-col :span="24">
-                <el-button type="primary" @click="login" class="full-btn">登录</el-button>
+                <el-button type="primary" @click="handleLogin" class="full-btn">登录</el-button>
               </el-col>
               <el-col :span="24">
                 <el-button text="plain" class="full-btn register-btn">注册账号</el-button>
@@ -69,43 +69,60 @@ import { ref, reactive } from 'vue'
 import { ElMessage as Message } from 'element-plus'
 import { useRouter } from 'vue-router'
 import LoginBg from './components/LoginBg/index.vue'
+import CryptoJS from 'crypto-js'
+import { login } from '@/api'
+import { useUserStore } from '@/stores'
+import { isRegularExpressionLiteral } from 'typescript'
+import { setToken, clearToken, getToken } from '@/utils/auth'
+const store = useUserStore()
 
-defineOptions({ name: 'Login' })
 const router = useRouter()
-// const userStore = useUserStore()
 
 const form = reactive({
-  username: 'admin',
-  password: '123456'
+  username: localStorage.getItem('userName') || '',
+  password: localStorage.getItem('password') || '',
+  remember: Boolean(localStorage.getItem('remember')) || false
 })
 
-// 记住密码
-const checked = ref(false)
+const rules = reactive({
+  username: [{ required: true, message: '请输入账号', trigger: 'blur' }],
+  password: [{ required: true, message: '请输入密码', trigger: 'blur' }]
+})
+
 // 登录加载
 // const { loading, setLoading } = useLoading()
 const errorMessage = ref('')
 
 const FormRef = ref<any>()
 // 点击登录
-const login = async () => {
-  //   try {
-  //     const flag = await FormRef.value?.validate()
-  //     if (flag) return
-  //     // setLoading(true)
-  //     await userStore.login(form)
-  //     const { redirect, ...othersQuery } = router.currentRoute.value.query
-  //     router.push({
-  //       path: (redirect as string) || '/',
-  //       query: {
-  //         ...othersQuery
-  //       }
-  //     })
-  //     Message.success('登录成功')
-  //   } catch (error) {
-  //     errorMessage.value = (error as Error).message
-  //   } finally {
-  //     // setLoading(false)
-  //   }
+const handleLogin = async () => {
+  const key = CryptoJS.enc.Utf8.parse('nanshagrid1@3456')
+  const password = CryptoJS.AES.encrypt(form.password, key, {
+    iv: key,
+    mode: CryptoJS.mode.ECB,
+    padding: CryptoJS.pad.Pkcs7
+  }).toString()
+  FormRef.value.validate((valid: boolean) => {
+    if (valid) {
+      login({
+        userName: form.username,
+        password: password
+      }).then((res) => {
+        setToken(res.data.accessToken)
+        if (form.remember) {
+          localStorage.setItem('userName', form.username)
+          localStorage.setItem('password', form.password)
+          localStorage.setItem('remember', form.remember ? '1' : '0')
+        } else {
+          localStorage.removeItem('username')
+          localStorage.removeItem('password')
+          localStorage.removeItem('remember')
+        }
+        Message.success('登录成功')
+        router.push('/home')
+      })
+    }
+  })
 }
 </script>
 

@@ -6,6 +6,7 @@ export default function getTableConfig(
   return {
     data: [],
     columns: [
+      { type: 'selection' },
       { label: '粤智助事项编码', prop: 'itemId', slot: 'itemId' },
       { label: '事项别名', prop: 'rename' },
       { label: '事项名称', prop: 'name' },

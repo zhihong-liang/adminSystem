@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
-import * as ELIcons from "@element-plus/icons-vue";
+import * as ElIcons from "@element-plus/icons-vue";
 import App from './App.vue'
 import router from './router'
 import moment from 'moment'
@@ -17,8 +17,8 @@ moment.locale('zh-cn')
 
 const app = createApp(App)
 
-for (let iconName in ELIcons) {
-    app.component(iconName, (ELIcons as any)[iconName]);
+for (let iconName in ElIcons) {
+    app.component(iconName, (ElIcons as any)[iconName]);
 }
 
 const pinia = createPinia()

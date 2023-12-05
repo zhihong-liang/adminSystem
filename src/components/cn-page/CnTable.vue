@@ -44,7 +44,7 @@ export default {
                 } else if (column.icons) {
                   return column.icons.map(icon => {
                     if (params.row.icon) {
-                      return h(ElIcon, null, () => h(resolveComponent(params.row.icon), { ...icon.props }))
+                      return h(ElIcon, { ...icon.props }, () => h(resolveComponent(params.row.icon)))
                     }
                   })
                 }
