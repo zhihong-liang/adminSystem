@@ -34,8 +34,10 @@ import IconDialog from './iconsDialog.vue'
 import type { Menu } from '@/layout/slider/type'
 
 const store = useHomeStore()
-const { modules } = storeToRefs(store)
-// const { getMenuList, updateMenuList } = store
+const { modules, menuList } = storeToRefs(store)
+const { getMenuList } = store
+
+const finalMenuList = computed(() => menuList.value)
 
 const componentMenu = computed(() =>
   Object.keys(modules.value).map((m) => ({ value: m.replace('..', '') }))
@@ -68,7 +70,17 @@ const dialogProps: CnPage.DialogProps = reactive({
       {
         label: '父级菜单',
         prop: 'parentId',
-        component: 'input'
+        component: 'cascader',
+        props: {
+          options: menuList,
+          props: {
+            checkStrictly: true,
+            emitPath: false,
+            label: 'name',
+            value: 'id',
+            children: 'childList'
+          }
+        }
       },
       {
         label: '类型',
@@ -121,6 +133,7 @@ const props: CnPage.Props = reactive({
         type: 'primary',
         onClick: () => {
           dialogRef.value?.open()
+          dialogProps.formProps!.model = {}
           dialogProps.action = () => handleSubmit('add')
         }
       }
@@ -173,25 +186,27 @@ function handleTransformResp(res: ListRes) {
 
 // 把扁平化的树结构还原
 function assembleData(menus: Menu[]) {
-  const map = new Map()
+  const map: any = {}
   const list: Menu[] = []
 
-  for (const item of menus) {
-    const { id, parentId } = item
+  menus.forEach((item: any) => {
+    const { id } = item
+    map[`${id}`] = { ...item, childList: [] }
+  })
 
-    item.childList = []
-    map.set(id, item)
+  menus.forEach((node) => {
+    const { parentId, id } = node
 
     if (parentId === 0) {
-      list.push(item)
+      list.push(map[`${id}`])
     } else {
-      if (map.has(parentId)) {
-        map.get(parentId).childList.push(item)
+      if (!!map[`${parentId}`]) {
+        map[`${parentId}`].childList.push(map[`${id}`])
       } else {
-        list.push(item)
+        list.push(map[`${id}`])
       }
     }
-  }
+  })
 
   return list
 }
@@ -263,10 +278,12 @@ function handleRemove({ row }: any) {
   }).then(() => {
     ElMessage.success({ message: '删除成功' })
     props.refresh = new Date().getTime()
+    getMenuList({})
   })
 }
 
 function queryMenuList() {
   props.refresh = new Date().getTime()
+  getMenuList({})
 }
 </script>

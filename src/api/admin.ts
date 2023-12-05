@@ -18,7 +18,11 @@ export const getDivisionList = (): Promise<Res<Division[]>> => axios.get('/api/a
 export interface Unit {
   id?: number
   fullName?: string
-  simpleName?: string
+  provinceCode?: string
+  cityCode?: string
+  districtCode?: string
+  streetCode?: string
+  villageCode?: string
   permissions?: UnitPermission[]
 }
 interface UnitPermission {
@@ -34,6 +38,8 @@ export const addUnit = (data: Unit): Promise<Res> => axios.post('/api/admin/unit
 export const editUnit = (data: Unit): Promise<Res> => axios.put('/api/admin/unit', data)
 // 删除
 export const delUnit = (ids: string): Promise<Res> => axios.delete(`/api/admin/unit/${ids}`)
+// 获取详情
+export const getUnitDetail = (id: Unit['id']): Promise<Res<Unit>> => axios.get(`/api/admin/unit/${id}`)
 
 /**
  * 单位类型

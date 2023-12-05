@@ -41,15 +41,15 @@ export default [
             path: '/system/user',
             name: 'user',
             component: () => import('../views/user/UserList.vue')
-          }
+          },
+          // 日志管理
+          {
+            path: '/system/log',
+            name: 'logManage',
+            component: () => import('../views/log/index.vue'),
+            meta: { requiredAuth: false }
+          },
         ]
-      },
-      // 日志管理
-      {
-        path: '/log',
-        name: 'logManage',
-        component: () => import('../views/log/index.vue'),
-        meta: { requiredAuth: false }
       },
       {
         // 系统管理 - 区划管理

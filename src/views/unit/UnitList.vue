@@ -4,11 +4,10 @@
     <template #auth>
       <el-tree
         v-model="areaCode"
-        :key="defaultChecked"
+        :key="areaCode"
         :data="division"
         node-key="value"
-        :default-checked-keys="defaultChecked ? [defaultChecked] : []"
-        :default-expanded-keys="defaultExpanded ? [defaultExpanded] : []"
+        :default-checked-keys="areaCode"
         show-checkbox
         check-strictly
         style="width: 100%"
@@ -36,14 +35,12 @@ import { reactive, ref, watch } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import CnDict from '@/components/cn-page/CnDict.vue'
-import { getUnitList, addUnit, editUnit, type Unit, delUnit } from '@/api/admin'
+import { getUnitList, addUnit, editUnit, getUnitDetail, type Unit, delUnit } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 import { useDelete } from '@/hooks/useConfirm'
 
-const division = useDivision()
+const division = ref<Division2[]>([])
 
-const defaultChecked = ref('')
-const defaultExpanded = ref('')
 const areaCode = ref<string[]>([])
 const authData = ref<Record<string, string[]>>({})
 const handleCheckChange = (data: Division2, checked: boolean) => {
@@ -91,19 +88,39 @@ const dialogProps = reactive<CnPage.DialogProps>({
   }
 })
 watch(
-  () => dialogProps.formProps?.model,
-  (model) => {
-    if (!model) return
-    const code = [
-      model.villageCode,
-      model.streetCode,
-      model.districtCode,
-      model.cityCode,
-      model.provinceCode
-    ].filter(Boolean)
-    defaultChecked.value = code[0]
-    defaultExpanded.value = code[1] || code[0]
-    areaCode.value = code[0] ? [code[0]] : []
+  [
+    () => dialogProps.formProps?.model.villageCode,
+    () => dialogProps.formProps?.model.streetCode,
+    () => dialogProps.formProps?.model.districtCode,
+    () => dialogProps.formProps?.model.cityCode,
+    () => dialogProps.formProps?.model.provinceCode
+  ],
+  (code) => {
+    const idx = code.findIndex(Boolean)
+    if (code[idx]) {
+      areaCode.value = [code[idx] as string]
+      division.value = useDivision(code[idx] as string).value
+      dialogProps.formProps!.model.unitLevel = 5 - idx
+    } else {
+      areaCode.value = []
+      division.value = []
+      dialogProps.formProps!.model.unitLevel = undefined
+    }
+  },
+  { immediate: true }
+)
+watch(
+  () => dialogProps.formProps?.model.permissions as Unit['permissions'],
+  (permissions) => {
+    if (!permissions) return
+    areaCode.value = permissions.map((v) => v.regionCode)
+    authData.value = permissions.reduce(
+      (acc, cur) => {
+        acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
   },
   { deep: true }
 )
@@ -112,25 +129,31 @@ function saveUnit(type = 'add', model: Unit = {}) {
   authData.value = {}
   dialogProps.title = type === 'add' ? '新增单位' : '编辑单位'
   dialogProps.formProps!.model = { ...model }
-  if (model.permissions) {
-    areaCode.value = model.permissions.map((v) => v.regionCode)
-    authData.value = model.permissions.reduce(
-      (acc, cur) => {
-        acc[cur.regionCode] = cur.dataPermissionPolicy.split(',')
-        return acc
-      },
-      {} as Record<string, string[]>
-    )
-  }
-  dialogProps.action = () => {
-    const action = type === 'add' ? addUnit : editUnit
-    const model = dialogProps.formProps?.model || {}
-    model.permissions = areaCode.value.map((v) => ({
-      regionCode: v,
-      dataPermissionPolicy: authData.value[v].toString()
-    }))
-    return action({ ...model })
-  }
+  dialogProps.loading = true
+  const getDetail = model.id ? getUnitDetail(model.id) : Promise.resolve()
+  getDetail
+    .then((res) => {
+      const model = res?.data || {}
+      if (model.permissions) {
+        dialogProps.formProps!.model.permissions = model.permissions
+      }
+      dialogProps.action = () => {
+        const action = type === 'add' ? addUnit : editUnit
+        const model = dialogProps.formProps?.model || {}
+        model.permissions = areaCode.value.map((v) => {
+          const item = (model.permissions as Unit['permissions'])?.find((w) => w.regionCode === v)
+          return {
+            ...item,
+            regionCode: v,
+            dataPermissionPolicy: authData.value[v]?.toString()
+          }
+        })
+        return action({ ...model })
+      }
+    })
+    .finally(() => {
+      dialogProps.loading = false
+    })
   dialogProps.onSuccess = () => (props.refresh = Date.now())
   dialogRef.value?.open()
 }
@@ -146,13 +169,7 @@ const props = reactive<CnPage.Props>({
     ]
   },
   toolbar: {
-    items: [
-      {
-        label: '新增',
-        type: 'primary',
-        onClick: () => saveUnit()
-      }
-    ]
+    items: [{ label: '新增', type: 'primary', onClick: () => saveUnit() }]
   },
   table: {
     columns: [

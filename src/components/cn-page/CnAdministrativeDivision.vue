@@ -1,17 +1,28 @@
 <template>
-  <el-cascader ref="adRef" :clearable="true" v-model="current" :options="division" @change="handleChange" />
+  <el-cascader
+    ref="adRef"
+    :clearable="true"
+    v-model="current"
+    :options="division"
+    @change="handleChange"
+  />
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
-import type { CascaderInstance } from 'element-plus';
+import { ref, watch } from 'vue'
+import type { CascaderInstance } from 'element-plus'
 import useDivision from '@/hooks/useDivision'
 
 const props = defineProps(['model'])
+const current = ref<string[]>([])
+watch(() => props.model, (model) => {
+  if (!model) return []
+  const { provinceCode, cityCode, districtCode, streetCode, villageCode } = model || {}
+  current.value = [provinceCode, cityCode, districtCode, streetCode, villageCode].filter(Boolean)
+}, { deep: true, immediate: true })
 
 const adRef = ref<CascaderInstance>()
 const division = useDivision()
-const current = ref([])
 
 function handleChange(value: string[]) {
   props.model.provinceCode = undefined

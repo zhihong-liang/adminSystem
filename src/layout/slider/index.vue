@@ -61,7 +61,7 @@ const tabListInit = () => {
 const init = () => {
   loading.value = true
 
-  getMenuList()
+  getMenuList({ manual: true })
     .then((res: Menu[]) => {
       updateMenuList(res)
       tabListInit()

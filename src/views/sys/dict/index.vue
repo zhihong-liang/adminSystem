@@ -1,7 +1,15 @@
 <template>
-  <div>字典</div>
+  <div v-show="type === ''">
+    <MainClass @change-type="(row) => (type = row.type)" />
+  </div>
+  <SubClass v-if="type" :type="type" @change-type="() => (type = '')" />
 </template>
 
-<script setup lang="ts"></script>
+<script lang="ts" setup>
+import { ref } from 'vue'
+import MainClass from './child/mainClass.vue'
+import SubClass from './child/subClass.vue'
+const type = ref('')
+</script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped></style>

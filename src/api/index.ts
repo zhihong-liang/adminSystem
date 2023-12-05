@@ -102,3 +102,5 @@ export const getMenuList = (params: Menu): Promise<Res<Menu[]>> => axios.post(me
 
 // 查询菜单列表
 export const checkMenuList = (params: ListReq<Menu>): Promise<any> => axios.post(menuBasePath + '/list', params)
+
+export * from "./sys"

@@ -8,21 +8,20 @@
   >
     <template #default>
       <slot v-if="formProps">
-        <CnForm v-bind="formProps" ref="formWrapRef">
+        <CnForm v-bind="formProps" v-loading="loading" ref="formWrapRef">
           <template v-for="item in slots" v-slot:[item.prop]="slotProps" :key="item.prop">
             <slot :name="item.prop" v-bind="slotProps" />
           </template>
         </CnForm>
       </slot>
 
-      <!-- 如果不需要form组件，能否自定义? -->
       <slot v-else></slot>
     </template>
 
     <template #footer>
       <slot name="footer">
         <el-button @click="handleCancel">取消</el-button>
-        <el-button type="primary" :loading="loading" @click="handleSubmit">提交</el-button></slot
+        <el-button type="primary" :loading="submitting" @click="handleSubmit">提交</el-button></slot
       >
     </template>
   </el-dialog>
@@ -30,6 +29,8 @@
 
 <script lang="ts" setup>
 import { ref, type PropType, type UnwrapNestedRefs, watchEffect } from 'vue'
+import { ElMessage } from 'element-plus'
+import type { Res } from '@/api'
 import CnForm from './CnForm.vue'
 
 const props = defineProps({
@@ -37,7 +38,8 @@ const props = defineProps({
   closeOnClickModal: { type: Boolean, default: false },
   appendToBody: { type: Boolean, default: true },
   formProps: { type: Object as PropType<UnwrapNestedRefs<CnPage.FormProps>> },
-  action: Function,
+  loading: { type: Boolean, default: false },
+  action: { type: Function as PropType<() => Promise<Res<any>>> }
 })
 const emits = defineEmits(['success'])
 
@@ -51,7 +53,7 @@ watchEffect(() => {
 })
 
 const visible = ref(false)
-const loading = ref(false)
+const submitting = ref(false)
 
 function handleCancel() {
   visible.value = false
@@ -61,12 +63,20 @@ function handleSubmit() {
     ?.validate()
     .then(() => {
       if (props.action) {
-        props.action().then(() => {
-          emits('success')
-        }).finally(() => {
-          visible.value = false
-          loading.value = false
-        })
+        submitting.value = true
+        props
+          .action()
+          .then((res) => {
+            ElMessage.success(res?.message || '操作成功')
+            emits('success')
+          })
+          .catch((err) => {
+            ElMessage.warning(err?.message || '操作失败')
+          })
+          .finally(() => {
+            visible.value = false
+            submitting.value = false
+          })
       }
     })
     .catch(() => {})

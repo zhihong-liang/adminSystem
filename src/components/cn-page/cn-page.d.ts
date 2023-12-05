@@ -290,6 +290,7 @@ declare namespace CnPage {
   } & {
     [key: string]: any
     formProps?: FormProps
+    loading?: Boolean
     action?: (params: any) => Promise<any>
   }
 }
