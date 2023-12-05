@@ -12,6 +12,8 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@editorjs/editorjs": "^2.28.2",
+    "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.0",
     "crypto-js": "^4.2.0",
     "element-plus": "^2.4.1",
