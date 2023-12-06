@@ -7,8 +7,10 @@
         background-color="var(--system-slider-background)"
         text-color="var(--system-slider-text-color)"
         active-color="var(--system-primary-color)"
-        :collapse-transition="false"
         :collapse="collapse"
+        :collapse-transition="false"
+        :unique-opened="true"
+        :router="true"
       >
         <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" />
       </el-menu>
@@ -30,7 +32,6 @@ import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
 
 import MenuItem from './menuItem.vue'
-import { ElMenu, ElScrollbar } from 'element-plus'
 
 import type { Menu } from './type'
 
@@ -76,7 +77,7 @@ const init = () => {
 
 onBeforeMount(() => {
   // !menuList.value.length ? init() : tabListInit()
-  init()
+  // init()
 })
 </script>
 

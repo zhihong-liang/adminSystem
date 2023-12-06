@@ -1,29 +1,21 @@
 <template>
-  <div class="slider-item" v-if="!isHideMenu">
-    <template v-if="menuItem.childList && menuItem.childList.length">
-      <el-sub-menu :key="menuItem.id" :index="menuItem.path">
-        <template #title>
-          <template v-if="menuItem.icon">
-            <DynamicIcon :html="menuItem.icon"/>
-          </template>
-          <span>{{ menuItem.name }}</span>
-        </template>
+  <template v-if="!isHideMenu">
+    <el-sub-menu v-if="isMenu" :key="menuItem.id" :index="menuIndex">
+      <template #title>
+        <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
+        <span>{{ menuItem.name }}</span>
+      </template>
 
-        <menu-item v-for="item in menuItem.childList" :menu-item="item" />
-      </el-sub-menu>
-    </template>
+      <menu-item v-for="item in menuItem.childList" :menu-item="item" />
+    </el-sub-menu>
 
-    <router-link v-else :to="(menuItem.path as string)" @click="handleRouterLinkClick(menuItem)">
-      <el-menu-item :index="menuItem.path">
-        <template v-if="menuItem.icon">
-          <DynamicIcon :html="menuItem.icon"/>
-        </template>
-        <template #title>
-          <span>{{ menuItem.name }}</span>
-        </template>
+    <router-link v-if="isDirt" :to="menuItem.path!" @click="handleRouterLinkClick(menuItem)">
+      <el-menu-item :index="menuIndex">
+        <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
+        <template #title>{{ menuItem.name }}</template>
       </el-menu-item>
     </router-link>
-  </div>
+  </template>
 </template>
 
 <script setup lang="ts">
@@ -44,7 +36,15 @@ const props = defineProps<{
 const emits = defineEmits(['onClick'])
 
 // 是否为隐藏菜单
-const isHideMenu = computed(() => (props.menuItem?.status === '0'))
+const isHideMenu = computed(() => props.menuItem?.status === '0')
+
+// 是否为菜单
+const isMenu = computed(() => props.menuItem?.type === 'menu')
+
+// 是否为模块
+const isDirt = computed(() => props.menuItem?.type === 'dirt')
+
+const menuIndex = computed(() => props.menuItem?.path?.toString())
 
 const handleRouterLinkClick = (item: Menu) => {
   const { name, id, path } = item

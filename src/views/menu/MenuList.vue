@@ -23,7 +23,7 @@ import { reactive, ref, computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import moment from 'moment'
-import { addMenu, removeMenu, editMenu, checkMenuList, type ListRes } from '@/api'
+import { addMenu, removeMenu, editMenu, checkMenuList, getMenuList, type ListRes } from '@/api'
 
 import { ElMessageBox, ElMessage } from 'element-plus'
 
@@ -35,13 +35,9 @@ import type { Menu } from '@/layout/slider/type'
 
 const store = useHomeStore()
 const { modules, menuList } = storeToRefs(store)
-const { getMenuList } = store
+// const { getMenuList } = store
 
-const finalMenuList = computed(() => menuList.value)
-
-const componentMenu = computed(() =>
-  Object.keys(modules.value).map((m) => ({ value: m.replace('..', '') }))
-)
+const componentMenus = computed(() => Object.keys(modules.value).map((m) => ({ value: m })))
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps: CnPage.DialogProps = reactive({
@@ -57,7 +53,7 @@ const dialogProps: CnPage.DialogProps = reactive({
         prop: 'component',
         component: 'select',
         props: {
-          options: componentMenu.value
+          options: componentMenus.value
         }
       },
       {
@@ -86,13 +82,7 @@ const dialogProps: CnPage.DialogProps = reactive({
         label: '类型',
         prop: 'type',
         component: 'select',
-        props: {
-          options: [
-            { label: '菜单', value: 'menu' },
-            { label: '模块', value: 'dirt' },
-            { label: '按钮', value: 'action' }
-          ]
-        }
+        dict: 'MENU_TYPE'
       },
       { label: '排序', prop: 'sort', component: 'input' },
       { label: '状态', prop: 'status', span: 24, component: 'slot' },
@@ -122,8 +112,8 @@ const props: CnPage.Props = reactive({
   search: {
     items: [
       { label: '标题', prop: 'name', component: 'input' },
-      { label: '类型', prop: 'type', component: 'select' },
-      { label: '状态', prop: 'status', component: 'select' }
+      { label: '类型', prop: 'type', component: 'select', dict: 'MENU_TYPE' },
+      { label: '状态', prop: 'status', component: 'select', dict: 'MENU_STATUS' }
     ]
   },
   toolbar: {
@@ -157,7 +147,7 @@ const props: CnPage.Props = reactive({
             /*props: {}*/
           }
         ]
-      }, // show：控制icon的显示？
+      },
       { prop: 'description', label: '描述' },
       {
         prop: 'action',

@@ -56,11 +56,16 @@ export const useHomeStore = defineStore('home', () => {
         })
     }
     function updateMenuList(list: Menu[]) {
-        menuList.value = list
+        if (!menuList.value.length) {
+            menuList.value = list
+        }
     }
 
     // 所有组件模块
-    const modules = ref(import.meta.glob('../views/**/*.vue') || [])
+    const modules = ref({})
+    function updateModules(list: any) {
+        modules.value = list
+    }
 
     // -------tabs---------
     const tabList = ref<TabItem[]>([]) // tabs数据列表
@@ -92,9 +97,11 @@ export const useHomeStore = defineStore('home', () => {
         addTabToList,
         updateTabList,
         updateActiveTab,
-        updateMenuList
+        updateMenuList,
+        updateModules
     }
 },
     {
         persist: true
-    })
+    }
+)
