@@ -17,8 +17,10 @@
       <template #offShelf>
         <div>下架</div>
       </template>
+      <template #content>
+        <CnEditor v-model:modelValue="editorContent"></CnEditor>
+      </template>
     </CnDialog>
-    <CnEditor></CnEditor>
   </div>
 </template>
 
@@ -26,7 +28,7 @@
 import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
-import CnEditor from '@/components/cn-page/CnEditor.vue'
+import CnEditor from '@/components/Editor/Editor.vue'
 
 import searchConfig from './config/search-config'
 import getTableConfig from './config/table-config'
@@ -45,6 +47,8 @@ import { getUsers } from '@/api'
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
+
+const editorContent = ref('123')
 
 const props = reactive<CnPage.Props>({
   init: undefined,

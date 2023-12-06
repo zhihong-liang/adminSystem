@@ -88,10 +88,7 @@ export function getTollBarActionDialogConfig(
           {
             label: '公告内容',
             prop: 'content',
-            component: 'input',
-            props: {
-              type: 'textarea'
-            }
+            component: 'slot'
           }
         ],
         labelWidth: 120,

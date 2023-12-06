@@ -7,7 +7,7 @@
       :mode="mode"
     />
     <Editor
-      style="height: 500px; overflow-y: hidden"
+      :style="{ height: props.height ? props.height : '300px', 'overflow-y': 'hidden' }"
       v-model="valueHtml"
       :defaultConfig="editorConfig"
       :mode="mode"
@@ -19,26 +19,45 @@
 <script setup lang="ts">
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 
-import { onBeforeUnmount, ref, shallowRef, onMounted } from 'vue'
+import { computed, onBeforeUnmount, ref, shallowRef } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import type { IToolbarConfig, IDomEditor } from '@wangeditor/editor'
+import type { IEditorConfig } from '@wangeditor/editor'
+
+interface Props {
+  height?: string
+  modelValue: string
+}
+
+const props = defineProps<Props>()
+const emit = defineEmits(['update:modelValue'])
 
 // 编辑器实例，必须用 shallowRef
-const editorRef = shallowRef()
+const editorRef = shallowRef<IDomEditor>()
 
 // 内容 HTML
-const valueHtml = ref('<p>hello</p>')
+const valueHtml = computed({
+  get() {
+    return props.modelValue
+  },
+  set(value) {
+    emit('update:modelValue', value)
+  }
+})
 
 const mode = ref('default')
 
-// 模拟 ajax 异步获取内容
-onMounted(() => {
-  setTimeout(() => {
-    valueHtml.value = '<p>模拟 Ajax 异步设置内容</p>'
-  }, 1500)
-})
+const toolbarConfig: Partial<IToolbarConfig> = {}
 
-const toolbarConfig = {}
-const editorConfig = { placeholder: '请输入内容...' }
+const editorConfig: Partial<IEditorConfig> = {
+  MENU_CONF: {
+    uploadImage: {
+      fileName: '', // 文件上传名称
+      server: '', // 服务器地址
+      base64LimitSize: 50 * 1024 // 50kb内直接转base64
+    }
+  }
+}
 
 // 组件销毁时，也及时销毁编辑器
 onBeforeUnmount(() => {
