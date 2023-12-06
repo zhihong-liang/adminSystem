@@ -23,7 +23,7 @@ import { reactive, ref, computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import moment from 'moment'
-import { addMenu, removeMenu, editMenu, checkMenuList, getMenuList, type ListRes } from '@/api'
+import { addMenu, removeMenu, editMenu, checkMenuList, type ListRes } from '@/api'
 
 import { ElMessageBox, ElMessage } from 'element-plus'
 
@@ -35,7 +35,7 @@ import type { Menu } from '@/layout/slider/type'
 
 const store = useHomeStore()
 const { modules, menuList } = storeToRefs(store)
-// const { getMenuList } = store
+const { getMenuList } = store
 
 const componentMenus = computed(() => Object.keys(modules.value).map((m) => ({ value: m })))
 
@@ -134,8 +134,8 @@ const props: CnPage.Props = reactive({
     columns: [
       { prop: 'name', label: '标题' },
       { prop: 'sort', label: '排序' },
-      { prop: 'type', label: '类型' },
-      { prop: 'status', label: '状态' },
+      { prop: 'type', label: '类型', dict: 'MENU_TYPE' },
+      { prop: 'status', label: '状态', dict: 'MENU_STATUS' },
       { prop: 'code', label: '编码' },
       { prop: 'path', label: '地址' },
       { prop: 'component', label: '组件' },

@@ -9,8 +9,8 @@
       <menu-item v-for="item in menuItem.childList" :menu-item="item" />
     </el-sub-menu>
 
-    <router-link v-if="isDirt" :to="menuItem.path!" @click="handleRouterLinkClick(menuItem)">
-      <el-menu-item :index="menuIndex">
+    <router-link v-if="isDirt" :to="menuItem.path!">
+      <el-menu-item :index="menuIndex" @click="handleMenuItemClick">
         <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
         <template #title>{{ menuItem.name }}</template>
       </el-menu-item>
@@ -19,15 +19,17 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
+import { storeToRefs } from 'pinia'
+
 import DynamicIcon from './dynamicIcon.vue'
 
 import type { Menu } from './type'
 
-const route = useRoute()
-const { addTabToList, updateActiveTab } = useHomeStore()
+const store = useHomeStore()
+const { menuList } = storeToRefs(store)
+const { addTabToList, updateActiveTab, updateBreadcrumb } = store
 
 const props = defineProps<{
   menuItem: Menu
@@ -46,21 +48,33 @@ const isDirt = computed(() => props.menuItem?.type === 'dirt')
 
 const menuIndex = computed(() => props.menuItem?.path?.toString())
 
-const handleRouterLinkClick = (item: Menu) => {
-  const { name, id, path } = item
-  const tab = { name, id, path: path as string }
+// 处理面包屑数据
+function filterMenu(list: Array<string>) {
+  let array: Menu[] = [...menuList.value]
 
-  addTabToList(tab)
+  return list.map((title: string) => {
+    const target = array.find((menu) => menu.path === title) || {}
+    const { id, path = '', name = '', childList = [] } = target as Menu
 
-  updateActiveTab(id as number)
+    array = childList
 
-  emits('onClick', item)
+    return { path, name, id }
+  })
 }
 
-onBeforeMount(() => {
-  // 为每个菜单路由添加元数据 id，后续需要哪些字段可在这里添加
-  route.meta.id = props.menuItem.id?.toString()
-})
+const handleMenuItemClick = (instance: any) => {
+  // 更新面包屑
+  const { indexPath = [] } = instance || {}
+  updateBreadcrumb(filterMenu(indexPath))
+
+  // 更新tab
+  const { name, id, path } = props.menuItem
+  const tab = { name, id, path: path as string }
+  addTabToList(tab)
+  updateActiveTab(id as number)
+
+  // emits('onClick', props.menuItem)
+}
 </script>
 
 <style scoped></style>
