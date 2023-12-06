@@ -70,17 +70,31 @@ export const delUnitType = (ids: string): Promise<Res> => axios.delete(`/api/adm
  * 日志管理
  */
 // 操作日志
+export interface OperationLog {
+  logNo?: string
+  moduleName?: string
+  logType?: string
+  operatorNo?: string
+  operatorUsername?: string
+  status?: string
+  createTime?: string
+  operatorIp?: string
+  browser?: string
+  msg?: string
+}
 export const getOperationLog = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/admin/operationLog/getPageList', data)
 // 登录日志
 export interface LoginLog {
-  id?: number
-  loginName?: string
+  logNo?: string
+  logType?: string
   userNo?: string
+  loginName?: string
+  status?: string
+  createTime?: string
   loginIp?: string
-  os?: string
   browser?: string
-  description?: string
+  msg?: string
 }
 export const getLoginLog = (data: ListReq<LoginLog>): Promise<ListRes<LoginLog>> =>
   axios.post('/api/admin/loginLog/ajaxList', data)
