@@ -55,9 +55,7 @@ export const useHomeStore = defineStore('home', () => {
         })
     }
     function updateMenuList(list: Menu[]) {
-        if (!menuList.value.length) {
-            menuList.value = list
-        }
+        menuList.value = list
     }
 
     // views中所有模块中的vue文件

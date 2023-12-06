@@ -10,7 +10,11 @@
     </el-sub-menu>
 
     <router-link v-if="isDirt" :to="menuItem.path!">
-      <el-menu-item :index="menuIndex" @click="handleMenuItemClick">
+      <el-menu-item
+        :index="menuIndex"
+        @click="handleMenuItemClick"
+        style="{--el-menu-hover-bg-color: var(--system-slider-hover-background)}"
+      >
         <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
         <template #title>{{ menuItem.name }}</template>
       </el-menu-item>
@@ -77,4 +81,16 @@ const handleMenuItemClick = (instance: any) => {
 }
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+
+.el-menu-item {
+  padding: 0 5px;
+  &:hover {
+    background-color: var(--system-primary-color);
+  }
+  &.is-active {
+    background-color: var(--system-primary-color);
+    color: var(--system-primary-text-color);
+  }
+}
+</style>

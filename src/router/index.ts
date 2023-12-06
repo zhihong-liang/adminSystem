@@ -73,12 +73,6 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   router.addRoute(baseRoute)
 }
 
-// async function initMenu() {
-//   const { getMenuList } = useHomeStore()
-
-//   await getMenuList({})
-// }
-
 const refresh = ref(true)
 
 router.beforeEach(async (to, from, next) => {

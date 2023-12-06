@@ -60,8 +60,6 @@ const dialogProps: CnPage.DialogProps = reactive({
         label: '图标',
         prop: 'icon',
         component: 'slot'
-        // props: { slots: [{ name: 'append', component: 'icon', label: 'Flag' }] },
-        // slots: []
       },
       {
         label: '父级菜单',
@@ -144,7 +142,7 @@ const props: CnPage.Props = reactive({
         label: '图标',
         icons: [
           {
-            /*props: {}*/
+            props: { size: '20px' }
           }
         ]
       },
@@ -268,7 +266,7 @@ function handleRemove({ row }: any) {
   }).then(() => {
     ElMessage.success({ message: '删除成功' })
     props.refresh = new Date().getTime()
-    getMenuList({})
+    getMenuList({}).then
   })
 }
 
