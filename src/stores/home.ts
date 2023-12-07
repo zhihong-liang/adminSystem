@@ -8,6 +8,10 @@ export interface getMenuListPayloadOptions {
     manual?: boolean // 手动更新，默认自动更新
 }
 
+export interface ContainerStyleProps {
+    [key: string]: string
+}
+
 export const useHomeStore = defineStore('home', () => {
     // -------slider---------
     const collapse = ref(false) // 菜单是否折叠
@@ -58,7 +62,7 @@ export const useHomeStore = defineStore('home', () => {
         menuList.value = list
     }
 
-    // views中所有模块中的vue文件
+    // views中所有模块的vue文件
     const modules = ref({})
     function updateModules(list: any) {
         modules.value = list
@@ -76,7 +80,6 @@ export const useHomeStore = defineStore('home', () => {
 
     // 当前激活状态的tab，跟菜单的id关联
     const activeTab = ref<number | undefined>()
-    const activeTabCpt = computed(() => activeTab.value)
     function updateActiveTab(id: number) {
         activeTab.value = id
     }
@@ -89,6 +92,11 @@ export const useHomeStore = defineStore('home', () => {
         breadcrumbList.value = list
     }
 
+    const containerStyle = ref<ContainerStyleProps>({})
+    function updateContainerStyle(style: ContainerStyleProps) {
+        containerStyle.value = style
+    }
+
     return {
         collapse,
         tabList,
@@ -96,8 +104,8 @@ export const useHomeStore = defineStore('home', () => {
         activeTab,
         modules,
         finalMenuList,
-        activeTabCpt,
         breadcrumbList,
+        containerStyle,
         getMenuList,
         updateCollapse,
         addTabToList,
@@ -105,7 +113,8 @@ export const useHomeStore = defineStore('home', () => {
         updateActiveTab,
         updateMenuList,
         updateModules,
-        updateBreadcrumb
+        updateBreadcrumb,
+        updateContainerStyle
     }
 },
     {

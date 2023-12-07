@@ -28,7 +28,7 @@ import getDialogConfig from './config/dialog-config'
 
 import type { handleType } from './config/type'
 
-import { getUsers } from '@/api'
+import { getDeptList, addDept } from '@/api/matter'
 
 // const init: Promise<void> = new Promise((resolve) =>
 //   setTimeout(() => {
@@ -40,13 +40,13 @@ const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
 
 const props = reactive<CnPage.Props>({
+  refresh: 0,
   init: undefined,
   params: {
     page: 1,
     size: 10
   },
-  // action: () => Promise.reject('暂无数据'),
-  action: getUsers,
+  action: getDeptList,
   search: searchConfig,
   toolbar: getTollbarConifg(showDialog),
   table: getTableConfig(showDialog),
@@ -57,17 +57,22 @@ const props = reactive<CnPage.Props>({
 })
 
 // 弹窗确定按钮的点击
-function submit() {
-  console.log(dialogProps.formProps?.model)
+function dialogSubmitSuccess() {
+  props.refresh = new Date().getTime()
+}
+
+function addDeptAction() {
+  const model = dialogProps.formProps?.model || {}
+  return addDept(model)
 }
 
 // 显示操作弹窗
 function showDialog(handle: handleType, row?: any) {
-  console.log(row)
-  const dialogConfig = getDialogConfig(handle, submit)
+  const dialogConfig = getDialogConfig(handle, dialogSubmitSuccess)
   for (const key of Object.keys(dialogConfig)) {
     dialogProps[key] = dialogConfig[key]
   }
+  dialogProps.action = () => addDeptAction()
   dialogRef.value?.open()
 }
 </script>

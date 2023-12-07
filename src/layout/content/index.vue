@@ -14,13 +14,12 @@
     </div>
 
     <!-- container -->
-    <div class="container ofh">
+    <div class="container ofh" :style="containerStyle">
       <el-scrollbar>
         <RouterView v-slot="{ Component, route }">
           <Transition name="fade-transform" mode="out-in">
             <!-- <keep-alive> -->
-            <div :key="route.path">
-              <!-- 解决没有根节点的组件与 transition 组件冲突的bug -->
+            <div class="connect" :key="route.path">
               <component :is="Component" :key="route.fullPath" />
             </div>
             <!-- </keep-alive> -->
@@ -39,7 +38,7 @@ import { storeToRefs } from 'pinia'
 import CnIcon from '@/components/cn-page/CnIcon.vue'
 
 const store = useHomeStore()
-const { breadcrumbList } = storeToRefs(store)
+const { breadcrumbList, containerStyle } = storeToRefs(store)
 </script>
 
 <style lang="scss" scoped>
