@@ -2,26 +2,25 @@ import type { handleType } from './type'
 
 export default function getDialogConfig(
   handleType: handleType,
-  submitCb: () => void
+  dialogSubmitSuccess: () => void
 ): CnPage.DialogProps {
   if (handleType === 'add') {
     return {
       title: '新建标签',
       formProps: {
-        model: {},
+        model: { status: '1' },
         labelPosition: 'left',
         requireAsteriskPosition: 'right',
         items: [
-          { label: '标签名称', prop: 'name', component: 'input' },
-          { label: '备注', prop: 'remind', component: 'input' },
-          { label: '图标', prop: 'avatar', component: 'input' }
+          { label: '标签名称', prop: 'lableName', component: 'input' },
+          { label: '备注', prop: 'remark', component: 'input' }
         ],
         labelWidth: 120,
         rules: {
-          name: [{ required: true, message: '请输入标签名称' }]
+          lableName: [{ required: true, message: '请输入标签名称' }]
         }
       },
-      onSubmit: submitCb
+      onSuccess: dialogSubmitSuccess
     }
   } else if (handleType === 'edit') {
     return {
@@ -67,7 +66,7 @@ export default function getDialogConfig(
           type: [{ required: true, message: '请选择所需导出的字段' }]
         }
       },
-      onSubmit: submitCb
+      onSuccess: dialogSubmitSuccess
     }
   } else if (handleType === 'delete') {
     return {
@@ -83,7 +82,7 @@ export default function getDialogConfig(
         ],
         labelWidth: 0
       },
-      onSubmit: submitCb
+      onSuccess: dialogSubmitSuccess
     }
   } else {
     return {
@@ -100,7 +99,7 @@ export default function getDialogConfig(
         colSpan: 12,
         labelWidth: 120
       },
-      onSubmit: submitCb
+      onSuccess: dialogSubmitSuccess
     }
   }
 }

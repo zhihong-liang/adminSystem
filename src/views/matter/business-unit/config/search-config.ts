@@ -4,7 +4,7 @@ const config: CnPage.SearchProps = {
   items: [
     {
       label: '业务部门',
-      prop: 'businessName',
+      prop: 'businessDeptName',
       component: 'input'
     }
   ],

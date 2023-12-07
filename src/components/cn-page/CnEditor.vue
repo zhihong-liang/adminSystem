@@ -3,14 +3,12 @@
     <Toolbar
       style="border-bottom: 1px solid #ccc"
       :editor="editorRef"
-      :defaultConfig="toolbarConfig"
-      :mode="mode"
+      :defaultConfig="props.toolbarConfig"
     />
     <Editor
-      :style="{ height: props.height ? props.height : '300px', 'overflow-y': 'hidden' }"
+      :style="{ height: props.height, 'overflow-y': 'hidden' }"
       v-model="valueHtml"
-      :defaultConfig="editorConfig"
-      :mode="mode"
+      :defaultConfig="props.editorConfig"
       @onCreated="handleCreated"
     />
   </div>
@@ -19,17 +17,22 @@
 <script setup lang="ts">
 import '@wangeditor/editor/dist/css/style.css' // 引入 css
 
-import { computed, onBeforeUnmount, ref, shallowRef } from 'vue'
+import { computed, onBeforeUnmount, shallowRef, withDefaults } from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import type { IToolbarConfig, IDomEditor } from '@wangeditor/editor'
 import type { IEditorConfig } from '@wangeditor/editor'
 
 interface Props {
   height?: string
-  modelValue: string
+  modelValue: string | undefined
+  toolbarConfig?: Partial<IToolbarConfig>
+  editorConfig?: Partial<IEditorConfig>
 }
 
-const props = defineProps<Props>()
+const props = withDefaults(defineProps<Props>(), {
+  height: '300px'
+})
+
 const emit = defineEmits(['update:modelValue'])
 
 // 编辑器实例，必须用 shallowRef
@@ -44,20 +47,6 @@ const valueHtml = computed({
     emit('update:modelValue', value)
   }
 })
-
-const mode = ref('default')
-
-const toolbarConfig: Partial<IToolbarConfig> = {}
-
-const editorConfig: Partial<IEditorConfig> = {
-  MENU_CONF: {
-    uploadImage: {
-      fileName: '', // 文件上传名称
-      server: '', // 服务器地址
-      base64LimitSize: 50 * 1024 // 50kb内直接转base64
-    }
-  }
-}
 
 // 组件销毁时，也及时销毁编辑器
 onBeforeUnmount(() => {

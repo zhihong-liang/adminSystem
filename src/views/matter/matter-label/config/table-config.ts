@@ -7,13 +7,9 @@ export default function getTableConfig(
     data: [],
     columns: [
       { type: 'selection' },
-      { label: '粤智助事项编码', prop: 'itemId', slot: 'itemId' },
-      { label: '事项别名', prop: 'rename' },
-      { label: '事项名称', prop: 'name' },
-      { label: '业务部门', prop: 'department' },
-      { label: '系统覆盖范围', prop: 'round' },
-      { label: '办理类型', prop: 'type' },
-      { label: '事项状态', prop: 'status', slot: 'status' },
+      { label: '标签名称', prop: 'lableName', slot: 'lableName' },
+      { label: '使用事项数', prop: 'mattersCount' },
+      { label: '创建时间', prop: 'createTime' },
       {
         label: '操作',
         prop: 'action',

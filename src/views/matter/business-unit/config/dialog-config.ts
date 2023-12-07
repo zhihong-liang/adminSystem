@@ -8,19 +8,19 @@ export default function getDialogConfig(
     return {
       title: '新建业务部门',
       formProps: {
-        model: {},
+        model: { status: '1' },
         labelPosition: 'left',
         requireAsteriskPosition: 'right',
         items: [
-          { label: '业务部门', prop: 'name', component: 'input' },
-          { label: '备注', prop: 'remind', component: 'input' }
+          { label: '业务部门', prop: 'businessDeptName', component: 'input' },
+          { label: '备注', prop: 'remark', component: 'input' }
         ],
         labelWidth: 120,
         rules: {
-          name: [{ required: true, message: '请输入标签名称' }]
+          businessDeptName: [{ required: true, message: '请输入业务部门' }]
         }
       },
-      onSubmit: submitCb
+      onSuccess: submitCb
     }
   } else if (handleType === 'edit') {
     return {
@@ -66,7 +66,7 @@ export default function getDialogConfig(
           type: [{ required: true, message: '请选择所需导出的字段' }]
         }
       },
-      onSubmit: submitCb
+      onSuccess: submitCb
     }
   } else if (handleType === 'delete') {
     return {
@@ -82,7 +82,7 @@ export default function getDialogConfig(
         ],
         labelWidth: 0
       },
-      onSubmit: submitCb
+      onSuccess: submitCb
     }
   } else {
     return {
@@ -99,7 +99,7 @@ export default function getDialogConfig(
         colSpan: 12,
         labelWidth: 120
       },
-      onSubmit: submitCb
+      onSuccess: submitCb
     }
   }
 }
