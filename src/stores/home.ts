@@ -2,8 +2,7 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { getMenuList as queryMenuList } from '@/api'
 
-import type { TabItem } from '@/layout/tabs/type'
-import type { Menu } from '@/layout/slider/type'
+import type { TabItem, Menu, BreadcrumbItem } from '@/layout/type'
 
 export interface getMenuListPayloadOptions {
     manual?: boolean // 手动更新，默认自动更新
@@ -37,8 +36,8 @@ export const useHomeStore = defineStore('home', () => {
             return list
         }
 
-        const _res = await queryMenuList({})
-        const { data = [], code } = _res
+        const _res = await queryMenuList({})  // TODO 接口失败也要做对应的处理
+        const { data = [], code } = _res || {}
 
         return new Promise((resolve, reject) => {
             if (manual) {
@@ -59,8 +58,11 @@ export const useHomeStore = defineStore('home', () => {
         menuList.value = list
     }
 
-    // 所有组件模块
-    const modules = ref(import.meta.glob('../views/**/*.vue') || [])
+    // views中所有模块中的vue文件
+    const modules = ref({})
+    function updateModules(list: any) {
+        modules.value = list
+    }
 
     // -------tabs---------
     const tabList = ref<TabItem[]>([]) // tabs数据列表
@@ -79,6 +81,14 @@ export const useHomeStore = defineStore('home', () => {
         activeTab.value = id
     }
 
+    /*
+    * breadcrumb
+    */
+    const breadcrumbList = ref<BreadcrumbItem[]>([])
+    function updateBreadcrumb(list: BreadcrumbItem[]) {
+        breadcrumbList.value = list
+    }
+
     return {
         collapse,
         tabList,
@@ -87,14 +97,18 @@ export const useHomeStore = defineStore('home', () => {
         modules,
         finalMenuList,
         activeTabCpt,
+        breadcrumbList,
         getMenuList,
         updateCollapse,
         addTabToList,
         updateTabList,
         updateActiveTab,
-        updateMenuList
+        updateMenuList,
+        updateModules,
+        updateBreadcrumb
     }
 },
     {
         persist: true
-    })
+    }
+)

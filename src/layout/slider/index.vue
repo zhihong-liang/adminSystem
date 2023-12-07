@@ -1,5 +1,5 @@
 <template>
-  <div class="home_slider" v-loading="loading" element-loading-background="rgba(0, 0, 0, 0)">
+  <div class="home_slider">
     <el-scrollbar>
       <el-menu
         class="layoutMenu"
@@ -7,77 +7,37 @@
         background-color="var(--system-slider-background)"
         text-color="var(--system-slider-text-color)"
         active-color="var(--system-primary-color)"
-        :collapse-transition="false"
         :collapse="collapse"
+        :collapse-transition="false"
+        :unique-opened="true"
+        :router="true"
       >
         <MenuItem v-for="menuItem in menuList" :menu-item="menuItem" />
       </el-menu>
     </el-scrollbar>
 
     <div class="collapse" @click="updateCollapse">
-      <el-icon>
-        <DArrowLeft :class="collapse ? 'icon_left' : 'icon_right'" />
-      </el-icon>
+      <CnIcon :class="collapse ? 'icon_left' : 'icon_right'" html="DArrowLeft" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, ref } from 'vue'
+import { computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { useRoute } from 'vue-router'
 import { storeToRefs } from 'pinia'
-import { ElMessage } from 'element-plus'
 
 import MenuItem from './menuItem.vue'
-import { ElMenu, ElScrollbar } from 'element-plus'
-
-import type { Menu } from './type'
+import CnIcon from '@/components/cn-page/CnIcon.vue'
 
 const [route, store] = [useRoute(), useHomeStore()]
 
-const { collapse, menuList, tabList } = storeToRefs(store)
+const { collapse, menuList } = storeToRefs(store)
 
-const { updateCollapse, updateMenuList, getMenuList } = store
-
-const loading = ref(false)
+const { updateCollapse } = store
 
 const activeMenuItem = computed(() => route.path as string)
-
-// tab 组件初始化
-const tabListInit = () => {
-  const { addTabToList } = store
-  const { path = '', name = '' } = route // 先获取当前路由的tab
-
-  const tabExit = !!tabList.value.find((t) => t.path === path)
-
-  // TODO tabList、menuList都不存在该路由的数据，则显示404或跳回首页
-  if (!tabExit) {
-    const exitInMenu = menuList.value.find((item) => item.path === path)
-    !!exitInMenu && addTabToList({ id: exitInMenu.id, name: name as string, path })
-  }
-}
-
-const init = () => {
-  loading.value = true
-
-  getMenuList({ manual: true })
-    .then((res: Menu[]) => {
-      updateMenuList(res)
-      tabListInit()
-    })
-    .catch(() => {
-      // ElMessage.error({message: '请求菜单列表失败', center: true})
-    })
-    .finally(() => {
-      loading.value = false
-    })
-}
-
-onBeforeMount(() => {
-  // !menuList.value.length ? init() : tabListInit()
-  init()
-})
 </script>
 
 <style lang="scss" scoped>

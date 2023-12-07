@@ -32,6 +32,7 @@
     --system-page-color: #303133; // 主要的文本颜色
     --system-page-tip-color: rgba(0, 0, 0, 0.45); // 协助展示的文本颜色
     --system-page-border-color: #000; // 通用的边框配置色，便于主题扩展
+    --el-color-border-input: #00BCD4; // 通用的边框配置色，便于主题扩展
 
     // element主题色修改
     --el-color-primary: var(--system-primary-color);
@@ -49,4 +50,10 @@ body #nprogress .peg {
 body #nprogress .spinner-icon {
     border-top-color: var(--system-primary-color);
     border-left-color: var(--system-primary-color);
+}
+
+
+.el-input__wrapper {
+    box-shadow: inset 0px -1px 0px 0px var(--el-color-border-input) !important;
+    border-radius: 0 !important;
 }

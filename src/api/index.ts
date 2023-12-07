@@ -104,3 +104,4 @@ export const getMenuList = (params: Menu): Promise<Res<Menu[]>> => axios.post(me
 export const checkMenuList = (params: ListReq<Menu>): Promise<any> => axios.post(menuBasePath + '/list', params)
 
 export * from "./sys"
+export * from "./device"

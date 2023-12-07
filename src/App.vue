@@ -2,9 +2,20 @@
 import { computed } from 'vue'
 import { ElConfigProvider } from 'element-plus'
 import { RouterView } from 'vue-router'
+import { useHomeStore } from '@/stores'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 
+const { updateModules} = useHomeStore()
 const local = computed(() => zhCn)
+
+const modules = import.meta.glob('./views/**/*.vue')
+
+const components = Object.keys(modules).reduce<Record<string, any>>((prev, cur) => {
+  prev[cur.replace('.', '')] = modules[cur]
+  return prev
+}, {}) as any
+
+updateModules(components)
 </script>
 
 <template>

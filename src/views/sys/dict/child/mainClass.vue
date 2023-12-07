@@ -12,19 +12,46 @@
 
 <script setup lang="ts">
 import { reactive, ref, computed } from 'vue'
-import { dictTypeList as ListApi } from '@/api'
+import { dictTypeList as ListRequest, dictTypeDel as DelRequest } from '@/api'
 import MainDeal from './mainDeal.vue'
-// 编辑
-const handleEdit = () => {}
+import { ElMessageBox, ElMessage } from 'element-plus'
+
+const emit = defineEmits(['changeType'])
 
 // 删除
-const handleRemove = () => {}
+const handleRemove = ({ row }: any) => {
+  ElMessageBox.confirm(`确定要删除${row.description}?`, {
+    title: '删除',
+    confirmButtonText: '确认',
+    cancelButtonText: '取消',
+    beforeClose: (action, instance, done) => {
+      if (action === 'confirm') {
+        instance.confirmButtonLoading = true
+        instance.confirmButtonText = 'Loading...'
+
+        DelRequest(row.type)
+          .then((res) => {
+            const { code, message } = res
+            if (code == '200') {
+              done()
+            }
+          })
+          .finally(() => {})
+      } else {
+        done()
+      }
+    }
+  }).then(() => {
+    ElMessage.success({ message: '删除成功' })
+    props.refresh = new Date().getTime()
+  })
+}
 
 const mainDealRef = ref()
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: (params) => ListApi(params),
+  action: (params) => ListRequest(params),
   search: {
     items: [{ label: '主类', prop: 'type', component: 'input' }]
   },
@@ -60,7 +87,15 @@ const props: CnPage.Props = reactive({
               mainDealRef.value.open(row)
             }
           },
-          { label: '删除', type: 'danger', text: true, onClick: handleRemove }
+          { label: '删除', type: 'danger', text: true, onClick: handleRemove },
+          {
+            label: '管理子类',
+            type: 'success',
+            text: true,
+            onClick: ({ row }) => {
+              emit('changeType', row)
+            }
+          }
         ]
       }
     ],
