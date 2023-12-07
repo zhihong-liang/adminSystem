@@ -2,15 +2,307 @@
   <CnPage v-bind="props" />
   <CnDialog v-bind="dialogProps" ref="dialogRef">
     <template #add>
-      <el-button type="success">增加授权</el-button>
+      <el-button type="success" @click="addAuth">增加授权</el-button>
+    </template>
+
+    <template #authSlot>
+      <div v-for="(item, index) in authList" :key="index">
+        <div>授权{{index + 1}}</div>
+        <el-row :gutter="20" class="aublock">
+          <el-col :span="12">
+            <el-form-item label="单位类型">
+              <el-select clearable filterable placeholder="请选择" v-model="item.unitType" @change="changeUnit">
+                <el-option v-for="option in unitTypeList" :key="option.id" :label="option.unitTypeName" :value="option.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="单位">
+              <el-select clearable filterable placeholder="请选择" v-model="item.unitId" @change="getPermit($event, index)">
+                <el-option v-for="option in unitList" :key="option.id" :label="option.fullName" :value="option.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="角色">
+              <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="changeRole">
+                <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="12">
+            <el-form-item label="岗位">
+              <el-select clearable filterable placeholder="请选择" v-model="item.postId">
+                <el-option v-for="option in postList" :key="option.id" :label="option.name" :value="option.id" />
+              </el-select>
+            </el-form-item>
+          </el-col>
+          <el-col :span="24">
+            <div>功能权限</div>
+            <el-tree
+              :data="limitsList"
+              :props="defaultProps"
+              node-key="id"
+              @node-click="handleNodeClick"
+              show-checkbox
+              :default-checked-keys="checkedKeys"
+              class="defTreecs"
+            />
+          </el-col>
+          <el-col :span="24">
+            <div>数据权限</div>
+            <el-tree
+              v-model="item.areaCode"
+              :key="item.areaCode"
+              :data="item.division"
+              node-key="value"
+              :default-checked-keys="item.areaCode"
+              show-checkbox
+              check-strictly
+              style="width: 100%"
+              @check-change="(data: Division2, checked: boolean)=>handleCheckChange(data,checked, index)"
+            >
+              <template #default="{ node, data }">
+                <div class="tree_label">
+                  {{ node.label }}
+                  <div v-if="item.areaCode.includes(data.value)" class="tree_auth" @click.stop>
+                    <CnDict
+                      v-model="item.authData[data.value]"
+                      component="checkbox"
+                      dict="DATA_PERMISSION_POLICY"
+                    />
+                  </div>
+                </div>
+              </template>
+            </el-tree>
+          </el-col>
+        </el-row>
+      </div>
+      
     </template>
   </CnDialog>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
+import {
+  getUserList,
+  addUserInfor,
+  getDeptpostList,
+  getUnitTypeList,
+  getUnitList,
+  getRoleList,
+  getRoleDetail,
+  getUnitDetail,
+  getUserDetail,
+  editUserInfor,
+  type Unit
+} from '@/api/admin'
+import useDivision, { type Division2 } from '@/hooks/useDivision'
+
+const handleCheckChange = (data: Division2, checked: boolean, index: number) => {
+  if (checked) {
+    authList.value[index].areaCode.push(data.value)
+  } else {
+    authList.value[index].areaCode = authList.value[index].areaCode.filter((v) => v !== data.value)
+  }
+}
+
+interface Tree {
+  name: string
+  childList?: Tree[],
+  disabled: boolean
+}
+const limitsList = ref<Tree[]>([])
+const checkedKeys = ref<number[]>([])
+const defaultProps = {
+  children: 'childList',
+  label: 'name',
+  disabled: 'disabled'
+}
+const handleNodeClick = (data: Tree) => {
+  console.log(data)
+}
+
+const authList: any = ref([] as any);
+
+const addAuth = () => {
+  authList.value.push({
+    unitType: "",
+  })
+}
+
+// 查询岗位
+const postList = ref([] as any)
+const queryPostList = () => {
+  getDeptpostList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    postList.value = res.rows
+  })
+}
+
+// 查询单位类型
+const unitTypeList = ref([] as any)
+const queryUnitList = () => {
+  getUnitTypeList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    unitTypeList.value = res.rows
+  })
+}
+
+// 查询单位
+const unitList = ref([] as any)
+function changeUnit(val: string) {
+  getUnitList({
+    page:1,
+    size:999,
+    obj: {
+      unitType: val
+    }
+  }).then((res) => {
+    unitList.value = res.rows
+  })
+}
+
+// 获取数据权限
+const getPermit = (val: number, index: number) => {
+  getUnitDetail(val).then((res) => {
+    authList.value[index].permiObj = res.data
+
+    const code = [
+      authList.value[index].permiObj.villageCode,
+      authList.value[index].permiObj.streetCode,
+      authList.value[index].permiObj.districtCode,
+      authList.value[index].permiObj.cityCode,
+      authList.value[index].permiObj.provinceCode
+    ]
+    const idx = code.findIndex(Boolean)
+    console.log("idx", idx, code[idx])
+    if (code[idx]) {
+      authList.value[index].areaCode = [code[idx] as string]
+      authList.value[index].division = useDivision(code[idx] as string).value
+      // authList.value[index].permiObj.unitLevel = 5 - idx
+    } else {
+      authList.value[index].areaCode = []
+      authList.value[index].division = []
+      // authList.value[index].permiObj.unitLevel = undefined
+    }
+
+    const permissions = authList.value[index].permiObj.permissions as Unit['permissions']
+    if (permissions) {
+      authList.value[index].areaCode = permissions.map((v) => v.regionCode)
+      authList.value[index].authData = permissions.reduce(
+        (acc, cur) => {
+          acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
+          return acc
+        },
+        {} as Record<string, string[]>
+      )
+    }
+  })
+}
+
+// 查询角色
+const RoleList = ref([] as any)
+const queryRoleList = () => {
+  getRoleList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    RoleList.value = res.rows
+  })
+}
+
+const arrChild = (arr: any) => {
+  arr.forEach((e: Tree[]) => {
+    e.disabled = true
+    if (e.childList?.length) {
+      arrChild(e.childList)
+    }
+  });
+  return arr
+}
+
+const changeRole = (val: string) => {
+  getRoleDetail(val).then((res) => {
+    limitsList.value = arrChild(res.data.menuList)
+    checkedKeys.value = res.data.menuIds
+  })
+}
+
+function operateUser(type = 'add', data = {}) {
+  queryPostList();
+  queryUnitList();
+  queryRoleList();
+
+  authList.value = []
+  dialogProps.title = type === 'add' ? '新增用户' : (type === 'edit' ? '编辑用户': '查看用户')
+
+  if (type !== 'add') {
+    getUserDetail(data.id).then((res) => {
+      changeUnit(res.data.unitType)
+      dialogProps.formProps!.model = res.data || {}
+      // 数据权限回显
+      authList.value = res.data.roleAuthList
+      res.data.roleAuthList.forEach((e: any) => {
+        const code = [ e.villageCode,e.streetCode,e.districtCode,e.cityCode,e.provinceCode ]
+        const idx = code.findIndex(Boolean)
+        console.log('code', code, idx, code[idx])
+        if (code[idx]) {
+          e.areaCode = [code[idx] as string]
+          e.division = useDivision(code[idx] as string).value
+        } else {
+          e.areaCode = []
+          e.division = []
+        }
+      });
+      console.log('你随意', authList.value)
+      
+    }) 
+  }
+
+  const params = dialogProps.formProps!.model || {}
+  dialogProps.action = () => {
+    const apiName = type === 'add' ? addUserInfor : editUserInfor
+    const roleAuthList: any[] = []
+    authList.value.forEach((v: any, i:number) => {
+      roleAuthList.push({
+        postId: v.postId,
+        roleId: v.roleId,
+        unitId: v.unitId,
+        userAuthDataList: []
+      })
+      for (let j in v.authData) {
+        if (v.authData[j]) {
+          roleAuthList[i].userAuthDataList.push({
+            regionCode: j,
+            dataPermissionPolicy: v.authData[j].join(','),
+            unitId: v.unitId,
+            status: '1'
+          })
+        }
+      }
+    });
+
+    return apiName({
+      ...params,
+      userName: params.phone,
+      roleAuthList: roleAuthList
+    })
+  }
+  console.log("99", authList.value)
+  dialogProps.onSuccess = () => (props.refresh = Date.now())
+  dialogRef.value?.open()
+}
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -19,12 +311,24 @@ const dialogProps = reactive<CnPage.DialogProps>({
     model: { position: [] },
     items: [
       { label: '基本信息', component: 'subtitle', span: 24 },
-      { label: '用户编号', prop: 'code', component: 'input' },
-      { label: '用户名称', prop: 'code', component: 'input' },
-      { label: '登录手机号', prop: 'code', component: 'input' },
-      { label: '联系电话', prop: 'code', component: 'input' },
-      { label: '电子邮箱', prop: 'code', span: 24, component: 'input' },
-      { label: '状态', prop: 'code', span: 24, component: 'radio' },
+      { label: '用户编号', prop: 'userNo', component: 'input' },
+      { label: '用户名称', prop: 'name', component: 'input' },
+      { label: '登录手机号', prop: 'phone', component: 'input' },
+      { label: '联系电话', prop: 'telephone', component: 'input' },
+      { label: '电子邮箱', prop: 'email', span: 24, component: 'input' },
+      {
+        label: '状态',
+        prop: 'status',
+        span: 24,
+        component: 'radio',
+        dict: 'USER_STATUS'
+        // props: {
+        //   options: [
+        //     { label: '启用', value: '1' },
+        //     { label: '禁用', value: '0' }
+        //   ]
+        // }
+      },
       { label: '授权信息', component: 'subtitle', span: 24 },
       {
         prop: 'auth',
@@ -40,9 +344,18 @@ const dialogProps = reactive<CnPage.DialogProps>({
           ]
         }
       },
-      { prop: 'add', component: 'slot', span: 24 }
+      { prop: 'add', component: 'slot', span: 24 },
+      { prop: 'authSlot', component: 'slot', span: 24 }
     ],
-    colSpan: 12
+    colSpan: 12,
+    rules: {
+      userNo: [{ required: true, message: '请输入用户编号'}],
+      name: [{ required: true, message: '请输入用户名称'}],
+      phone: [{ required: true, message: '请输入登录手机号'}],
+      telephone: [{ required: true, message: '请输入联系电话'}],
+      status: [{ required: true, message: '请选择状态'}],
+      // authSlot: [{ required: true, message: '请'}]
+    }
   },
   onSubmit: () => {
     console.log({ ...dialogProps.formProps?.model })
@@ -56,7 +369,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: () => Promise.reject(),
+  action: getUserList,
   search: {
     items: [
       { label: '用户名称', prop: 'name', component: 'input' },
@@ -68,35 +381,37 @@ const props: CnPage.Props = reactive({
       {
         label: '新增',
         type: 'primary',
-        onClick: () => {
-          dialogRef.value?.open()
-        }
+        // onClick: () => {
+        //   dialogRef.value?.open()
+        // },
+          onClick: () => operateUser()
       }
     ]
   },
   table: {
     columns: [
       { type: 'index', label: '序号', width: 60 },
-      { prop: 'code', label: '用户编号' },
-      { prop: 'code', label: '用户名称' },
-      { prop: 'code', label: '登录手机号' },
-      { prop: 'code', label: '单位名称' },
-      { prop: 'code', label: '单位层级' },
-      { prop: 'code', label: '类型' },
-      { prop: 'code', label: '岗位' },
-      { prop: 'code', label: '状态' },
-      { prop: 'code', label: '创建时间' },
+      { prop: 'userNo', label: '用户编号' },
+      { prop: 'name', label: '用户名称' },
+      { prop: 'phone', label: '登录手机号' },
+      { prop: 'unitName', label: '单位名称' },
+      { prop: 'unitLevel', label: '单位层级' },
+      { prop: 'unitType', label: '类型' },
+      { prop: 'currentPost', label: '岗位' },
+      { prop: 'status', label: '状态' },
+      { prop: 'createTime', label: '创建时间' },
       {
         prop: 'action',
         label: '操作',
         buttons: [
-          { label: '查看', type: 'primary' },
-          { label: '编辑', type: 'warning' }
+          { label: '查看', type: 'primary', onClick: ({row}) => operateUser('look', row) },
+          { label: '编辑', type: 'warning', onClick: ({row}) => operateUser('edit', row) }
         ]
       }
     ]
   }
 })
+
 </script>
 
 <style lang="scss" scoped>
@@ -104,5 +419,27 @@ const props: CnPage.Props = reactive({
   margin-top: -120px;
   text-align: right;
   width: 100%;
+}
+.aublock {
+  background-color: #f8f8f8;
+  border: 1px dashed #eee;
+  padding: 15px 15px 25px;
+  margin-bottom: 15px;
+}
+
+.tree_label {
+  align-items: center;
+  display: flex;
+  width: 100%;
+}
+.tree_auth {
+  margin-left: 10px;
+}
+:deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner ){
+  background-color: #409eff;
+  border-color: #409eff;
+}
+:deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after) {
+  border-color: #fff;
 }
 </style>

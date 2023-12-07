@@ -8,10 +8,10 @@ export default function getTableConfig(
 
     columns: [
       { type: 'selection' },
-      { label: '业务部门', prop: 'businessName' },
-      { label: '备注', prop: 'remake' },
-      { label: '事项数', prop: 'matterCount' },
-      { label: '创建时间', prop: 'createDate' },
+      { label: '业务部门', prop: 'businessDeptName' },
+      { label: '备注', prop: 'remark' },
+      { label: '事项数', prop: 'mattersCount' },
+      { label: '创建时间', prop: 'createTime' },
       {
         label: '操作',
         prop: 'action',
