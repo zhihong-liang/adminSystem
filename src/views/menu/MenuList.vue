@@ -22,6 +22,7 @@
 import { reactive, ref, computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
+import { dymanicAddRoute } from '@/router'
 import moment from 'moment'
 import { addMenu, removeMenu, editMenu, checkMenuList, type ListRes } from '@/api'
 
@@ -266,12 +267,15 @@ function handleRemove({ row }: any) {
   }).then(() => {
     ElMessage.success({ message: '删除成功' })
     props.refresh = new Date().getTime()
-    getMenuList({}).then
+    getMenuList({})
   })
 }
 
 function queryMenuList() {
   props.refresh = new Date().getTime()
-  getMenuList({})
+  getMenuList({}).then(() => {
+    // 每次新增菜单都动态添加路由
+    dymanicAddRoute(menuList.value, modules.value)
+  })
 }
 </script>
