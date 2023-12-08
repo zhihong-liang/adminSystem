@@ -44,7 +44,7 @@ function useDictionary(
       types.length = 0
       getDictionary(newTypes).then((res) => {
         for (const key in res.data) {
-          dict[key].value = res.data[key].map(v => ({
+          dict[key].value = res.data[key].map((v) => ({
             label: v.description,
             value: v.subtype
           }))
@@ -69,8 +69,8 @@ function useDictionary(
 export default useDictionary
 
 function getUnitTypeDict() {
-  getUnitTypeList({ page: 1, size: 1000, obj: {} }).then(res => {
-    dict['UNIT_TYPE'].value = res.rows.map(v => ({
+  getUnitTypeList({ page: 1, size: 1000, obj: {} }).then((res) => {
+    dict['UNIT_TYPE'].value = res.rows.map((v) => ({
       label: v.unitTypeName,
       value: v.id.toString()
     }))
