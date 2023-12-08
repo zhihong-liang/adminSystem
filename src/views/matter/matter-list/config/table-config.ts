@@ -22,7 +22,7 @@ export default function getTableConfig(
             label: '编辑',
             type: 'text',
             onClick: (params: any) => {
-              editClickCb(params.row, 'edit')
+              editClickCb('edit', params.row)
             }
           }
         ]
