@@ -17,9 +17,6 @@
       <template #offShelf>
         <div>下架</div>
       </template>
-      <template #content>
-        <CnEditor v-model:modelValue="editorContent"></CnEditor>
-      </template>
     </CnDialog>
   </div>
 </template>
@@ -28,7 +25,6 @@
 import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
-import CnEditor from '@/components/Editor/Editor.vue'
 
 import searchConfig from './config/search-config'
 import getTableConfig from './config/table-config'

@@ -7,7 +7,9 @@
         </el-text>
       </template>
       <template #matterCode="{ row }">
-        <el-button type="text">{{ row.matterCode }}</el-button>
+        <el-button type="text" @click="showDialogByEdit('edit', row)">{{
+          row.matterCode
+        }}</el-button>
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
@@ -22,7 +24,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
+import { reactive, ref, toRaw } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 
@@ -34,12 +36,16 @@ import { getDialogConfig } from './config/dialog-config'
 import type { ActionType, tabsActivateName } from './config/type'
 
 import { getMatterList, addMatter } from '@/api/matter'
+import { isString } from 'lodash-es'
 
 // const init: Promise<void> = new Promise((resolve) =>
 //   setTimeout(() => {
 //     resolve()
 //   }, 1000)
 // )
+
+const detailAndEditorModel = ref<any>({})
+const openDialogHandle = ref<ActionType>('detail')
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
@@ -55,8 +61,8 @@ const props = reactive<CnPage.Props>({
   },
   action: getMatterList,
   search: searchConfig,
-  toolbar: getTollbarConifg(showDialog),
-  table: getTableConfig(handleTableActionClick),
+  toolbar: getTollbarConifg(showDialogByAddOrLabel),
+  table: getTableConfig(showDialogByEdit),
   pagination: {
     page: 1,
     size: 10
@@ -66,11 +72,6 @@ const props = reactive<CnPage.Props>({
 // 弹窗确定按钮的点击
 function dialogSubmitSuccess() {
   props.refresh = new Date().getTime()
-}
-
-// table操作按钮的点击
-function handleTableActionClick(row: any, handle: ActionType) {
-  console.log(handle)
 }
 
 // 控制是否显示支付方式
@@ -83,7 +84,9 @@ function authenticationTypeVisible() {
   return dialogProps.formProps?.model?.identityAuthType === '1'
 }
 
-function handleTabChange() {}
+function handleTabChange() {
+  showDialogByEdit(openDialogHandle.value, detailAndEditorModel.value)
+}
 
 // 新增事项
 function addMatterAction() {
@@ -95,12 +98,31 @@ function addMatterAction() {
   return addMatter(model)
 }
 
-// 设置tollbar点击弹窗的配置
-function showDialog(handle: ActionType) {
-  const dialogConfig = getDialogConfig(handle, dialogSubmitSuccess, {
-    identityAuthItem: authenticationTypeVisible,
-    payWay: payTypeVisible
-  })
+// 显示新建事项/所属标签窗口
+function showDialogByAddOrLabel(handle: ActionType) {
+  const dialogConfig = getDialogConfig(handle)(dialogSubmitSuccess)
+  for (const key of Object.keys(dialogConfig)) {
+    dialogProps[key] = dialogConfig[key]
+  }
+  dialogProps.action = () => addMatterAction()
+  dialogRef.value?.open()
+}
+
+function stringToArray(value: any) {
+  return isString(value) ? value.split(',') : value
+}
+
+// 显示编辑窗口
+function showDialogByEdit(handle: ActionType, row: any) {
+  const model = window.structuredClone(toRaw(row))
+  console.log(model)
+  model.hardwareModule = stringToArray(model.hardwareModule)
+  model.identityAuthItem = stringToArray(model.identityAuthItem)
+  model.networdPolicy = stringToArray(model.networdPolicy)
+  model.payWay = stringToArray(model.payWay)
+  detailAndEditorModel.value = model
+  openDialogHandle.value = handle
+  const dialogConfig = getDialogConfig(handle)(dialogSubmitSuccess, activeName.value, model)
   for (const key of Object.keys(dialogConfig)) {
     dialogProps[key] = dialogConfig[key]
   }
