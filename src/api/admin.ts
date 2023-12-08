@@ -70,17 +70,49 @@ export const delUnitType = (ids: string): Promise<Res> => axios.delete(`/api/adm
  * 日志管理
  */
 // 操作日志
+export interface OperationLog {
+  logNo?: string
+  moduleName?: string
+  logType?: string
+  operatorNo?: string
+  operatorUsername?: string
+  status?: string
+  createTime?: string
+  operatorIp?: string
+  browser?: string
+  msg?: string
+}
 export const getOperationLog = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/admin/operationLog/getPageList', data)
 // 登录日志
 export interface LoginLog {
-  id?: number
-  loginName?: string
+  logNo?: string
+  logType?: string
   userNo?: string
+  loginName?: string
+  status?: string
+  createTime?: string
   loginIp?: string
-  os?: string
   browser?: string
-  description?: string
+  msg?: string
 }
 export const getLoginLog = (data: ListReq<LoginLog>): Promise<ListRes<LoginLog>> =>
   axios.post('/api/admin/loginLog/ajaxList', data)
+
+
+/**
+ * 用户管理
+ */
+export const getUserList = (data: ListReq): Promise<ListRes> => axios.post('/api/admin/user/list', data)
+// 新增
+export const addUserInfor = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/user/add', data)
+// 编辑
+export const editUserInfor = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/user/edit', data)
+// 新增编辑-岗位查询
+export const getDeptpostList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/deptPost/list', data)
+// 新增编辑-查询角色列表
+export const getRoleList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sysRole/list', data)
+// 新增编辑-查询角色详情
+export const getRoleDetail = (id: string): Promise<Res> => axios.get('/api/admin/sysRole/get/' + id)
+// 新增编辑-获取用户详细信息
+export const getUserDetail = (id: string): Promise<Res> => axios.get('/api/admin/user/get/' + id)

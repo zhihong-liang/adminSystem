@@ -1,41 +1,39 @@
 <template>
-  <div class="slider-item" v-if="!isHideMenu">
-    <template v-if="menuItem.childList && menuItem.childList.length">
-      <el-sub-menu :key="menuItem.id" :index="menuItem.path">
-        <template #title>
-          <template v-if="menuItem.icon">
-            <DynamicIcon :html="menuItem.icon"/>
-          </template>
-          <span>{{ menuItem.name }}</span>
-        </template>
+  <template v-if="!isHideMenu">
+    <el-sub-menu v-if="isMenu" :key="menuItem.id" :index="menuIndex">
+      <template #title>
+        <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
+        <span>{{ menuItem.name }}</span>
+      </template>
 
-        <menu-item v-for="item in menuItem.childList" :menu-item="item" />
-      </el-sub-menu>
-    </template>
+      <menu-item v-for="item in menuItem.childList" :menu-item="item" />
+    </el-sub-menu>
 
-    <router-link v-else :to="(menuItem.path as string)" @click="handleRouterLinkClick(menuItem)">
-      <el-menu-item :index="menuItem.path">
-        <template v-if="menuItem.icon">
-          <DynamicIcon :html="menuItem.icon"/>
-        </template>
-        <template #title>
-          <span>{{ menuItem.name }}</span>
-        </template>
+    <router-link v-if="isDirt" :to="menuItem.path!">
+      <el-menu-item
+        :index="menuIndex"
+        @click="handleMenuItemClick"
+        style="{--el-menu-hover-bg-color: var(--system-slider-hover-background)}"
+      >
+        <DynamicIcon v-if="menuItem.icon" :html="menuItem.icon" />
+        <template #title>{{ menuItem.name }}</template>
       </el-menu-item>
     </router-link>
-  </div>
+  </template>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount } from 'vue'
-import { useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
+import { storeToRefs } from 'pinia'
+
 import DynamicIcon from './dynamicIcon.vue'
 
 import type { Menu } from './type'
 
-const route = useRoute()
-const { addTabToList, updateActiveTab } = useHomeStore()
+const store = useHomeStore()
+const { menuList } = storeToRefs(store)
+const { addTabToList, updateActiveTab, updateBreadcrumb } = store
 
 const props = defineProps<{
   menuItem: Menu
@@ -44,23 +42,55 @@ const props = defineProps<{
 const emits = defineEmits(['onClick'])
 
 // 是否为隐藏菜单
-const isHideMenu = computed(() => (props.menuItem?.status === '0'))
+const isHideMenu = computed(() => props.menuItem?.status === '0')
 
-const handleRouterLinkClick = (item: Menu) => {
-  const { name, id, path } = item
-  const tab = { name, id, path: path as string }
+// 是否为菜单
+const isMenu = computed(() => props.menuItem?.type === 'menu')
 
-  addTabToList(tab)
+// 是否为模块
+const isDirt = computed(() => props.menuItem?.type === 'dirt')
 
-  updateActiveTab(id as number)
+const menuIndex = computed(() => props.menuItem?.path?.toString())
 
-  emits('onClick', item)
+// 处理面包屑数据
+function filterMenu(list: Array<string>) {
+  let array: Menu[] = [...menuList.value]
+
+  return list.map((title: string) => {
+    const target = array.find((menu) => menu.path === title) || {}
+    const { id, path = '', name = '', childList = [] } = target as Menu
+
+    array = childList
+
+    return { path, name, id }
+  })
 }
 
-onBeforeMount(() => {
-  // 为每个菜单路由添加元数据 id，后续需要哪些字段可在这里添加
-  route.meta.id = props.menuItem.id?.toString()
-})
+const handleMenuItemClick = (instance: any) => {
+  // 更新面包屑
+  const { indexPath = [] } = instance || {}
+  updateBreadcrumb(filterMenu(indexPath))
+
+  // 更新tab
+  const { name, id, path } = props.menuItem
+  const tab = { name, id, path: path as string }
+  addTabToList(tab)
+  updateActiveTab(id as number)
+
+  // emits('onClick', props.menuItem)
+}
 </script>
 
-<style scoped></style>
+<style lang="scss" scoped>
+
+.el-menu-item {
+  padding: 0 5px;
+  &:hover {
+    background-color: var(--system-primary-color);
+  }
+  &.is-active {
+    background-color: var(--system-primary-color);
+    color: var(--system-primary-text-color);
+  }
+}
+</style>

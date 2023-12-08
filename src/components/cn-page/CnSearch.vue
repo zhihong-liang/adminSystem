@@ -1,22 +1,51 @@
 <template>
-  <CnForm :col-span="colSpan" :footer-span="footerSpan || colSpan">
+  <CnForm :items="items" :col-span="colSpan" :footer-span="footerSpan || colSpan">
     <template #footer="{ data, el }">
       <el-button type="primary" @click="handleSearch(data)">搜索</el-button>
       <el-button @click="handleReset(data, el)">重置</el-button>
+      <el-button @click="moreFun" v-if="showBtn">
+        <span v-if="showMore">
+          更多
+          <ArrowDown style="width: 15px; height: 15px; margin-right: 8px" />
+        </span>
+        <span v-else>
+          收起
+          <ArrowUp style="width: 15px; height: 15px; margin-right: 8px" />
+        </span>
+      </el-button>
     </template>
   </CnForm>
 </template>
 
 <script lang="ts" setup>
+import { ref, type PropType, type UnwrapNestedRefs, onMounted } from "vue";
 import type { FormInstance } from 'element-plus'
 import CnForm from './CnForm.vue'
 
-defineProps({
+const showBtn = ref(false);
+const showMore = ref(true);
+
+const props = defineProps({
   colSpan: { type: Number, default: 6 },
-  footerSpan: { type: Number, default: 6 }
+  footerSpan: { type: Number, default: 6 },
+  items: {
+    type: Array as PropType<UnwrapNestedRefs<CnPage.FormItem>[]>,
+    default: () => [],
+  },
 })
 
 const emits = defineEmits(['search', 'reset'])
+
+onMounted(() => {
+  if (props.items.length > 3) {
+    showBtn.value = true;
+    props.items.map((item: any, index: number) => {
+      if (index >= 3) {
+        item.visible = () => false
+      }
+    });
+  }
+})
 
 function handleSearch(data: unknown) {
   emits('search', data)
@@ -25,5 +54,23 @@ function handleSearch(data: unknown) {
 function handleReset(data: unknown, el?: FormInstance) {
   el?.resetFields()
   emits('reset', data, el)
+}
+
+function moreFun () {
+  showMore.value = !showMore.value;
+  if (showMore.value) {
+    props.items.map((item: any, index: number) => {
+      if (index >= 3) {
+        // item.display = "none";
+        item.visible = () => false
+      }
+    });
+  } else {
+    props.items.map((item: any) => {
+      if (item.visible = () => false) {
+        item.visible = () => true
+      }
+    });
+  }
 }
 </script>

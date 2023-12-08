@@ -2,78 +2,50 @@ const config: CnPage.SearchProps = {
   model: {},
   labelPosition: 'left',
   items: [
-    { label: '粤智助事项编码', prop: 'itemId', component: 'input' },
-    { label: '事项名称', prop: 'sex1', component: 'input' },
+    { label: '粤智助事项编码', prop: 'matterCode', component: 'input' },
+    { label: '事项名称', prop: 'matterName', component: 'input' },
     {
       label: '事项别名',
-      prop: 'sex',
+      prop: 'matterAlias',
       component: 'input'
     },
     {
       label: '服务对象',
-      prop: 'birthday',
+      prop: 'serviceObject',
       component: 'select',
-      props: {
-        options: [
-          { label: '已婚', value: 0 },
-          { label: '未婚', value: 1 },
-          { label: '离异', value: 2 },
-          { label: '丧偶', value: 3 }
-        ]
-      }
+      dict: 'SERVICE_OBJECT'
     },
     {
       label: '系统层级',
-      prop: 'marital',
+      prop: 'sysLevel',
       component: 'select',
-      props: {
-        options: [
-          { label: '已婚', value: 0 },
-          { label: '未婚', value: 1 },
-          { label: '离异', value: 2 },
-          { label: '丧偶', value: 3 }
-        ]
-      }
+      dict: 'SYS_LEVEL'
     },
     {
       label: '系统覆盖范围',
-      prop: 'name2',
-      component: 'cascader',
-      props: {
-        showAllLevels: false,
-        options: [{ label: '广东', value: '44', children: [{ label: '广州', value: '4401' }] }]
-      }
+      prop: 'sysCoverage',
+      component: 'select',
+      dict: 'SYS_COVERAGE'
     },
     {
       label: '业务部门',
-      prop: 'address',
-      component: 'select',
-      props: {
-        options: [
-          { label: '读书', value: 0 },
-          { label: '打球', value: 1 }
-        ]
-      }
+      prop: 'businessUnit',
+      component: 'input'
     },
     {
       label: '办理类型',
-      prop: 'hobby',
+      prop: 'handleType',
       component: 'select',
-      props: {
-        options: [
-          { label: '读书', value: 0 },
-          { label: '打球', value: 1 }
-        ]
-      }
+      dict: 'HANDLE_TYPE'
     },
     {
       label: '事项状态',
-      prop: 'hobby',
+      prop: 'matterStatus',
       component: 'select',
       props: {
         options: [
-          { label: '读书', value: 0 },
-          { label: '打球', value: 1 }
+          { label: '有效', value: '1' },
+          { label: '无效', value: '0' }
         ]
       }
     }

@@ -22,6 +22,7 @@
 import { reactive, ref, computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
+import { dymanicAddRoute } from '@/router'
 import moment from 'moment'
 import { addMenu, removeMenu, editMenu, checkMenuList, type ListRes } from '@/api'
 
@@ -37,11 +38,7 @@ const store = useHomeStore()
 const { modules, menuList } = storeToRefs(store)
 const { getMenuList } = store
 
-const finalMenuList = computed(() => menuList.value)
-
-const componentMenu = computed(() =>
-  Object.keys(modules.value).map((m) => ({ value: m.replace('..', '') }))
-)
+const componentMenus = computed(() => Object.keys(modules.value).map((m) => ({ value: m })))
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps: CnPage.DialogProps = reactive({
@@ -57,15 +54,13 @@ const dialogProps: CnPage.DialogProps = reactive({
         prop: 'component',
         component: 'select',
         props: {
-          options: componentMenu.value
+          options: componentMenus.value
         }
       },
       {
         label: '图标',
         prop: 'icon',
         component: 'slot'
-        // props: { slots: [{ name: 'append', component: 'icon', label: 'Flag' }] },
-        // slots: []
       },
       {
         label: '父级菜单',
@@ -86,13 +81,7 @@ const dialogProps: CnPage.DialogProps = reactive({
         label: '类型',
         prop: 'type',
         component: 'select',
-        props: {
-          options: [
-            { label: '菜单', value: 'menu' },
-            { label: '模块', value: 'dirt' },
-            { label: '按钮', value: 'action' }
-          ]
-        }
+        dict: 'MENU_TYPE'
       },
       { label: '排序', prop: 'sort', component: 'input' },
       { label: '状态', prop: 'status', span: 24, component: 'slot' },
@@ -122,8 +111,8 @@ const props: CnPage.Props = reactive({
   search: {
     items: [
       { label: '标题', prop: 'name', component: 'input' },
-      { label: '类型', prop: 'type', component: 'select' },
-      { label: '状态', prop: 'status', component: 'select' }
+      { label: '类型', prop: 'type', component: 'select', dict: 'MENU_TYPE' },
+      { label: '状态', prop: 'status', component: 'select', dict: 'MENU_STATUS' }
     ]
   },
   toolbar: {
@@ -144,8 +133,8 @@ const props: CnPage.Props = reactive({
     columns: [
       { prop: 'name', label: '标题' },
       { prop: 'sort', label: '排序' },
-      { prop: 'type', label: '类型' },
-      { prop: 'status', label: '状态' },
+      { prop: 'type', label: '类型', dict: 'MENU_TYPE' },
+      { prop: 'status', label: '状态', dict: 'MENU_STATUS' },
       { prop: 'code', label: '编码' },
       { prop: 'path', label: '地址' },
       { prop: 'component', label: '组件' },
@@ -154,10 +143,10 @@ const props: CnPage.Props = reactive({
         label: '图标',
         icons: [
           {
-            /*props: {}*/
+            props: { size: '20px' }
           }
         ]
-      }, // show：控制icon的显示？
+      },
       { prop: 'description', label: '描述' },
       {
         prop: 'action',
@@ -284,6 +273,9 @@ function handleRemove({ row }: any) {
 
 function queryMenuList() {
   props.refresh = new Date().getTime()
-  getMenuList({})
+  getMenuList({}).then(() => {
+    // 每次新增菜单都动态添加路由
+    dymanicAddRoute(menuList.value, modules.value)
+  })
 }
 </script>

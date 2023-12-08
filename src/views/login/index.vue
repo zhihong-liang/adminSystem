@@ -71,10 +71,7 @@ import { useRouter } from 'vue-router'
 import LoginBg from './components/LoginBg/index.vue'
 import CryptoJS from 'crypto-js'
 import { login } from '@/api'
-import { useUserStore } from '@/stores'
-import { isRegularExpressionLiteral } from 'typescript'
-import { setToken, clearToken, getToken } from '@/utils/auth'
-const store = useUserStore()
+import { setToken } from '@/utils/auth'
 
 const router = useRouter()
 
@@ -119,6 +116,7 @@ const handleLogin = async () => {
           localStorage.removeItem('remember')
         }
         Message.success('登录成功')
+
         router.push('/home')
       })
     }

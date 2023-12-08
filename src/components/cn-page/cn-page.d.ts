@@ -23,6 +23,9 @@ import type {
   InputNumberProps as ElInputNumberProps
 } from 'element-plus'
 
+import type { IToolbarConfig } from '@wangeditor/editor'
+import type { IEditorConfig } from '@wangeditor/editor'
+
 declare namespace CnPage {
   interface Props<Row = Record<string, any>, Params = Record<string, any>, Init = void> {
     /**
@@ -100,7 +103,12 @@ declare namespace CnPage {
     columns: TableColumnProps<T>[]
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
-    ElTableColumnCtx<T> & { slot: string; dict: string; buttons: ButtonProps<T>[], icons: ElIconProps<T>[] }
+    ElTableColumnCtx<T> & {
+      slot: string
+      dict: string
+      buttons: ButtonProps<T>[]
+      icons: ElIconProps<T>[]
+    }
   >
 
   /**
@@ -146,6 +154,7 @@ declare namespace CnPage {
     | FormItemAdministrativeDivisionProps
     | FormItemGroupProps
     | FormItemSlotProps
+    | FormItemEditorProps
 
   type FormItemProps = {
     -readonly [K in keyof ElFormItemProps]?: ElFormItemProps[K]
@@ -165,7 +174,7 @@ declare namespace CnPage {
    * 小标题
    */
   interface FormItemSubTitleProps extends FormItemProps {
-    component: 'subtitle',
+    component: 'subtitle'
   }
 
   /**
@@ -264,11 +273,24 @@ declare namespace CnPage {
   }
 
   /**
+   * 富文本
+   */
+  interface FormItemEditorProps extends FormItemProps {
+    component: 'editor'
+    props?: {
+      [key: string]: any
+      height?: string
+      toolbarConfig?: Partial<IToolbarConfig>
+      editorConfig?: Partial<IEditorConfig>
+    }
+  }
+
+  /**
    * 表单组
    * TODO
    */
   interface FormItemGroupProps extends FormItemProps {
-    component: 'group',
+    component: 'group'
     props?: {
       children: FormItem[]
     }

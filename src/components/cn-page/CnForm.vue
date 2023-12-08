@@ -3,6 +3,7 @@ import { computed, reactive, ref, watchEffect, type PropType, type UnwrapNestedR
 import type { FormInstance } from 'element-plus'
 import CnFormItem from './CnFormItem.vue'
 import CnAdministrativeDivision from './CnAdministrativeDivision.vue'
+import CnEditor from './CnEditor.vue'
 
 const props = defineProps({
   model: { type: Object, default: () => ({}) },
@@ -100,6 +101,11 @@ defineExpose({ formRef })
             v-else-if="component === 'ad'"
             v-bind="props"
             :model="modelValue"
+          />
+          <CnEditor
+            v-else-if="component === 'editor'"
+            v-bind="props"
+            v-model:modelValue="modelValue[rest.prop as string]"
           />
           <CnFormItem
             v-else
