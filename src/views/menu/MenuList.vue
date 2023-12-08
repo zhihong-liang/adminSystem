@@ -24,7 +24,7 @@ import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import { dymanicAddRoute } from '@/router'
 import moment from 'moment'
-import { addMenu, removeMenu, editMenu, checkMenuList, type ListRes } from '@/api'
+import { addMenu, removeMenu, editMenu, getMenuList as queryMenuTree, type Res } from '@/api'
 
 import { ElMessageBox, ElMessage } from 'element-plus'
 
@@ -36,7 +36,7 @@ import type { Menu } from '@/layout/slider/type'
 
 const store = useHomeStore()
 const { modules, menuList } = storeToRefs(store)
-const { getMenuList } = store
+const { updateMenuList } = store
 
 const componentMenus = computed(() => Object.keys(modules.value).map((m) => ({ value: m })))
 
@@ -107,7 +107,7 @@ const IconDialogRef = ref<InstanceType<typeof CnDialog>>()
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: (params) => checkMenuList(params),
+  action: Action,
   search: {
     items: [
       { label: '标题', prop: 'name', component: 'input' },
@@ -162,43 +162,70 @@ const props: CnPage.Props = reactive({
   },
   pagination: false,
   refresh: new Date().getTime(),
+  transformRequest: (params) => params,
   transformResponse: handleTransformResp
 })
 
-function handleTransformResp(res: ListRes) {
-  const { code, rows, total } = res
+const step = ref('') // 有两个状态：add 或 delete
+
+function Action(params: any) {
+  return new Promise((resolve, reject) => {
+    queryMenuTree(params)
+      .then((res) => {
+        if (res.code === '200') {
+          resolve(res)
+        } else {
+          reject(res)
+        }
+      })
+      .catch((err) => reject(err))
+  })
+}
+
+function handleTransformResp(res: Res) {
+  const { code, data } = res
 
   if (code !== '200') return ElMessage.error({ message: '查询失败' })
 
-  return { code, total, rows: assembleData(rows as Menu[]) }
+  // 如果是 删除(delete) 或 新增(add)，则需要更新 pinia 的 menuList
+  if (step.value === 'delete' || step.value === 'add') {
+    updateMenuList(data)
+
+    // 每次 新增菜单 都 更新动态路由
+    step.value === 'add' && dymanicAddRoute(menuList.value, modules.value)
+  }
+
+  step.value = ''
+
+  return { code, total: 0, rows: data }
 }
 
 // 把扁平化的树结构还原
-function assembleData(menus: Menu[]) {
-  const map: any = {}
-  const list: Menu[] = []
+// function assembleData(menus: Menu[]) {
+//   const map: any = {}
+//   const list: Menu[] = []
 
-  menus.forEach((item: any) => {
-    const { id } = item
-    map[`${id}`] = { ...item, childList: [] }
-  })
+//   menus.forEach((item: any) => {
+//     const { id } = item
+//     map[`${id}`] = { ...item, childList: [] }
+//   })
 
-  menus.forEach((node) => {
-    const { parentId, id } = node
+//   menus.forEach((node) => {
+//     const { parentId, id } = node
 
-    if (parentId === 0) {
-      list.push(map[`${id}`])
-    } else {
-      if (!!map[`${parentId}`]) {
-        map[`${parentId}`].childList.push(map[`${id}`])
-      } else {
-        list.push(map[`${id}`])
-      }
-    }
-  })
+//     if (parentId === 0) {
+//       list.push(map[`${id}`])
+//     } else {
+//       if (!!map[`${parentId}`]) {
+//         map[`${parentId}`].childList.push(map[`${id}`])
+//       } else {
+//         list.push(map[`${id}`])
+//       }
+//     }
+//   })
 
-  return list
-}
+//   return list
+// }
 
 function handleSubmit(action: 'add' | 'edit') {
   let params: Menu = {
@@ -266,16 +293,13 @@ function handleRemove({ row }: any) {
     }
   }).then(() => {
     ElMessage.success({ message: '删除成功' })
+    step.value = 'delete'
     props.refresh = new Date().getTime()
-    getMenuList({})
   })
 }
 
 function queryMenuList() {
+  step.value = 'add'
   props.refresh = new Date().getTime()
-  getMenuList({}).then(() => {
-    // 每次新增菜单都动态添加路由
-    dymanicAddRoute(menuList.value, modules.value)
-  })
 }
 </script>

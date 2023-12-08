@@ -43,7 +43,11 @@ import InfoBox from './infoBox.vue'
 const { updateContainerStyle } = useHomeStore()
 
 const userFileData = reactive({
-  width: 280,
+  styles: {
+    'width': '280px',
+    'min-width':  '260px',
+    'max-width': '320px'
+  },
   formProps: {
     model: {
       unitType: '运营中心',
@@ -87,7 +91,8 @@ const authorizeInfoData = reactive({
       job: '管理员',
       unitName: '天河区政务服务中心',
       data: '天河区（本单位、本级同类、下级同类）',
-      feature: '首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、',
+      feature:
+        '首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、首页、个人中心、设备管理、菜单管理、用户管理、角色管理、'
     },
     items: [
       { label: '单位类型', prop: 'unitType', component: 'text', span: 8 },
@@ -102,7 +107,8 @@ const authorizeInfoData = reactive({
 
 onBeforeMount(() => {
   updateContainerStyle({
-    'background-color': 'var(--system-container-background)'
+    'background-color': 'var(--system-container-background)',
+    padding: '0px'
   })
 })
 

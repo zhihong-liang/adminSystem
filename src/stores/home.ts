@@ -6,6 +6,7 @@ import type { TabItem, Menu, BreadcrumbItem } from '@/layout/type'
 
 export interface getMenuListPayloadOptions {
     manual?: boolean // 手动更新，默认自动更新
+    params?: Menu
 }
 
 export interface ContainerStyleProps {
@@ -22,7 +23,7 @@ export const useHomeStore = defineStore('home', () => {
     const menuList = ref<Menu[]>([])  // 菜单列表
     const finalMenuList = computed(() => menuList.value)
     // 请求菜单列表
-    async function getMenuList({ manual = false }: getMenuListPayloadOptions): Promise<Menu[]> {
+    async function getMenuList({ manual = false, params }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
         const formatMenu = (menus: Menu[]): Menu[] => {
             const list: Menu[] = []
@@ -40,7 +41,7 @@ export const useHomeStore = defineStore('home', () => {
             return list
         }
 
-        const _res = await queryMenuList({})  // TODO 接口失败也要做对应的处理
+        const _res = await queryMenuList(params ?? {})  // TODO 接口失败也要做对应的处理
         const { data = [], code } = _res || {}
 
         return new Promise((resolve, reject) => {
@@ -92,6 +93,7 @@ export const useHomeStore = defineStore('home', () => {
         breadcrumbList.value = list
     }
 
+    // 页面布局container的样式
     const containerStyle = ref<ContainerStyleProps>({})
     function updateContainerStyle(style: ContainerStyleProps) {
         containerStyle.value = style
