@@ -6,79 +6,85 @@
     </template>
 
     <template #authSlot>
-      <div v-for="(item, index) in authList" :key="index">
-        <div>授权{{index + 1}}</div>
-        <el-row :gutter="20" class="aublock">
-          <el-col :span="12">
-            <el-form-item label="单位类型">
-              <el-select clearable filterable placeholder="请选择" v-model="item.unitType" @change="changeUnit">
-                <el-option v-for="option in unitTypeList" :key="option.id" :label="option.unitTypeName" :value="option.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="单位">
-              <el-select clearable filterable placeholder="请选择" v-model="item.unitId" @change="getPermit($event, index)">
-                <el-option v-for="option in unitList" :key="option.id" :label="option.fullName" :value="option.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="角色">
-              <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="changeRole">
-                <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="12">
-            <el-form-item label="岗位">
-              <el-select clearable filterable placeholder="请选择" v-model="item.postId">
-                <el-option v-for="option in postList" :key="option.id" :label="option.name" :value="option.id" />
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <div>功能权限</div>
-            <el-tree
-              :data="limitsList"
-              :props="defaultProps"
-              node-key="id"
-              @node-click="handleNodeClick"
-              show-checkbox
-              :default-checked-keys="checkedKeys"
-              class="defTreecs"
-            />
-          </el-col>
-          <el-col :span="24">
-            <div>数据权限</div>
-            <el-tree
-              v-model="item.areaCode"
-              :key="item.areaCode"
-              :data="item.division"
-              node-key="value"
-              :default-checked-keys="item.areaCode"
-              show-checkbox
-              check-strictly
-              style="width: 100%"
-              @check-change="(data: Division2, checked: boolean)=>handleCheckChange(data,checked, index)"
-            >
-              <template #default="{ node, data }">
-                <div class="tree_label">
-                  {{ node.label }}
-                  <div v-if="item.areaCode.includes(data.value)" class="tree_auth" @click.stop>
-                    <CnDict
-                      v-model="item.authData[data.value]"
-                      component="checkbox"
-                      dict="DATA_PERMISSION_POLICY"
-                    />
+      <el-form>
+        <div v-for="(item, index) in authList" :key="index">
+          <div>授权{{index + 1}}<span v-if="index !== 0" style="float: right;color:red;cursor:pointer;" @click="delAuth(index)">删除</span></div>
+          <el-row :gutter="20" class="aublock">
+            <el-col :span="12">
+              <el-form-item label="单位类型">
+                <el-select clearable filterable placeholder="请选择" v-model="item.unitType" @change="(val: string) => changeUnit(val, index, 'change')">
+                  <el-option v-for="option in unitTypeList" :key="option.id" :label="option.unitTypeName" :value="option.id" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="单位">
+                <el-select clearable filterable placeholder="请选择" v-model="item.unitId" @change="getPermit($event, index)">
+                  <el-option v-for="option in unitList" :key="option.id" :label="option.fullName" :value="option.id" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="角色">
+                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: string) => changeRole(val, index)">
+                  <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="12">
+              <el-form-item label="岗位">
+                <el-select clearable filterable placeholder="请选择" v-model="item.postId">
+                  <el-option v-for="option in postList" :key="option.id" :label="option.name" :value="option.id" />
+                </el-select>
+              </el-form-item>
+            </el-col>
+            <el-col :span="24">
+              <div>功能权限</div>
+              <el-tree
+                :data="item.limitsList"
+                :props="defaultProps"
+                node-key="id"
+                @node-click="handleNodeClick"
+                show-checkbox
+                :default-checked-keys="item.checkedKeys"
+                class="defTreecs"
+              />
+            </el-col>
+            <el-col :span="24">
+              <div>数据权限</div>
+              <el-tree
+                v-model="item.areaCode"
+                :key="item.areaCode"
+                :data="item.division"
+                node-key="value"
+                :default-checked-keys="item.areaCode"
+                show-checkbox
+                check-strictly
+                style="width: 100%"
+                @check-change="(data: Division2, checked: boolean)=>handleCheckChange(data,checked, index)"
+              >
+                <template #default="{ node, data }">
+                  <div class="tree_label">
+                    {{ node.label }}
+                    <div v-if="item.areaCode.includes(data.value)" class="tree_auth" @click.stop>
+                      <CnDict
+                        v-model="item.authData[data.value]"
+                        component="checkbox"
+                        dict="DATA_PERMISSION_POLICY"
+                      />
+                    </div>
                   </div>
-                </div>
-              </template>
-            </el-tree>
-          </el-col>
-        </el-row>
-      </div>
+                </template>
+              </el-tree>
+            </el-col>
+          </el-row>
+        </div>
+      </el-form>
       
+      
+    </template>
+    <template #footer>
+      <el-button v-if="dialogProps.title === '查看用户'" @click="dialogRef?.close()">关闭</el-button>
     </template>
   </CnDialog>
 </template>
@@ -134,6 +140,10 @@ const addAuth = () => {
   })
 }
 
+const delAuth = (index: number) => {
+  authList.value.splice(index, 1)
+}
+
 // 查询岗位
 const postList = ref([] as any)
 const queryPostList = () => {
@@ -160,7 +170,13 @@ const queryUnitList = () => {
 
 // 查询单位
 const unitList = ref([] as any)
-function changeUnit(val: string) {
+function changeUnit(val: string, index: number, type: string) {
+  if(type !== 'detail'){
+    authList.value[index].unitId = ""
+    authList.value[index].areaCode = []
+    authList.value[index].division = []
+    authList.value[index].authData = {}
+  }
   getUnitList({
     page:1,
     size:999,
@@ -232,10 +248,11 @@ const arrChild = (arr: any) => {
   return arr
 }
 
-const changeRole = (val: string) => {
+const changeRole = (val: string, index: number) => {
+  authList.value[index].limitsList = []
   getRoleDetail(val).then((res) => {
-    limitsList.value = arrChild(res.data.menuList)
-    checkedKeys.value = res.data.menuIds
+    authList.value[index].limitsList = arrChild(res.data.menuList)
+    authList.value[index].checkedKeys = res.data.menuIds
   })
 }
 
@@ -245,61 +262,81 @@ function operateUser(type = 'add', data = {}) {
   queryRoleList();
 
   authList.value = []
-  dialogProps.title = type === 'add' ? '新增用户' : (type === 'edit' ? '编辑用户': '查看用户')
+  dialogProps.formProps.disabled = false
+  if (type === 'look') dialogProps.formProps.disabled = true
 
-  if (type !== 'add') {
-    getUserDetail(data.id).then((res) => {
-      changeUnit(res.data.unitType)
-      dialogProps.formProps!.model = res.data || {}
+  dialogProps.title = type === 'add' ? '新增用户' : (type === 'edit' ? '编辑用户': '查看用户')
+  
+  const detailApi = data.id? getUserDetail(data.id) : Promise.resolve()
+  if (type) {
+    detailApi.then((res) => {
+      dialogProps.formProps!.model = res?.data || {}
       // 数据权限回显
-      authList.value = res.data.roleAuthList
-      res.data.roleAuthList.forEach((e: any) => {
-        const code = [ e.villageCode,e.streetCode,e.districtCode,e.cityCode,e.provinceCode ]
-        const idx = code.findIndex(Boolean)
-        console.log('code', code, idx, code[idx])
-        if (code[idx]) {
-          e.areaCode = [code[idx] as string]
-          e.division = useDivision(code[idx] as string).value
-        } else {
-          e.areaCode = []
-          e.division = []
-        }
-      });
+      authList.value = res?.data.roleAuthList || [{}]
+      if (type !== 'add') {
+        authList.value.forEach((e: any, ind: number) => {
+          changeUnit(e.unitType, ind, "detail")
+          changeRole(e.roleId, ind)
+
+          const code = [ e.villageCode,e.streetCode,e.districtCode,e.cityCode,e.provinceCode ]
+          const idx = code.findIndex(Boolean)
+          e.authData = {}
+          if (code[idx]) {
+            e.areaCode = [code[idx] as string]
+            e.division = useDivision(code[idx] as string).value
+          } else {
+            e.areaCode = []
+            e.division = []
+          }
+
+          const permissions = e.userAuthDataList as Unit['permissions']
+          if (permissions) {
+            e.areaCode = permissions.map((v) => v.regionCode)
+            e.authData = permissions.reduce(
+              (acc, cur) => {
+                acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
+                return acc
+              },
+              {} as Record<string, string[]>
+            )
+          }
+        });
+      }
+      
       console.log('你随意', authList.value)
       
+      const params = dialogProps.formProps!.model || {}
+      dialogProps.action = () => {
+        const apiName = type === 'add' ? addUserInfor : editUserInfor
+        const roleAuthList: any[] = []
+        authList.value.forEach((v: any, i:number) => {
+          roleAuthList.push({
+            postId: v.postId,
+            roleId: v.roleId,
+            unitId: v.unitId,
+            userAuthDataList: []
+          })
+          for (let item of v.areaCode) {
+            if (v.authData[item]) {
+              roleAuthList[i].userAuthDataList.push({
+                regionCode: item,
+                dataPermissionPolicy: v.authData[item].join(','),
+                unitId: v.unitId,
+                status: '1'
+              })
+            }
+          }
+        });
+
+        return apiName({
+          ...params,
+          userName: params.phone,
+          roleAuthList: roleAuthList
+        })
+      }
     }) 
   }
 
-  const params = dialogProps.formProps!.model || {}
-  dialogProps.action = () => {
-    const apiName = type === 'add' ? addUserInfor : editUserInfor
-    const roleAuthList: any[] = []
-    authList.value.forEach((v: any, i:number) => {
-      roleAuthList.push({
-        postId: v.postId,
-        roleId: v.roleId,
-        unitId: v.unitId,
-        userAuthDataList: []
-      })
-      for (let j in v.authData) {
-        if (v.authData[j]) {
-          roleAuthList[i].userAuthDataList.push({
-            regionCode: j,
-            dataPermissionPolicy: v.authData[j].join(','),
-            unitId: v.unitId,
-            status: '1'
-          })
-        }
-      }
-    });
-
-    return apiName({
-      ...params,
-      userName: params.phone,
-      roleAuthList: roleAuthList
-    })
-  }
-  console.log("99", authList.value)
   dialogProps.onSuccess = () => (props.refresh = Date.now())
   dialogRef.value?.open()
 }
@@ -345,7 +382,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
         }
       },
       { prop: 'add', component: 'slot', span: 24 },
-      { prop: 'authSlot', component: 'slot', span: 24 }
+      { prop: 'authSlot', component: 'slot', span: 24 },
     ],
     colSpan: 12,
     rules: {
@@ -354,7 +391,6 @@ const dialogProps = reactive<CnPage.DialogProps>({
       phone: [{ required: true, message: '请输入登录手机号'}],
       telephone: [{ required: true, message: '请输入联系电话'}],
       status: [{ required: true, message: '请选择状态'}],
-      // authSlot: [{ required: true, message: '请'}]
     }
   },
   onSubmit: () => {
@@ -395,11 +431,11 @@ const props: CnPage.Props = reactive({
       { prop: 'name', label: '用户名称' },
       { prop: 'phone', label: '登录手机号' },
       { prop: 'unitName', label: '单位名称' },
-      { prop: 'unitLevel', label: '单位层级' },
-      { prop: 'unitType', label: '类型' },
-      { prop: 'currentPost', label: '岗位' },
-      { prop: 'status', label: '状态' },
-      { prop: 'createTime', label: '创建时间' },
+      { prop: 'unitLevel', label: '单位层级', dict: 'UNIT_LEVEL' },
+      { prop: 'unitType', label: '类型', minWidth: 100 },
+      { prop: 'postName', label: '岗位' },
+      { prop: 'status', label: '状态', dict: 'USER_STATUS' },
+      { prop: 'createTime', label: '创建时间', width: 170 },
       {
         prop: 'action',
         label: '操作',
@@ -435,11 +471,15 @@ const props: CnPage.Props = reactive({
 .tree_auth {
   margin-left: 10px;
 }
-:deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner ){
-  background-color: #409eff;
-  border-color: #409eff;
-}
-:deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after) {
-  border-color: #fff;
-}
+// :deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner ){
+//   background-color: #409eff;
+//   border-color: #409eff;
+// }
+// :deep(.defTreecs .el-checkbox__input.is-disabled.is-indeterminate .el-checkbox__inner::before) {
+//   background-color: #409eff;
+//   border-color: #409eff;
+// }
+// :deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after) {
+//   border-color: #fff;
+// }
 </style>
