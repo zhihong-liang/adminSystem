@@ -24,6 +24,7 @@ export interface Unit {
   streetCode?: string
   villageCode?: string
   permissions?: UnitPermission[]
+  unitType?: string
 }
 interface UnitPermission {
   regionCode: string
