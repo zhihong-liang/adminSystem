@@ -100,25 +100,49 @@ export interface LoginLog {
 export const getLoginLog = (data: ListReq<LoginLog>): Promise<ListRes<LoginLog>> =>
   axios.post('/api/admin/loginLog/ajaxList', data)
 
-
 /**
  * 用户管理
  */
-export const getUserList = (data: ListReq): Promise<ListRes> => axios.post('/api/admin/user/list', data)
+export interface UserTs {
+  userNo: string
+  name: string
+  phone: string
+  telephone: string
+  email?: string
+  status: string
+  id?: number
+  roleAuthList?:UserAuthTs[]
+  userName?: string
+}
+interface UserAuthTs {
+  postId: number
+  roleId: number
+  unitId: string
+  userAuthDataList?: AuthItemTs[]
+}
+interface AuthItemTs {
+  dataPermissionPolicy: string
+  regionCode: string
+  unitId: string
+}
+
+export const getUserList = (data: ListReq): Promise<ListRes<UserTs>> => axios.post('/api/admin/user/list', data)
 // 新增
-export const addUserInfor = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/user/add', data)
+export const addUserInfor = (data: UserTs): Promise<Res> => axios.post('/api/admin/user/add', data)
 // 编辑
-export const editUserInfor = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/user/edit', data)
+export const editUserInfor = (data: UserTs): Promise<Res> => axios.put('/api/admin/user/edit', data)
 // 新增编辑-岗位查询
-export const getDeptpostList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/deptPost/list', data)
+export const getDeptpostList = (data: ListReq): Promise<ListRes> => axios.post('/api/admin/deptPost/list', data)
 // 新增编辑-查询角色列表
-export const getRoleList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sysRole/list', data)
+export const getRoleList = (data: ListReq): Promise<ListRes> => axios.post('/api/admin/sysRole/list', data)
+// 新增编辑-查询角色详情
+export const getRoleDetail = (id: number): Promise<Res> => axios.get('/api/admin/sysRole/get/' + id)
+// 新增编辑-获取用户详细信息
+export const getUserDetail = (id: number): Promise<Res> => axios.get('/api/admin/user/get/' + id)
+
+
 // 查下菜单树
 export const getSysMenuTree = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sys/sysMenu/tree', data)
-// 新增编辑-查询角色详情
-export const getRoleDetail = (id: string): Promise<Res> => axios.get('/api/admin/sysRole/get/' + id)
-// 新增编辑-获取用户详细信息
-export const getUserDetail = (id: string): Promise<Res> => axios.get('/api/admin/user/get/' + id)
 // 新增角色 
 export const sysRoleAdd = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sysRole/add', data)
 // 删除角色 

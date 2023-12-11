@@ -26,7 +26,7 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="角色" :prop="'authList.' + index + '.roleId'" :rules="{ required: true, message: '请选择角色', trigger: 'change'}" style="margin-bottom: 18px">
-                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: string) => changeRole(val, index)">
+                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: number) => changeRole(val, index)">
                   <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
                 </el-select>
               </el-form-item>
@@ -104,7 +104,7 @@ import {
   getUnitDetail,
   getUserDetail,
   editUserInfor,
-  type Unit
+  type Unit, type UserTs
 } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 
@@ -112,7 +112,7 @@ const handleCheckChange = (data: Division2, checked: boolean, index: number) => 
   if (checked) {
     model.authList[index].areaCode.push(data.value)
   } else {
-    model.authList[index].areaCode = model.authList[index].areaCode.filter((v) => v !== data.value)
+    model.authList[index].areaCode = model.authList[index].areaCode.filter((v: string) => v !== data.value)
   }
 }
 
@@ -122,11 +122,22 @@ interface Tree {
   disabled: boolean
 }
 interface AuthTs {
+  unitType: string
   postId: number
   roleId: number
   unitId: string
   areaCode: string[]
   authData: Record<string, string[]>
+  permiObj: any
+  division?: any[]
+  limitsList?: any[]
+  checkedKeys: number[]
+  villageCode?: string
+  streetCode?: string
+  districtCode?: string
+  cityCode?: string
+  provinceCode?: string
+  userAuthDataList?: any[]
 }
 
 const defaultProps = {
@@ -138,7 +149,7 @@ const handleNodeClick = (data: Tree) => {
   console.log(data)
 }
 const model = reactive<{
-  authList: any[]
+  authList: AuthTs[]
 }
 >({
   authList:[]
@@ -149,7 +160,7 @@ const setLoading = ref(false)
 const addAuth = () => {
   model.authList.push({
     unitType: "",
-  })
+  } as AuthTs)
 }
 
 const delAuth = (index: number) => {
@@ -249,7 +260,7 @@ const queryRoleList = () => {
 }
 
 const arrChild = (arr: any) => {
-  arr.forEach((e: Tree[]) => {
+  arr.forEach((e: Tree) => {
     e.disabled = true
     if (e.childList?.length) {
       arrChild(e.childList)
@@ -258,7 +269,7 @@ const arrChild = (arr: any) => {
   return arr
 }
 
-const changeRole = (val: string, index: number) => {
+const changeRole = (val: number, index: number) => {
   model.authList[index].limitsList = []
   getRoleDetail(val).then((res) => {
     model.authList[index].limitsList = arrChild(res.data.menuList)
@@ -266,7 +277,8 @@ const changeRole = (val: string, index: number) => {
   })
 }
 
-function operateUser(type = 'add', data = {}) {
+function operateUser(type = 'add', data = {} as UserTs) {
+  console.log('data', data)
   queryPostList();
   queryUnitList();
   queryRoleList();
@@ -284,7 +296,7 @@ function operateUser(type = 'add', data = {}) {
       // 数据权限回显
       model.authList = res?.data.roleAuthList || [{}]
       if (type !== 'add') {
-        model.authList.forEach((e: any, ind: number) => {
+        model.authList.forEach((e: AuthTs, ind: number) => {
           changeUnit(e.unitType, ind, "detail")
           changeRole(e.roleId, ind)
 
@@ -349,7 +361,7 @@ const handleSubmit = (val: any) => {
       ...params,
       userName: params.phone,
       roleAuthList: roleAuthList
-    }).then((res) => {
+    } as UserTs).then((res) => {
       props.refresh = Date.now()
       dialogRef.value?.close()
     }).finally(() => {
@@ -457,8 +469,8 @@ const props: CnPage.Props = reactive({
         prop: 'action',
         label: '操作',
         buttons: [
-          { label: '查看', type: 'primary', onClick: ({row}) => operateUser('look', row) },
-          { label: '编辑', type: 'warning', onClick: ({row}) => operateUser('edit', row) }
+          { label: '查看', type: 'primary', onClick: ({row}) => operateUser('look', row as UserTs) },
+          { label: '编辑', type: 'warning', onClick: ({row}) => operateUser('edit', row as UserTs) }
         ]
       }
     ]
