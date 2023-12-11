@@ -23,12 +23,17 @@ export interface MatterLabel {
   remark?: string
 }
 
+// SYS_COVERAGE
+export const getDictBySysCoverage = (): Promise<Res> =>
+  axios.post('/api/admin/dict/getOptionsList', ['SYS_COVERAGE'])
+
 // 查询事项信息列表
 export const getMatterList = (data: ListReq<MatterInfo>): Promise<ListRes> =>
   axios.post('/api/matters/info/list', data)
-
 // 新增事项信息
 export const addMatter = (data: any): Promise<Res> => axios.post('/api/matters/info/add', data)
+// 修改事项信息
+export const editMatter = (data: any): Promise<Res> => axios.put('/api/matters/info/edit', data)
 
 // 查询业务部门列表
 export const getDeptList = (data: ListReq<BusinessUnit>): Promise<ListRes> =>
