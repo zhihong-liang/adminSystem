@@ -1,5 +1,5 @@
 <template>
-  <div class="infoBox-root" :style="styles">
+  <div class="infoBox-root" :style="{ ...finalWidth, ...finalStyle }">
     <div class="header flex flex-between">
       <div class="left">
         <slot name="left">
@@ -21,7 +21,25 @@
 </template>
 
 <script setup lang="ts">
-defineProps(['title', 'styles', 'formProps'])
+import { computed } from 'vue';
+
+const props = defineProps(['title', 'width', 'styles', 'formProps'])
+
+const finalStyle = computed(() => {
+  return props.styles ?? {}
+})
+
+const finalWidth = computed(() => {
+  if (props.width) {
+    return {
+      width: props.width + 'px',
+      'min-width': props.width - 20 + 'px',
+      'max-width': props.width + 40 + 'px'
+    }
+  } else {
+    return {}
+  }
+})
 </script>
 
 <style lang="scss" scoped>

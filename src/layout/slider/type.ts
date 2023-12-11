@@ -5,6 +5,7 @@ export type Menu = {
     component?: string,
     createTime?: string
     createUser?: string,
+    currentRoleId?: number,
     description?: string,
     icon?: string,
     name?: string

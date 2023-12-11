@@ -200,33 +200,6 @@ function handleTransformResp(res: Res) {
   return { code, total: 0, rows: data }
 }
 
-// 把扁平化的树结构还原
-// function assembleData(menus: Menu[]) {
-//   const map: any = {}
-//   const list: Menu[] = []
-
-//   menus.forEach((item: any) => {
-//     const { id } = item
-//     map[`${id}`] = { ...item, childList: [] }
-//   })
-
-//   menus.forEach((node) => {
-//     const { parentId, id } = node
-
-//     if (parentId === 0) {
-//       list.push(map[`${id}`])
-//     } else {
-//       if (!!map[`${parentId}`]) {
-//         map[`${parentId}`].childList.push(map[`${id}`])
-//       } else {
-//         list.push(map[`${id}`])
-//       }
-//     }
-//   })
-
-//   return list
-// }
-
 function handleSubmit(action: 'add' | 'edit') {
   let params: Menu = {
     ...dialogProps.formProps!.model

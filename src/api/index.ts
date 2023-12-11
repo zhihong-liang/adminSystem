@@ -3,7 +3,7 @@ import type { Menu } from '@/layout/slider/type'
 import { ElMessage } from 'element-plus'
 import { getToken } from '@/utils/auth'
 import router from '@/router'
-import { start, close } from "@/utils/nprogress"
+import { start, close } from '@/utils/nprogress'
 axios.interceptors.request.use(
   (config) => {
     start()
@@ -23,7 +23,7 @@ axios.interceptors.response.use(
     if (data.code === '600') {
       router.replace('/login')
     }
-    ElMessage.error(data.message);
+    ElMessage.error(data.message)
     return Promise.reject(data)
   },
   (err) => {
@@ -86,22 +86,96 @@ export const getDictionary = (typeList: string[]): Promise<Res<Record<string, Di
 
 // export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
 
-
 /**
  * 菜单管理
  */
 const menuBasePath = '/api/admin/sys/sysMenu'
-export const addMenu = (params: Menu): Promise<any> => axios.post(menuBasePath + '/add', params)
+export const addMenu = (params: Menu): Promise<Res> => axios.post(menuBasePath + '/add', params)
 
-export const editMenu = (params: Menu): Promise<any> => axios.put(menuBasePath + '/edit', params)
+export const editMenu = (params: Menu): Promise<Res> => axios.put(menuBasePath + '/edit', params)
 
-export const removeMenu = (params: Record<'ids', string>): Promise<any> => axios.delete(menuBasePath + `/remove/${params.ids}`)
+export const removeMenu = (params: Record<'ids', string>): Promise<Res> =>
+  axios.delete(menuBasePath + `/remove/${params.ids}`)
 
 // 查询菜单树
-export const getMenuList = (params: Menu): Promise<Res<Menu[]>> => axios.post(menuBasePath + '/tree', params)
+export const getMenuList = (params: Menu): Promise<Res<Menu[]>> =>
+  axios.post(menuBasePath + '/tree', params)
 
 // 查询菜单列表
-export const checkMenuList = (params: ListReq<Menu>): Promise<any> => axios.post(menuBasePath + '/list', params)
+export const checkMenuList = (params: ListReq<Menu>): Promise<any> =>
+  axios.post(menuBasePath + '/list', params)
 
-export * from "./sys"
-export * from "./device"
+/**
+ *  个人中心
+ */
+
+export interface RoleAuth { // 权限集合
+  authName?: string
+  authNo?: string
+  createTime?: string
+  createUser?: string
+  id?: number
+  menuList?: Menu[]
+  params?: object
+  postId?: number
+  roleId?: number
+  unitId?: number
+  unitNo?: string
+  updateTime?: string
+  updateUser?: string
+  userAuthDataList?: object // userAuthDataList	数据权限
+  userId?: number
+
+}
+export interface UserInfo { // 用户信息
+  accountLevel?: number
+  accountSource?: number
+  address?: string
+  birth?: string
+  cityCode?: string
+  countyCode?: string
+  createTime?: string
+  createUser?: string
+  currentAuthId?: number
+  currentPost?: string
+  deptId?: string
+  education?: string
+  email?: string
+  employeeId?: number
+  headImage?: string
+  id?: number
+  idNumber?: string
+  isUpdatePassword?: number
+  lastLoginTime?: string
+  lockType?: number
+  locked?: number
+  marry?: string
+  name?: string
+  nation?: string
+  params?: {}
+  password?: string
+  phone?: string
+  provinceCode?: string
+  pwdExpireTime?: string
+  roleAuthList?: RoleAuth
+  sex?: string
+  sort?: number
+  status?: string
+  stopReason?: string
+  telephone?: string
+  townCode?: string
+  unitCode?: string
+  unitId?: number
+  unitName?: string
+  updateTime?: string
+  updateUser?: string
+  userName?: string
+  userNo?: string
+  villageCode?: string
+}
+// 修改用户信息
+export const updateUserInfo = (params: UserInfo): Promise<Res> =>
+  axios.put('/api/admin/personal/edit', params)
+
+export * from './sys'
+export * from './device'
