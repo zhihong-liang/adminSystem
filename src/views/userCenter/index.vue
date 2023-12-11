@@ -7,7 +7,7 @@
 
           <div class="flex flex-column flex-center">
             <h2>{{ userFileData.formProps.model.name || '--' }}</h2>
-            <p>{{  userFileData.formProps.model.job || '--' }}</p>
+            <p>{{ userFileData.formProps.model.job || '--' }}</p>
           </div>
         </div>
       </template>
@@ -25,10 +25,10 @@
     <div class="info-root">
       <InfoBox class="mb-lg" v-bind="baseInfoData">
         <template #right>
-          <el-button :type="editStatus ? 'info' : 'primary'" @click="handleEdit">{{
-            editStatus ? '取消' : '编辑'
+          <el-button :type="baseInfoData.edit ? 'info' : 'primary'" @click="handleEdit">{{
+            baseInfoData.edit ? '取消' : '编辑'
           }}</el-button>
-          <el-button v-show="editStatus" type="primary" @click="handleSave">保存</el-button>
+          <el-button v-show="baseInfoData.edit" type="primary" @click="handleSave">保存</el-button>
         </template>
       </InfoBox>
 
@@ -44,47 +44,47 @@ import { updateUserInfo, type UserInfo } from '@/api'
 
 import InfoBox from './infoBox.vue'
 
+import type { InfoBoxProps } from './infoBox.vue'
+
 const { updateContainerStyle } = useHomeStore()
 
-const userFileData = reactive<any>({
+const userFileData = reactive<InfoBoxProps>({
   width: 280,
   formProps: {
     model: {},
     items: [
-      { label: '单位类型', prop: 'unitType', component: 'text', span: 24 },
-      { label: '单位名称', prop: 'unitName', component: 'text', span: 24 }
+      { label: '单位类型', prop: 'unitType', span: 24 },
+      { label: '单位名称', prop: 'unitName', span: 24 }
     ]
   }
 })
 
-// 基本信息按钮状态
-const editStatus = ref(false)
-
-const baseInfoData = reactive({
+const baseInfoData = reactive<InfoBoxProps>({
   title: '基础信息',
+  edit: false,
   formProps: {
     prevModel: {},
     model: {},
     items: [
-      { label: '用户编号', prop: 'name', component: '', span: 8 },
+      { label: '用户编号', prop: 'name', component: undefined, span: 8 },
       {
         label: '登录手机号',
         prop: 'loginPhone',
-        component: '',
+        component: 'input',
         span: 8
       },
-      { label: '电子邮箱', prop: 'email', component: '', span: 8 },
+      { label: '电子邮箱', prop: 'email', component: 'input', span: 8 },
       {
         label: '用户名称',
         prop: 'unitType',
-        component: '',
+        component: 'input',
         span: 8
       },
-      { label: '联系电话', prop: 'phone', component: '', span: 8 },
+      { label: '联系电话', prop: 'phone', component: 'input', span: 8 },
       {
         label: '状态',
         prop: 'status',
-        component: '',
+        component: 'select',
         span: 8,
         dict: 'MENU_STATUS'
       }
@@ -92,37 +92,27 @@ const baseInfoData = reactive({
   }
 })
 
-const authorizeInfoData = reactive({
+const authorizeInfoData = reactive<InfoBoxProps>({
   title: '授权信息',
   formProps: {
     model: {},
     items: [
-      { label: '单位类型', prop: 'unitType', component: 'text', span: 8 },
-      { label: '角色', prop: 'role', component: 'text', span: 8 },
-      { label: '岗位', prop: 'job', component: 'text', span: 8 },
-      { label: '单位', prop: 'unitName', component: 'text', span: 8 },
-      { label: '数据权限', prop: 'data', component: 'text', span: 8 },
-      { label: '功能权限', prop: 'feature', component: 'text', span: 24 }
+      { label: '单位类型', prop: 'unitType', span: 8 },
+      { label: '角色', prop: 'role', span: 8 },
+      { label: '岗位', prop: 'job', span: 8 },
+      { label: '单位', prop: 'unitName', span: 8 },
+      { label: '数据权限', prop: 'data', span: 8 },
+      { label: '功能权限', prop: 'feature', span: 24 }
     ]
   }
 })
 
 function handleEdit() {
-  editStatus.value = !editStatus.value
+  baseInfoData.edit = !baseInfoData.edit
 
-  baseInfoData.formProps.items.forEach((item) => {
-    if (editStatus.value) {
-      item.component = 'input'
-      if (item.prop === 'name') item.component = ''
-      if (item.prop === 'status') item.component = 'select'
-    } else {
-      item.component = ''
-    }
-  })
+  const { prevModel, model } = baseInfoData.formProps as any
 
-  const { prevModel, model } = baseInfoData.formProps
-
-  if (editStatus.value) {
+  if (baseInfoData.edit) {
     baseInfoData.formProps.prevModel = { ...model }
   } else {
     baseInfoData.formProps.model = { ...prevModel }
