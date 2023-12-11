@@ -41,7 +41,8 @@ onMounted(() => {
     showBtn.value = true;
     props.items.map((item: any, index: number) => {
       if (index >= 3) {
-        item.visible = () => false
+        item.display = "none";
+        // item.visible = () => false
       }
     });
   }
@@ -61,14 +62,17 @@ function moreFun () {
   if (showMore.value) {
     props.items.map((item: any, index: number) => {
       if (index >= 3) {
-        // item.display = "none";
-        item.visible = () => false
+        item.display = "none";
+        // item.visible = () => false
       }
     });
   } else {
     props.items.map((item: any) => {
-      if (item.visible = () => false) {
-        item.visible = () => true
+      // if (item.visible = () => false) {
+      //   item.visible = () => true
+      // }
+      if (item.display === "none") {
+        item.display = "block";
       }
     });
   }

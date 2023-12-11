@@ -93,18 +93,6 @@ export default [
         name: 'serviceBulletin',
         component: () => import('../views/matter/service-bulletin/ServiceBulletin.vue')
       },
-      {
-        // 设备列表
-        path: '/device',
-        name: 'device',
-        component: () => import('../views/device/index.vue')
-      },
-      {
-        // 注销设备列表
-        path: '/logOffDevice',
-        name: 'logOffDevice',
-        component: () => import('../views/logOffDevice/index.vue')
-      },
     ]
   }
   // {

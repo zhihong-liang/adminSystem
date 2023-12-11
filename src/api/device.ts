@@ -2,9 +2,12 @@ import axios from 'axios'
 import type { ListReq, ListRes, Res } from '.'
 const device = "/api/device"
 
-// 设备列表
+// 设备列表（分页）
 export const devBaseInfoListPage = (data: ListReq): Promise<ListRes> =>
   axios.post(device + '/devBaseInfo/listPage', data)
+// 设备列表（bu分页）
+export const devBaseInfoList = (data: any): Promise<ListRes> =>
+  axios.post(device + '/devBaseInfo/list', data)
 // 启用
 export const devBaseInfoStart = (ids: string): Promise<ListRes> =>
   axios.get(device + `/devBaseInfo/start/${ids}`)
