@@ -1,2 +1,14 @@
 @use "./theme.scss";
-@use "./transition.scss"
+@use "./transition.scss";
+
+.pointer {
+  cursor: pointer
+}
+
+.not-allow {
+  cursor: not-allowed;
+}
+
+.underline {
+  text-decoration: underline;
+}

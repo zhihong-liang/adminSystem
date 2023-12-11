@@ -1,5 +1,5 @@
 <template>
-  <div class="infoBox-root" :style="{ ...finalWidth }">
+  <div class="infoBox-root" :style="styles">
     <div class="header flex flex-between">
       <div class="left">
         <slot name="left">
@@ -15,25 +15,13 @@
     </div>
 
     <CnForm v-bind="formProps"></CnForm>
+
+    <slot></slot>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
-
-const props = defineProps(['title', 'width', 'formProps'])
-
-const finalWidth = computed(() => {
-  if (props.width) {
-    return {
-      width: props.width + 'px',
-      'min-width': props.width - 20 + 'px',
-      'max-width': props.width + 40 + 'px'
-    }
-  } else {
-    return {}
-  }
-})
+defineProps(['title', 'styles', 'formProps'])
 </script>
 
 <style lang="scss" scoped>

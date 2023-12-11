@@ -10,6 +10,7 @@ import CnInputNumber from './CnInputNumber.vue'
 import CnReadonly from './CnReadonly.vue'
 import CnIcon from './CnIcon.vue'
 import CnText from './CnText.vue'
+import CnTree from './CnTree.vue'
 
 defineProps(['component', 'dict', 'readonly'])
 </script>
@@ -26,4 +27,5 @@ defineProps(['component', 'dict', 'readonly'])
   <CnIcon v-else-if="component === 'icon'" />
   <CnInputNumber v-else-if="component === 'inputnumber'" />
   <CnText v-else-if="component === 'text'" />
+  <CnTree v-else-if="component === 'tree'" />
 </template>

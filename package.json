@@ -16,7 +16,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.0",
     "crypto-js": "^4.2.0",
-    "element-plus": "^2.4.1",
+    "element-plus": "^2.4.3",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
     "nprogress": "^0.2.0",

@@ -20,6 +20,12 @@ export default [
         meta: { requiredAuth: true }
       },
       {
+        path: '/role',
+        name: 'role',
+        component: () => import('../views/sys/role/index.vue'),
+        meta: { requiredAuth: true }
+      },
+      {
         path: '/home',
         name: 'homeView',
         component: () => import('../views/HomeView.vue'),

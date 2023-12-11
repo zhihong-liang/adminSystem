@@ -5,7 +5,6 @@ import * as ElIcons from "@element-plus/icons-vue";
 import App from './App.vue'
 import router from './router'
 import moment from 'moment'
-
 import './api/mock'
 
 import 'normalize.css/normalize.css'  // 初始化样式

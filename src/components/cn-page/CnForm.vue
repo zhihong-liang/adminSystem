@@ -89,7 +89,7 @@ defineExpose({ formRef })
   >
     <el-row :gutter="colSpan ? 20 : 0">
       <el-col
-        v-for="({ span, component, dict, props, display, ...rest }, index) in items.filter((v) =>
+        v-for="({ data, span, component, dict, props, display, ...rest }, index) in items.filter((v) =>
           v.visible!()
         )"
         :key="index"
