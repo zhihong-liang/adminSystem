@@ -3,7 +3,7 @@ import type { Menu } from '@/layout/slider/type'
 import { ElMessage } from 'element-plus'
 import { getToken } from '@/utils/auth'
 import router from '@/router'
-import { start, close } from "@/utils/nprogress"
+import { start, close } from '@/utils/nprogress'
 axios.interceptors.request.use(
   (config) => {
     start()
@@ -15,15 +15,19 @@ axios.interceptors.request.use(
   }
 )
 axios.interceptors.response.use(
-  ({ data }) => {
+  (res) => {
+    const { data } = res
     close()
+    if (res.config.responseType === 'blob') {
+      return data
+    }
     if (data.code === '200') {
       return data
     }
     if (data.code === '600') {
       router.replace('/login')
     }
-    ElMessage.error(data.message);
+    ElMessage.error(data.message)
     return Promise.reject(data)
   },
   (err) => {
@@ -86,7 +90,6 @@ export const getDictionary = (typeList: string[]): Promise<Res<Record<string, Di
 
 // export const getMenuList = (params: Object): Promise<any> => axios.get('/menuList', { params })
 
-
 /**
  * 菜单管理
  */
@@ -95,13 +98,16 @@ export const addMenu = (params: Menu): Promise<any> => axios.post(menuBasePath +
 
 export const editMenu = (params: Menu): Promise<any> => axios.put(menuBasePath + '/edit', params)
 
-export const removeMenu = (params: Record<'ids', string>): Promise<any> => axios.delete(menuBasePath + `/remove/${params.ids}`)
+export const removeMenu = (params: Record<'ids', string>): Promise<any> =>
+  axios.delete(menuBasePath + `/remove/${params.ids}`)
 
 // 查询菜单树
-export const getMenuList = (params: Menu): Promise<Res<Menu[]>> => axios.post(menuBasePath + '/tree', params)
+export const getMenuList = (params: Menu): Promise<Res<Menu[]>> =>
+  axios.post(menuBasePath + '/tree', params)
 
 // 查询菜单列表
-export const checkMenuList = (params: ListReq<Menu>): Promise<any> => axios.post(menuBasePath + '/list', params)
+export const checkMenuList = (params: ListReq<Menu>): Promise<any> =>
+  axios.post(menuBasePath + '/list', params)
 
-export * from "./sys"
-export * from "./device"
+export * from './sys'
+export * from './device'

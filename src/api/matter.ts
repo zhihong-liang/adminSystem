@@ -23,15 +23,21 @@ export interface MatterLabel {
   remark?: string
 }
 
-// SYS_COVERAGE
-export const getDictBySysCoverage = (): Promise<Res> =>
-  axios.post('/api/admin/dict/getOptionsList', ['SYS_COVERAGE'])
-
 // 查询事项信息列表
 export const getMatterList = (data: ListReq<MatterInfo>): Promise<ListRes> =>
   axios.post('/api/matters/info/list', data)
 // 新增事项信息
 export const addMatter = (data: any): Promise<Res> => axios.post('/api/matters/info/add', data)
+// 获取事项信息详细信息
+export const getMatterInfo = (id: string): Promise<Res> => axios.get(`/api/matters/info/get/${id}`)
+// 所属标签
+export const infoLabel = (data: any): Promise<Res> => axios.post(`/api/matters/info/label`, data)
+
+// 导出事项信息列表
+export const exportMatterList = (data: any): Promise<Res> =>
+  axios.post(`/api/matters/info/export`, data, {
+    responseType: 'blob'
+  })
 // 修改事项信息
 export const editMatter = (data: any): Promise<Res> => axios.put('/api/matters/info/edit', data)
 
@@ -50,3 +56,11 @@ export const getMatterLabelList = (data: ListReq<any>): Promise<ListRes> =>
 // 新增事项标签
 export const addMatterLabel = (data: MatterLabel): Promise<ListRes> =>
   axios.post('/api/matters/label/add', data)
+
+// 修改事项标签
+export const editMatterLabel = (data: MatterLabel): Promise<ListRes> =>
+  axios.put('/api/matters/label/edit', data)
+
+// 删除事项标签
+export const removeMatterLabel = (ids: string): Promise<ListRes> =>
+  axios.delete(`/api/matters/label/remove/${ids}`)
