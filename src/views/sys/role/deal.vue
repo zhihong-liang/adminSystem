@@ -26,7 +26,7 @@ const dialogProps: CnPage.DialogProps = reactive({
     items: [
       { label: '基本信息', component: 'divider', span: 24 },
       { label: '角色名称', prop: 'name', component: 'input' },
-      { label: '状态', prop: 'status', component: 'input' },
+      { label: '状态', prop: 'status', component: 'select', dict: "ROLE_STATUS" },
       { label: '角色描述', prop: 'description', component: 'input', props: { type: 'textarea' } },
       { label: '功能权限', component: 'divider', span: 24 },
       {
