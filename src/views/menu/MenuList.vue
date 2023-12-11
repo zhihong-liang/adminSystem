@@ -8,12 +8,6 @@
         </template>
       </el-input>
     </template>
-    <template #status>
-      <el-radio-group v-model="dialogProps.formProps!.model!.status">
-        <el-radio label="1" size="large">启用</el-radio>
-        <el-radio label="0" size="large">禁用</el-radio>
-      </el-radio-group>
-    </template>
   </CnDialog>
   <IconDialog v-model:value="dialogProps.formProps!.model.icon" ref="IconDialogRef" />
 </template>
@@ -35,8 +29,8 @@ import IconDialog from './iconsDialog.vue'
 import type { Menu } from '@/layout/slider/type'
 
 const store = useHomeStore()
-const { modules, menuList } = storeToRefs(store)
-const { updateMenuList } = store
+const { modules, menuList, tabList } = storeToRefs(store)
+const { updateMenuList, updateTabList } = store
 
 const componentMenus = computed(() => Object.keys(modules.value).map((m) => ({ value: m })))
 
@@ -84,7 +78,18 @@ const dialogProps: CnPage.DialogProps = reactive({
         dict: 'MENU_TYPE'
       },
       { label: '排序', prop: 'sort', component: 'input' },
-      { label: '状态', prop: 'status', span: 24, component: 'slot' },
+      {
+        label: '状态',
+        prop: 'status',
+        span: 24,
+        component: 'radio',
+        props: {
+          options: [
+            { label: '启用', value: '1' },
+            { label: '禁用', value: '0' }
+          ]
+        }
+      },
       {
         label: '描述',
         prop: 'description',
@@ -200,33 +205,6 @@ function handleTransformResp(res: Res) {
   return { code, total: 0, rows: data }
 }
 
-// 把扁平化的树结构还原
-// function assembleData(menus: Menu[]) {
-//   const map: any = {}
-//   const list: Menu[] = []
-
-//   menus.forEach((item: any) => {
-//     const { id } = item
-//     map[`${id}`] = { ...item, childList: [] }
-//   })
-
-//   menus.forEach((node) => {
-//     const { parentId, id } = node
-
-//     if (parentId === 0) {
-//       list.push(map[`${id}`])
-//     } else {
-//       if (!!map[`${parentId}`]) {
-//         map[`${parentId}`].childList.push(map[`${id}`])
-//       } else {
-//         list.push(map[`${id}`])
-//       }
-//     }
-//   })
-
-//   return list
-// }
-
 function handleSubmit(action: 'add' | 'edit') {
   let params: Menu = {
     ...dialogProps.formProps!.model
@@ -279,6 +257,9 @@ function handleRemove({ row }: any) {
             const { code, message } = res
 
             if (code == '200') {
+              // 更新tab
+              updateTabList(tabList.value.filter(t => t.id !== row.id))
+
               done()
             } else {
               ElMessage.error({ message: `${message}` })

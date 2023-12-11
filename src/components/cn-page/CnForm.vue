@@ -89,10 +89,11 @@ defineExpose({ formRef })
   >
     <el-row :gutter="colSpan ? 20 : 0">
       <el-col
-        v-for="({ data, span, component, dict, props, ...rest }, index) in items.filter((v) =>
+        v-for="({ data, span, component, dict, props, display, ...rest }, index) in items.filter((v) =>
           v.visible!()
         )"
         :key="index"
+        :class="display"
         :span="span || colSpan"
       >
         <el-form-item v-bind="rest" :rules="readonly ? undefined : rest.rules">
@@ -144,5 +145,11 @@ defineExpose({ formRef })
 }
 .el-form--inline :deep(.el-col-0) {
   display: block;
+}
+.none {
+  display: none !important;
+}
+.block {
+  display: block !important;
 }
 </style>
