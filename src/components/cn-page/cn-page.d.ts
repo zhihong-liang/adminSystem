@@ -163,6 +163,7 @@ declare namespace CnPage {
     props?: undefined
     prop?: string | string[]
     span?: number
+    display?: string
     /**
      * 字典
      */
