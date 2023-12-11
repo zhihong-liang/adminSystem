@@ -112,7 +112,17 @@ export const editUserInfor = (data: Record<string, unknown>): Promise<Res> => ax
 export const getDeptpostList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/deptPost/list', data)
 // 新增编辑-查询角色列表
 export const getRoleList = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sysRole/list', data)
+// 查下菜单树
+export const getSysMenuTree = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sys/sysMenu/tree', data)
 // 新增编辑-查询角色详情
 export const getRoleDetail = (id: string): Promise<Res> => axios.get('/api/admin/sysRole/get/' + id)
 // 新增编辑-获取用户详细信息
 export const getUserDetail = (id: string): Promise<Res> => axios.get('/api/admin/user/get/' + id)
+// 新增角色 
+export const sysRoleAdd = (data: Record<string, unknown>): Promise<Res> => axios.post('/api/admin/sysRole/add', data)
+// 删除角色 
+export const sysRoleRemoveIids = (id: Record<string, unknown>): Promise<Res> => axios.delete(`/api/admin/sysRole/remove/${id}`)
+// 查看详情 
+export const sysRoleGetId = (id: Record<string, unknown>): Promise<Res> => axios.get(`/api/admin/sysRole/get/${id}`)
+// 修改 
+export const sysRoleEdit = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/sysRole/edit', data)

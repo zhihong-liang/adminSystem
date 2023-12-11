@@ -29,10 +29,12 @@ function getLastLevelNodes(tree) {
         traverse(child)
       })
     } else {
-      allsubs.push(node[attrs.nodeKey])
-      if (attrs.modelValue.includes(node[attrs.nodeKey])) {
-        lastLevelNodes.push(node[attrs.nodeKey])
-      }
+      // console.log(tree);
+      
+      // allsubs.push(node[attrs.nodeKey])
+      // if (attrs.modelValue.includes(node[attrs.nodeKey])) {
+      //   lastLevelNodes.push(node[attrs.nodeKey])
+      // }
     }
   }
   tree.forEach((item) => {

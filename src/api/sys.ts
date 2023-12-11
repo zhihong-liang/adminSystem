@@ -7,6 +7,7 @@ import axios from 'axios'
 export interface DictType {
   type?: string;// 类型
   description?: string // 描述
+  id?: string
 }
 // 查询数据字典类型列表(分页)
 export const dictTypeList = (data: ListReq<DictType>): Promise<ListRes> =>
