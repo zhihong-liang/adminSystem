@@ -20,6 +20,10 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  base: "/selfHelp",
+  build: {
+    outDir: "selfHelp",
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
