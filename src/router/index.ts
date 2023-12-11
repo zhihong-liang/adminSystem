@@ -85,7 +85,6 @@ router.beforeEach(async (to, from, next) => {
 
   if (hasToken) {
     if (refresh.value && menuList.value.length) {
-      // Q：如果下一次新增路由，不跑进这里，会不会没有把新路由动态添加上去，导致找不到新路由？
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
 

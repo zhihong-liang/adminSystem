@@ -1,4 +1,5 @@
 import type { ActionType, getDialogConfigParams } from './type'
+
 export function getDialogConfig(actionType: ActionType) {
   if (actionType === 'label') {
     return getLabelActionDialogConfig
@@ -11,17 +12,28 @@ export function getDialogConfig(actionType: ActionType) {
   }
 }
 
+// 事项标签
 export function getLabelActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, activeName, sysCoverAgeList, model, visible } = params
+  const { dialogSubmitSuccess, model, optionsMap } = params
   return {
     title: '所属标签',
     formProps: {
-      model: {},
+      model: model ?? {},
       labelPosition: 'left',
       requireAsteriskPosition: 'right',
       items: [
-        { label: '事项名称', prop: 'name' },
-        { label: '事项标签', prop: 'label', component: 'input' }
+        {
+          label: '事项名称',
+          prop: 'matterName'
+        },
+        {
+          label: '事项标签',
+          prop: 'label',
+          component: 'select',
+          props: {
+            options: optionsMap!.label
+          }
+        }
       ],
       labelWidth: 120,
       rules: {
@@ -34,7 +46,7 @@ export function getLabelActionDialogConfig(params: getDialogConfigParams): CnPag
 
 // 新建事项
 export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, sysCoverAgeList, visible } = params
+  const { dialogSubmitSuccess, optionsMap, visible } = params
   return {
     title: '新建',
     formProps: {
@@ -87,7 +99,7 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
           prop: 'sysCoverage',
           component: 'cascader',
           props: {
-            options: sysCoverAgeList!,
+            options: optionsMap!.sysCoverage,
             props: {
               checkStrictly: false,
               multiple: true,
@@ -114,8 +126,10 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
           label: '',
           prop: 'identityAuthItem',
           component: 'checkbox',
-          // visible: visibleMap?.['identityAuthItem'] || undefined,
-          dict: 'IDENTITY_AUTH_ITEM'
+          visible: visible?.['identityAuthItem'] || undefined,
+          props: {
+            options: optionsMap!.identityAuthItem
+          }
         },
         {
           label: '涉及支付方式',
@@ -127,8 +141,10 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
           label: '',
           prop: 'payWay',
           component: 'checkbox',
-          // visible: visibleMap?.['payWay'] || undefined,
-          dict: 'PAY_WAY'
+          visible: visible?.['payWay'] || undefined,
+          props: {
+            options: optionsMap!.payWay
+          }
         },
         // { label: '中文编码', prop: 'cnCode', component: 'input' },
         // { label: '访问路径', prop: 'accessPath', component: 'input' },
@@ -171,7 +187,7 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
 
 // 编辑事项
 export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, activeName, sysCoverAgeList, model, visible } = params
+  const { dialogSubmitSuccess, activeName, optionsMap, model, visible } = params
   const basicInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
     {
@@ -197,8 +213,7 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
     },
     {
       label: '粤智助事项编码',
-      prop: 'matterCode',
-      component: 'text'
+      prop: 'matterCode'
     },
     {
       label: '办理类型',
@@ -251,7 +266,7 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       prop: 'sysCoverage',
       component: 'cascader',
       props: {
-        options: sysCoverAgeList!,
+        options: optionsMap!.sysCoverage,
         props: {
           checkStrictly: false,
           multiple: true,
@@ -271,14 +286,18 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       label: '身份认证方式',
       prop: 'identityAuthItem',
       component: 'checkbox',
-      dict: 'IDENTITY_AUTH_ITEM',
+      props: {
+        options: optionsMap!.identityAuthItem
+      },
       span: 24
     },
     {
       label: '涉及支付方式',
       prop: 'payWay',
       component: 'checkbox',
-      dict: 'PAY_WAY',
+      props: {
+        options: optionsMap!.payWay
+      },
       span: 24
     },
     {
@@ -305,100 +324,87 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
 
 // 事项详情
 export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, activeName, model, visible } = params
+  const { activeName, model, visible } = params
   const basicInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
-    { label: '事项名称', prop: 'matterName', component: 'text' },
-    { label: '状态', prop: 'matterStatus', component: 'text' },
+    { label: '事项名称', prop: 'matterName' },
+    { label: '状态', prop: 'matterStatus' },
     {
       label: '事项别名',
-      prop: 'matterAlias',
-      component: 'text'
+      prop: 'matterAlias'
     },
     {
       label: '粤智助事项编码',
-      prop: 'matterCode',
-      component: 'text'
+      prop: 'matterCode'
     },
     {
       label: '办理类型',
-      prop: 'handleType',
-      component: 'text'
+      prop: 'handleType'
     },
     {
       label: '事项类型',
-      prop: 'matterType',
-      component: 'text'
+      prop: 'matterType'
     },
     {
       label: '服务对象',
-      prop: 'serviceObject',
-      component: 'text'
+      prop: 'serviceObject'
     },
     {
       label: '网络策略',
-      prop: 'networdPolicy',
-      component: 'text'
+      prop: 'networdPolicy'
     },
     {
       label: '业务部门',
-      prop: 'businessUnit',
-      component: 'text'
+      prop: 'businessUnit'
     },
     {
       label: '事项进驻单位',
-      prop: 'entryUnit',
-      component: 'text'
+      prop: 'entryUnit'
     },
     {
       label: '系统层级',
-      prop: 'sysLevel',
-      component: 'text'
+      prop: 'sysLevel'
     },
     {
       label: '业务系统名称',
-      prop: 'businessSystemName',
-      component: 'text'
+      prop: 'businessSystemName'
     },
     {
       label: '系统覆盖范围',
-      prop: 'sysCoverage',
-      component: 'text'
+      prop: 'sysCoverage'
     }
   ]
 
   const configInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
-    { label: '搜索关键词', prop: 'searchKeywords', component: 'text', span: 24 },
+    { label: '搜索关键词', prop: 'searchKeywords', span: 24 },
     {
       label: '身份认证方式',
       prop: 'identityAuthItem',
-      component: 'text',
       span: 24
     },
     {
       label: '涉及支付方式',
       prop: 'payWay',
-      component: 'text',
       span: 24
     },
     {
       label: '硬件模块',
       prop: 'hardwareModule',
-      component: 'text',
       span: 24
     }
   ]
   return {
     title: '事项详情',
+
     formProps: {
+      readonly: true,
       model: model ?? {},
       labelPosition: 'left',
       requireAsteriskPosition: 'right',
       items: [...(activeName === 'basicInfo' ? basicInfoItems : configInfoItems)],
       labelWidth: 120,
       colSpan: 12
-    },
-    onSuccess: dialogSubmitSuccess
+    }
   }
 }

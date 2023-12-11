@@ -1,9 +1,11 @@
 import type { ActionType } from './type'
 export default function getTableConfig(
-  editClickCb: (params: any, handle: ActionType) => void
+  editClickCb: (params: any, handle: ActionType) => void,
+  selectionChange?: (selection: any) => void
 ): CnPage.TableProps {
   return {
     data: [],
+    selectionChange,
     columns: [
       { type: 'selection' },
       { label: '粤智助事项编码', slot: 'matterCode' },

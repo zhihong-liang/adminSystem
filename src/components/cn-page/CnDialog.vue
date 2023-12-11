@@ -19,7 +19,7 @@
     </template>
 
     <template #footer>
-      <slot name="footer">
+      <slot name="footer" v-bind="{ ref: formWrapRef }">
         <el-button @click="handleCancel">取消</el-button>
         <el-button type="primary" :loading="submitting" @click="handleSubmit">提交</el-button></slot
       >
