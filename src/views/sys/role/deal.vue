@@ -59,9 +59,6 @@ const dialogProps: CnPage.DialogProps = reactive({
 const dialogRef = ref()
 
 const open = (data?: any, type?: string) => {
-  console.log("这个Data", data);
-  console.log("这个Data", type);
-  // sysRoleGetId
   dialogRef.value.open()
   if (!type) {
     // 新增
@@ -72,6 +69,9 @@ const open = (data?: any, type?: string) => {
     dialogProps.action = () => handleSubmit('add')
     type.value = 'add'
   } else {
+    if(type === "view") {
+      dialogProps.formProps!.disabled = true
+    }
     sysRoleGetId(data.id).then((res: any) => {
       if (res.code === "200") {
         dialogProps.formProps!.model = res.data;

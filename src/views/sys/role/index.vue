@@ -50,9 +50,10 @@ import { getRoleList, sysRoleRemoveIids } from "@/api/admin";
 // 搜索
 const inited = ref(false);
 const search = ref({
+  params: {},
   items: [
     { label: "主类", prop: "type", component: "input" },
-    { label: "角色状态", prop: "status", component: "select" },
+    { label: "角色状态", prop: "status", component: "select", dict: "ROLE_STATUS"  },
   ],
 });
 const roleList = ref();

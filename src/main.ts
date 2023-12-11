@@ -1,5 +1,6 @@
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
+import axios from 'axios';
 import piniaPluginPersistedstate from 'pinia-plugin-persistedstate'
 import * as ElIcons from "@element-plus/icons-vue";
 import App from './App.vue'
@@ -15,6 +16,7 @@ import 'nprogress/nprogress.css';
 moment.locale('zh-cn')
 
 const app = createApp(App)
+axios.defaults.baseURL = "/selfHelp";
 
 for (let iconName in ElIcons) {
     app.component(iconName, (ElIcons as any)[iconName]);

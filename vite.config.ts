@@ -31,7 +31,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://192.168.10.225:19769/'
+      '/selfHelp/api': 'http://192.168.10.212/'
     }
   }
 })
