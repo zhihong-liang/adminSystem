@@ -5,10 +5,10 @@
         <div class="userinfo flex flex-column flex-center mb-lg">
           <el-avatar class="mb-lg" :size="100">user</el-avatar>
 
-          <!-- <div class="flex flex-column flex-center">
-            <h2>{{ data.name || '--' }}</h2>
-            <p>{{ data.job || '--' }}</p>
-          </div> -->
+          <div class="flex flex-column flex-center">
+            <h2>{{ userFileData.formProps.model.name || '--' }}</h2>
+            <p>{{  userFileData.formProps.model.job || '--' }}</p>
+          </div>
         </div>
       </template>
 
