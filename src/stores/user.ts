@@ -1,16 +1,20 @@
+import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import { ref, reactive, computed } from 'vue'
-import { setToken, clearToken, getToken } from '@/utils/auth'
+import { clearToken, getToken } from '@/utils/auth'
+import type { UserInfo } from '@/api'
 
 const storeSetup = () => {
 
   const token = ref(getToken() || '')
-  const userInfo = ref({})
-
   // 重置token
   const resetToken = () => {
     token.value = ''
     clearToken()
+  }
+
+  const userInfo = ref<UserInfo>({})
+  function updateUserInfo(info: UserInfo) {
+    userInfo.value = info
   }
 
   // 获取用户信息
@@ -22,11 +26,9 @@ const storeSetup = () => {
   const logout = async () => {
     token.value = ''
   }
-  return { token, logout, resetToken }
+  return { token, userInfo, logout, resetToken, updateUserInfo }
 }
 
-
-
 export const useUserStore = defineStore('user', storeSetup, {
-  persist: { paths: ['token'], storage: localStorage }
+  persist: { paths: ['userInfo'] }
 })

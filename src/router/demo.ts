@@ -33,20 +33,5 @@ export default [
     path: '/demo/page/data',
     name: 'DemoPageData',
     component: () => import('../views/demo/cn-page/PageData.vue')
-  },
-  // {
-  //   name : '日志管理',
-  //   children: [
-  //     {
-  //       path: '/log/login-log',
-  //       name: '登录日志',
-  //       component: () => import('@/views/log/index.vue')
-  //     },
-  //     {
-  //       path: '/log/action-log',
-  //       name: '操作日志',
-  //       component: () => import('@/views/log/index.vue')
-  //     }
-  //   ]
-  // }
+  }
 ]

@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
 import Demo from './demo'
@@ -55,18 +55,18 @@ const formatMenus = (menus: Menu[], modules: any) => {
 export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   const _children = [
     ...formatMenus(menuList, modules),
-    {
-      path: '/home',
-      name: 'home',
-      component: () => import('../views/HomeView.vue')
-    }
+    // {
+    //   path: '/home',
+    //   name: 'home',
+    //   component: () => import('../views/HomeView.vue')
+    // }
   ]
 
   const baseRoute: any = {
     path: '/',
     name: 'layout',
     component: BaseLayout,
-    redirect: '/home',
+    redirect: '/system/usercenter',
     children: _children
   }
 
@@ -75,12 +75,10 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
 
 const refresh = ref(true)
 
-router.beforeEach(async (to, from, next) => {
-  start();
-
+const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
   const home = useHomeStore()
   const { menuList, modules } = storeToRefs(home)
-  const { getMenuList } = home
+  const { getMenuList, updateTabList, updateBreadcrumb, updateActiveTab, addTabToList } = home
   const hasToken = !!getToken()
 
   if (hasToken) {
@@ -94,17 +92,32 @@ router.beforeEach(async (to, from, next) => {
       if (!menuList.value.length) {
         await getMenuList({})
         next({ path: to.path })
+      } else {
+        addTabToList({
+          id: to.meta.id as number,
+          name: to.meta.name as string,
+          path: to.path
+        })
+        next()
       }
-
-      next()
     }
   } else {
+    updateTabList([])
+    updateBreadcrumb([])
+    updateActiveTab()
+
     if (to.path !== '/login') {
       next('/login')
     } else {
       next()
     }
   }
+}
+
+router.beforeEach((to, from, next) => {
+  start();
+
+  handleRouterBeforeEach(to, next)
 })
 
 router.afterEach(() => {

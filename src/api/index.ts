@@ -113,73 +113,85 @@ export const checkMenuList = (params: ListReq<Menu>): Promise<any> =>
  *  个人中心
  */
 
-export interface RoleAuth { // 权限集合
-  authName?: string
-  authNo?: string
-  createTime?: string
-  createUser?: string
-  id?: number
-  menuList?: Menu[]
-  params?: object
-  postId?: number
-  roleId?: number
-  unitId?: number
-  unitNo?: string
-  updateTime?: string
-  updateUser?: string
-  userAuthDataList?: object // userAuthDataList	数据权限
-  userId?: number
-
-}
-export interface UserInfo { // 用户信息
-  accountLevel?: number
+export interface UserInfo {
   accountSource?: number
-  address?: string
-  birth?: string
-  cityCode?: string
-  countyCode?: string
   createTime?: string
   createUser?: string
-  currentAuthId?: number
-  currentPost?: string
-  deptId?: string
-  education?: string
   email?: string
   employeeId?: number
   headImage?: string
   id?: number
-  idNumber?: string
   isUpdatePassword?: number
   lastLoginTime?: string
   lockType?: number
   locked?: number
-  marry?: string
   name?: string
-  nation?: string
-  params?: {}
   password?: string
   phone?: string
-  provinceCode?: string
+  postName?: string
   pwdExpireTime?: string
-  roleAuthList?: RoleAuth
-  sex?: string
+  roleAuthList?: RoleAuthList[]
   sort?: number
   status?: string
   stopReason?: string
   telephone?: string
-  townCode?: string
-  unitCode?: string
-  unitId?: number
+  unitLevel?: string
   unitName?: string
+  unitType?: string
   updateTime?: string
   updateUser?: string
+  userAuthType?: string
   userName?: string
   userNo?: string
+  userType?: string
+}
+export interface RoleAuthList {
+  authName?: string
+  authNo?: string
+  cityCode?: string
+  createDate?: string
+  createTime?: string
+  createUser?: string
+  districtCode?: string
+  id?: number
+  menuList?: Menu[]
+  params?: Object
+  postId?: number
+  postName?: string
+  provinceCode?: string
+  roleId?: number
+  roleName?: string
+  streetCode?: string
+  unitId?: number
+  unitName?: string
+  unitNo?: string
+  unitType?: string
+  updateDate?: string
+  updateTime?: string
+  updateUser?: string
+  userAuthDataList?: UserAuthDataList[]
+  userId?: number
   villageCode?: string
+}
+
+export interface UserAuthDataList {
+  ahthId?: number
+  createDate?: string
+  createUser?: string
+  dataPermissionPolicy?: string
+  id?: number
+  regionCode?: string
+  unitId?: number
+  updateDate?: string
+  updateUser?: string
+  userId?: number
 }
 // 修改用户信息
 export const updateUserInfo = (params: UserInfo): Promise<Res> =>
   axios.put('/api/admin/personal/edit', params)
+// 查询用户详情
+export const queryUserInfo = (id: number): Promise<Res<UserInfo>> =>
+  axios.get('/api/admin/user/get/' + id)
 
 export * from './sys'
 export * from './device'
