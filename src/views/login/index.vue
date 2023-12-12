@@ -119,7 +119,7 @@ const handleLogin = async () => {
         }
         Message.success('登录成功')
 
-        router.push('/home')
+        router.push('/system/usercenter') // 默认跳到个人中心
       })
     }
   })

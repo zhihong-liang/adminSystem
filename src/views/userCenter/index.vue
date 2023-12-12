@@ -22,7 +22,7 @@
       </div>
     </InfoBox>
 
-    <div class="info-root">
+    <div class="rightPane-root">
       <InfoBox class="mb-lg" v-bind="baseInfoData">
         <template #right>
           <el-button :type="baseInfoData.edit ? 'info' : 'primary'" @click="handleEdit">{{
@@ -38,8 +38,8 @@
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, onUnmounted, reactive, ref } from 'vue'
-import { useHomeStore } from '@/stores/home'
+import { onBeforeMount, onUnmounted, reactive } from 'vue'
+import { useHomeStore, useUserStore } from '@/stores'
 import { updateUserInfo, type UserInfo } from '@/api'
 
 import InfoBox from './infoBox.vue'
@@ -47,6 +47,7 @@ import InfoBox from './infoBox.vue'
 import type { InfoBoxProps } from './infoBox.vue'
 
 const { updateContainerStyle } = useHomeStore()
+const { userInfo } = useUserStore()
 
 const userFileData = reactive<InfoBoxProps>({
   width: 280,
@@ -137,6 +138,8 @@ onBeforeMount(() => {
     padding: '0px'
   })
 
+  console.log('userInfo: ', userInfo);
+
   userFileData.formProps.model = {
     name: '张上上',
     job: '管理员',
@@ -173,7 +176,7 @@ onUnmounted(() => {
 .userCenter-root {
   height: 100%;
 
-  .info-root {
+  .rightPane-root {
     flex: 1;
   }
 }
