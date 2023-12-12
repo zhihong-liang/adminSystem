@@ -27,7 +27,12 @@
           </div>
         </template>
       </CnForm>
-      <CnTable v-bind="propsTable" v-loading="loading" />
+      <div v-if="propsTable.data.length > 0">
+        <CnTable v-bind="propsTable" v-loading="loading" />
+      </div>
+      <div v-else>
+        <el-empty description="请筛选需要批量修改信息的设备" />
+      </div>
     </div>
     <div v-if="step1 === 2">
       <CnForm ref="stpeTowBulkEditFromRef" v-bind="stpeTowBulkEditFrom">
@@ -64,7 +69,7 @@
     <div v-if="step1 === 4">44444</div>
     <template #footer>
       <el-button type="primary" @click="BackStep" v-if="step1 !== 1">上一步</el-button>
-      <el-button type="primary" @click="nextStep" v-if="step1 !== 4 && step1 !== 3"
+      <el-button type="primary" @click="nextStep" :disabled="propsTable.data.length === 0" v-if="step1 !== 4 && step1 !== 3"
         >下一步</el-button
       >
       <el-button type="primary" @click="submitTo" v-if="step1 === 3">提交</el-button>
@@ -106,6 +111,21 @@ const dialogProps = reactive<CnPage.DialogProps>({
 
 const bulkEditProps = reactive<CnPage.DialogProps>({
   title: "批量编辑",
+});
+
+const propsTable = reactive<CnPage.TableProps>({
+  columns: [
+    { label: "省统一设备编号", prop: "proDevCode", sortable: true },
+    { label: "设备接入单位设备编号", prop: "unitDevCode", sortable: true },
+    { label: "设备型号", prop: "devModelNo" },
+    { label: "部署场所", prop: "siteName" },
+    { label: "行政区域", prop: "regionDetail" },
+    { label: "自助终端管理员", prop: "managePersonName" },
+    { label: "自助终端管理员联系方式", prop: "managePersonContact" },
+    { label: "安装激活时间", prop: "installActivateTime", sortable: true },
+    { label: "政务程序版本号", prop: "procedureVersion" },
+  ],
+  data: [],
 });
 
 const bulkEditFrom = reactive({
@@ -167,10 +187,10 @@ const stpeTowBulkEditFrom = reactive({
       span: 24,
       props: {
         options: [
-          { label: "行政区划", value: 0 },
-          { label: "详细地址", value: 1 },
-          { label: "地理坐标", value: 2 },
-          { label: "部署场所名称", value: 3 },
+          { label: "行政区划", value: 0, disabled: propsTable.data.length <= 10 }, // propsTable.data.length >= 1
+          { label: "详细地址", value: 1, disabled: propsTable.data.length >= 1 },
+          { label: "地理坐标", value: 2, disabled: propsTable.data.length >= 1 },
+          { label: "部署场所名称", value: 3, disabled: propsTable.data.length >= 1 },
           { label: "部署场所类型", value: 4 },
           { label: "设备用途", value: 5 },
           { label: "自助终端管理员", value: 6 },
@@ -327,7 +347,7 @@ const props = reactive<CnPage.Props>({
               closeOnClickModal: false,
               confirmButtonText: "确定",
             }).then(() => {
-              devBaseInfoStart(params.join(",")).then((res) => {
+              devBaseInfoStart(params.join(",")).then((res: any) => {
                 if (res.code === "200") {
                   ElMessage({
                     type: "info",
@@ -358,7 +378,7 @@ const props = reactive<CnPage.Props>({
               type: "warning",
               closeOnClickModal: false,
             }).then(() => {
-              devBaseInfoStop(params.join(",")).then((res) => {
+              devBaseInfoStop(params.join(",")).then((res: any) => {
                 console.log(res);
                 if (res.code === "200") {
                   ElMessage({
@@ -378,7 +398,7 @@ const props = reactive<CnPage.Props>({
           if (selectionIds.value.length < 1) {
             ElMessage({
               type: "error",
-              message: "请选择要停用的设备",
+              message: "请选择要注销的设备",
             });
           } else {
             const ids: any = [];
@@ -389,7 +409,7 @@ const props = reactive<CnPage.Props>({
               type: "warning",
               closeOnClickModal: false,
             }).then(() => {
-              devBaseInfoLogoff(params.join(",")).then((res) => {
+              devBaseInfoLogoff(params.join(",")).then((res: any) => {
                 console.log(res);
                 if (res.code === "200") {
                   ElMessage({
@@ -437,21 +457,6 @@ const props = reactive<CnPage.Props>({
     },
   },
   pagination: false,
-});
-
-const propsTable = reactive<CnPage.TableProps>({
-  columns: [
-    { label: "省统一设备编号", prop: "proDevCode", sortable: true },
-    { label: "设备接入单位设备编号", prop: "unitDevCode", sortable: true },
-    { label: "设备型号", prop: "devModelNo" },
-    { label: "部署场所", prop: "siteName" },
-    { label: "行政区域", prop: "regionDetail" },
-    { label: "自助终端管理员", prop: "managePersonName" },
-    { label: "自助终端管理员联系方式", prop: "managePersonContact" },
-    { label: "安装激活时间", prop: "installActivateTime", sortable: true },
-    { label: "政务程序版本号", prop: "procedureVersion" },
-  ],
-  data: [],
 });
 
 // 查看详情
