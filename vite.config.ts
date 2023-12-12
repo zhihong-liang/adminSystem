@@ -20,6 +20,10 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
   ],
+  base: "/selfHelp",
+  build: {
+    outDir: "selfHelp",
+  },
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
@@ -27,7 +31,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/api': 'http://192.168.10.225:19769/'
+      '/selfHelp/api': 'http://192.168.10.212/'
     }
   }
 })

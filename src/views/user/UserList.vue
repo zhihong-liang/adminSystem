@@ -6,33 +6,33 @@
     </template>
 
     <template #authSlot>
-      <el-form>
-        <div v-for="(item, index) in authList" :key="index">
+      <el-form :model="model" ref="authRef">
+        <div v-for="(item, index) in model.authList" :key="index">
           <div>授权{{index + 1}}<span v-if="index !== 0" style="float: right;color:red;cursor:pointer;" @click="delAuth(index)">删除</span></div>
           <el-row :gutter="20" class="aublock">
             <el-col :span="12">
-              <el-form-item label="单位类型">
+              <el-form-item label="单位类型" :prop="'authList.' + index + '.unitType'" :rules="{ required: true, message: '请选择单位类型', trigger: 'change'}" style="margin-bottom: 18px">
                 <el-select clearable filterable placeholder="请选择" v-model="item.unitType" @change="(val: string) => changeUnit(val, index, 'change')">
                   <el-option v-for="option in unitTypeList" :key="option.id" :label="option.unitTypeName" :value="option.id" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="单位">
+              <el-form-item label="单位" :prop="'authList.' + index + '.unitId'" :rules="{ required: true, message: '请选择单位', trigger: 'change'}" style="margin-bottom: 18px">
                 <el-select clearable filterable placeholder="请选择" v-model="item.unitId" @change="getPermit($event, index)">
                   <el-option v-for="option in unitList" :key="option.id" :label="option.fullName" :value="option.id" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="角色">
-                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: string) => changeRole(val, index)">
+              <el-form-item label="角色" :prop="'authList.' + index + '.roleId'" :rules="{ required: true, message: '请选择角色', trigger: 'change'}" style="margin-bottom: 18px">
+                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: number) => changeRole(val, index)">
                   <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="岗位">
+              <el-form-item label="岗位" style="margin-bottom: 18px">
                 <el-select clearable filterable placeholder="请选择" v-model="item.postId">
                   <el-option v-for="option in postList" :key="option.id" :label="option.name" :value="option.id" />
                 </el-select>
@@ -80,11 +80,11 @@
           </el-row>
         </div>
       </el-form>
-      
-      
+
     </template>
-    <template #footer>
-      <el-button v-if="dialogProps.title === '查看用户'" @click="dialogRef?.close()">关闭</el-button>
+    <template v-slot:footer="slotProp">
+      <el-button @click="dialogRef?.close()">{{dialogProps.title === "查看用户" ? "关闭" : "取消"}}</el-button>
+      <el-button v-if="dialogProps.title !== '查看用户'" type="primary" :loading="setLoading" @click="handleSubmit(slotProp)">提交</el-button>
     </template>
   </CnDialog>
 </template>
@@ -104,15 +104,15 @@ import {
   getUnitDetail,
   getUserDetail,
   editUserInfor,
-  type Unit
+  type Unit, type UserTs
 } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 
 const handleCheckChange = (data: Division2, checked: boolean, index: number) => {
   if (checked) {
-    authList.value[index].areaCode.push(data.value)
+    model.authList[index].areaCode.push(data.value)
   } else {
-    authList.value[index].areaCode = authList.value[index].areaCode.filter((v) => v !== data.value)
+    model.authList[index].areaCode = model.authList[index].areaCode.filter((v: string) => v !== data.value)
   }
 }
 
@@ -121,8 +121,25 @@ interface Tree {
   childList?: Tree[],
   disabled: boolean
 }
-const limitsList = ref<Tree[]>([])
-const checkedKeys = ref<number[]>([])
+interface AuthTs {
+  unitType: string
+  postId: number
+  roleId: number
+  unitId: string
+  areaCode: string[]
+  authData: Record<string, string[]>
+  permiObj: any
+  division?: any[]
+  limitsList?: any[]
+  checkedKeys: number[]
+  villageCode?: string
+  streetCode?: string
+  districtCode?: string
+  cityCode?: string
+  provinceCode?: string
+  userAuthDataList?: any[]
+}
+
 const defaultProps = {
   children: 'childList',
   label: 'name',
@@ -131,17 +148,23 @@ const defaultProps = {
 const handleNodeClick = (data: Tree) => {
   console.log(data)
 }
-
-const authList: any = ref([] as any);
+const model = reactive<{
+  authList: AuthTs[]
+}
+>({
+  authList:[]
+})
+const authRef = ref();
+const setLoading = ref(false)
 
 const addAuth = () => {
-  authList.value.push({
+  model.authList.push({
     unitType: "",
-  })
+  } as AuthTs)
 }
 
 const delAuth = (index: number) => {
-  authList.value.splice(index, 1)
+  model.authList.splice(index, 1)
 }
 
 // 查询岗位
@@ -172,10 +195,10 @@ const queryUnitList = () => {
 const unitList = ref([] as any)
 function changeUnit(val: string, index: number, type: string) {
   if(type !== 'detail'){
-    authList.value[index].unitId = ""
-    authList.value[index].areaCode = []
-    authList.value[index].division = []
-    authList.value[index].authData = {}
+    model.authList[index].unitId = ""
+    model.authList[index].areaCode = []
+    model.authList[index].division = []
+    model.authList[index].authData = {}
   }
   getUnitList({
     page:1,
@@ -191,31 +214,29 @@ function changeUnit(val: string, index: number, type: string) {
 // 获取数据权限
 const getPermit = (val: number, index: number) => {
   getUnitDetail(val).then((res) => {
-    authList.value[index].permiObj = res.data
+    model.authList[index].permiObj = res.data
 
     const code = [
-      authList.value[index].permiObj.villageCode,
-      authList.value[index].permiObj.streetCode,
-      authList.value[index].permiObj.districtCode,
-      authList.value[index].permiObj.cityCode,
-      authList.value[index].permiObj.provinceCode
+    model.authList[index].permiObj.villageCode,
+    model.authList[index].permiObj.streetCode,
+    model.authList[index].permiObj.districtCode,
+    model.authList[index].permiObj.cityCode,
+    model.authList[index].permiObj.provinceCode
     ]
     const idx = code.findIndex(Boolean)
     console.log("idx", idx, code[idx])
     if (code[idx]) {
-      authList.value[index].areaCode = [code[idx] as string]
-      authList.value[index].division = useDivision(code[idx] as string).value
-      // authList.value[index].permiObj.unitLevel = 5 - idx
+      model.authList[index].areaCode = [code[idx] as string]
+      model.authList[index].division = useDivision(code[idx] as string).value
     } else {
-      authList.value[index].areaCode = []
-      authList.value[index].division = []
-      // authList.value[index].permiObj.unitLevel = undefined
+      model.authList[index].areaCode = []
+      model.authList[index].division = []
     }
 
-    const permissions = authList.value[index].permiObj.permissions as Unit['permissions']
+    const permissions = model.authList[index].permiObj.permissions as Unit['permissions']
     if (permissions) {
-      authList.value[index].areaCode = permissions.map((v) => v.regionCode)
-      authList.value[index].authData = permissions.reduce(
+      model.authList[index].areaCode = permissions.map((v) => v.regionCode)
+      model.authList[index].authData = permissions.reduce(
         (acc, cur) => {
           acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
           return acc
@@ -239,7 +260,7 @@ const queryRoleList = () => {
 }
 
 const arrChild = (arr: any) => {
-  arr.forEach((e: Tree[]) => {
+  arr.forEach((e: Tree) => {
     e.disabled = true
     if (e.childList?.length) {
       arrChild(e.childList)
@@ -248,20 +269,21 @@ const arrChild = (arr: any) => {
   return arr
 }
 
-const changeRole = (val: string, index: number) => {
-  authList.value[index].limitsList = []
+const changeRole = (val: number, index: number) => {
+  model.authList[index].limitsList = []
   getRoleDetail(val).then((res) => {
-    authList.value[index].limitsList = arrChild(res.data.menuList)
-    authList.value[index].checkedKeys = res.data.menuIds
+    model.authList[index].limitsList = arrChild(res.data.menuList)
+    model.authList[index].checkedKeys = res.data.menuIds
   })
 }
 
-function operateUser(type = 'add', data = {}) {
+function operateUser(type = 'add', data = {} as UserTs) {
+  console.log('data', data)
   queryPostList();
   queryUnitList();
   queryRoleList();
 
-  authList.value = []
+  model.authList = []
   dialogProps.formProps.disabled = false
   if (type === 'look') dialogProps.formProps.disabled = true
 
@@ -272,9 +294,9 @@ function operateUser(type = 'add', data = {}) {
     detailApi.then((res) => {
       dialogProps.formProps!.model = res?.data || {}
       // 数据权限回显
-      authList.value = res?.data.roleAuthList || [{}]
+      model.authList = res?.data.roleAuthList || [{}]
       if (type !== 'add') {
-        authList.value.forEach((e: any, ind: number) => {
+        model.authList.forEach((e: AuthTs, ind: number) => {
           changeUnit(e.unitType, ind, "detail")
           changeRole(e.roleId, ind)
 
@@ -302,43 +324,50 @@ function operateUser(type = 'add', data = {}) {
           }
         });
       }
-      
-      console.log('你随意', authList.value)
-      
-      const params = dialogProps.formProps!.model || {}
-      dialogProps.action = () => {
-        const apiName = type === 'add' ? addUserInfor : editUserInfor
-        const roleAuthList: any[] = []
-        authList.value.forEach((v: any, i:number) => {
-          roleAuthList.push({
-            postId: v.postId,
-            roleId: v.roleId,
-            unitId: v.unitId,
-            userAuthDataList: []
-          })
-          for (let item of v.areaCode) {
-            if (v.authData[item]) {
-              roleAuthList[i].userAuthDataList.push({
-                regionCode: item,
-                dataPermissionPolicy: v.authData[item].join(','),
-                unitId: v.unitId,
-                status: '1'
-              })
-            }
-          }
-        });
-
-        return apiName({
-          ...params,
-          userName: params.phone,
-          roleAuthList: roleAuthList
-        })
-      }
     }) 
   }
 
   dialogProps.onSuccess = () => (props.refresh = Date.now())
   dialogRef.value?.open()
+}
+
+const handleSubmit = (val: any) => {
+  const valid1 = val.ref.formRef.validate();
+  const valid2 = authRef.value.validate()
+  Promise.all([valid1, valid2]).then(() => {
+    setLoading.value = true
+    const params = dialogProps.formProps!.model || {}
+    const apiName = dialogProps.title === '新增用户' ? addUserInfor : editUserInfor
+    const roleAuthList: any[] = []
+    model.authList.forEach((v: AuthTs, i:number) => {
+      roleAuthList.push({
+        postId: v.postId,
+        roleId: v.roleId,
+        unitId: v.unitId,
+        userAuthDataList: []
+      })
+      for (let item of v.areaCode) {
+        if (v.authData[item]) {
+          roleAuthList[i].userAuthDataList.push({
+            regionCode: item,
+            dataPermissionPolicy: v.authData[item].join(','),
+            unitId: v.unitId,
+            status: '1'
+          })
+        }
+      }
+    });
+    apiName({
+      ...params,
+      userName: params.phone,
+      roleAuthList: roleAuthList
+    } as UserTs).then((res) => {
+      props.refresh = Date.now()
+      dialogRef.value?.close()
+    }).finally(() => {
+      setLoading.value = false
+    })
+  })
 }
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
@@ -440,8 +469,8 @@ const props: CnPage.Props = reactive({
         prop: 'action',
         label: '操作',
         buttons: [
-          { label: '查看', type: 'primary', onClick: ({row}) => operateUser('look', row) },
-          { label: '编辑', type: 'warning', onClick: ({row}) => operateUser('edit', row) }
+          { label: '查看', type: 'primary', onClick: ({row}) => operateUser('look', row as UserTs) },
+          { label: '编辑', type: 'warning', onClick: ({row}) => operateUser('edit', row as UserTs) }
         ]
       }
     ]

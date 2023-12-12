@@ -57,8 +57,8 @@ function filterMenu(list: Array<string>) {
   let array: Menu[] = [...menuList.value]
 
   return list.map((title: string) => {
-    const target = array.find((menu) => menu.path === title) || {}
-    const { id, path = '', name = '', childList = [] } = target as Menu
+    const target = array.find((menu) => menu.path === title)
+    const { id, path = '', name = '', childList = [] } = target || {} as Menu
 
     array = childList
 

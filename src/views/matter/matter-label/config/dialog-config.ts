@@ -1,105 +1,72 @@
-import type { handleType } from './type'
+import type { ActionType, getDialogConfigParams } from './type'
 
-export default function getDialogConfig(
-  handleType: handleType,
-  dialogSubmitSuccess: () => void
-): CnPage.DialogProps {
-  if (handleType === 'add') {
-    return {
-      title: '新建标签',
-      formProps: {
-        model: { status: '1' },
-        labelPosition: 'left',
-        requireAsteriskPosition: 'right',
-        items: [
-          { label: '标签名称', prop: 'lableName', component: 'input' },
-          { label: '备注', prop: 'remark', component: 'input' }
-        ],
-        labelWidth: 120,
-        rules: {
-          lableName: [{ required: true, message: '请输入标签名称' }]
-        }
-      },
-      onSuccess: dialogSubmitSuccess
-    }
-  } else if (handleType === 'edit') {
-    return {
-      title: '编辑标签',
-      formProps: {
-        model: {},
-        items: [
-          {
-            label: '标签编号',
-            prop: 'id'
-          },
-          {
-            label: '标签名称',
-            prop: 'labelName',
-            component: 'select',
-            props: {
-              options: [
-                { label: '读书', value: 0 },
-                { label: '打球', value: 1 }
-              ]
-            }
-          },
-          { label: '备注', prop: 'remind', component: 'input' },
-          {
-            label: '图标',
-            prop: 'avatar',
-            component: 'input'
-          },
-          {
-            label: '状态',
-            prop: 'status',
-            component: 'select',
-            props: {
-              options: [
-                { label: '启用', value: 0 },
-                { label: '停用', value: 1 }
-              ]
-            }
-          }
-        ],
-        labelWidth: 120,
-        rules: {
-          type: [{ required: true, message: '请选择所需导出的字段' }]
-        }
-      },
-      onSuccess: dialogSubmitSuccess
-    }
-  } else if (handleType === 'delete') {
-    return {
-      title: '删除标签',
-      formProps: {
-        model: {},
-        items: [
-          {
-            label: '',
-            prop: 'delete',
-            component: 'slot'
-          }
-        ],
-        labelWidth: 0
-      },
-      onSuccess: dialogSubmitSuccess
-    }
+export function getDialogConfig(actionType: ActionType) {
+  if (actionType === 'add' || actionType === 'edit') {
+    return getAddOrEditActionDialogConfig
+  } else if (actionType === 'delete') {
+    return getDeleteActionDialogConfig
   } else {
-    return {
-      title: '事项标签详情',
-      formProps: {
-        model: {},
-        labelPosition: 'left',
-        items: [
-          { label: '标签名称', prop: 'name', component: 'input' },
-          { label: '备注', prop: 'remind', component: 'input' },
-          { label: '图标', prop: 'avatar', component: 'input' }
-        ],
-        readonly: true,
-        colSpan: 12,
-        labelWidth: 120
-      },
-      onSuccess: dialogSubmitSuccess
+    return getDetailActionDialogConfig
+  }
+}
+
+// 新建/编辑标签
+export function getAddOrEditActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
+  const { dialogSubmitSuccess, model } = params
+  return {
+    title: model ? '编辑标签' : '新建标签',
+    formProps: {
+      model: model ? { ...model, status: '1' } : { status: '1' },
+      labelPosition: 'left',
+      requireAsteriskPosition: 'right',
+      items: [
+        { label: '标签名称', prop: 'lableName', component: 'input' },
+        { label: '备注', prop: 'remark', component: 'input' }
+      ],
+      labelWidth: 120,
+      rules: {
+        lableName: [{ required: true, message: '请输入标签名称' }]
+      }
+    },
+    onSuccess: dialogSubmitSuccess
+  }
+}
+
+// 删除标签
+export function getDeleteActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
+  return {
+    title: '删除标签',
+    formProps: {
+      model: {},
+      labelPosition: 'left',
+      requireAsteriskPosition: 'right',
+      items: [{ label: '', prop: 'deleteTitle', component: 'slot' }],
+      labelWidth: 0
+    }
+  }
+}
+
+// 查看标签详情
+export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
+  const { model } = params
+  return {
+    title: '事项标签详情',
+    formProps: {
+      model: model!,
+      labelPosition: 'left',
+      requireAsteriskPosition: 'right',
+      items: [
+        { label: '标签编号', prop: 'id' },
+        { label: '标签名称', prop: 'lableName' },
+        { label: '状态', prop: 'status' },
+        { label: '备注', prop: 'remake' },
+        { label: '图标', prop: 'lableIcon' },
+        { label: '使用事项数', prop: 'mattersCount' },
+        { label: '创建人', prop: 'createUser' },
+        { label: '创建时间', prop: 'createTime' }
+      ],
+      labelWidth: 120,
+      colSpan: 12
     }
   }
 }

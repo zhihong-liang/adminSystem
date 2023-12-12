@@ -1,18 +1,39 @@
 <template>
-  <CnSearch v-bind="search" :model="params" @search="handleQuery()" @reset="handleQuery()" />
+  <CnSearch
+    v-bind="search"
+    :model="params"
+    @search="handleQuery()"
+    @reset="handleQuery()"
+  />
   <div class="role-list">
     <div class="add-card pointer" @click="handleAdd">
       <el-icon class="add-icon"><Plus /></el-icon>
     </div>
-    <div class="role-card">
+    <div class="role-card" v-for="(item, index) in roleList" :key="index">
       <div class="role-main">
-        <div class="role-name">系统管理员</div>
-        <div class="role-desc">系统自带角色，拥有所有权限</div>
+        <div class="role-name">
+          {{ item.name }}
+        </div>
+        <div class="role-desc">{{ item.description }}</div>
       </div>
       <div class="card-footer">
-        <div class="card-footer-item card-show pointer">查看</div>
-        <div class="card-footer-item card-edit pointer">修改</div>
-        <div class="card-footer-item card-del pointer">删除</div>
+        <div class="card-footer-item card-show pointer" @click="handleModify(item, 'view')">
+          查看
+        </div>
+        <div
+          class="card-footer-item card-edit pointer"
+          @click="handleModify(item, 'modify')"
+          v-if="item.id !== 1"
+        >
+          修改
+        </div>
+        <div
+          class="card-footer-item card-del pointer"
+          @click="handleDet(item)"
+          v-if="item.isSys !== '1'"
+        >
+          删除
+        </div>
       </div>
     </div>
   </div>
@@ -20,27 +41,66 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
-import CnSearch from '@/components/cn-page/CnSearch.vue'
-import { Plus } from '@element-plus/icons-vue'
-import Deal from './deal.vue'
+import { reactive, ref, computed, onMounted } from "vue";
+import CnSearch from "@/components/cn-page/CnSearch.vue";
+import { Plus } from "@element-plus/icons-vue";
+import Deal from "./deal.vue";
+import { getRoleList, sysRoleRemoveIids } from "@/api/admin";
 
 // 搜索
-const inited = ref(false)
+const inited = ref(false);
 const search = ref({
+  params: {},
   items: [
-    { label: '主类', prop: 'type', component: 'input' },
-    { label: '角色状态', prop: 'status', component: 'select' }
-  ]
-})
-const params = ref()
-const handleQuery = () => {}
+    { label: "主类", prop: "type", component: "input" },
+    { label: "角色状态", prop: "status", component: "select", dict: "ROLE_STATUS"  },
+  ],
+});
+const roleList = ref();
+onMounted(() => {
+  getData()
+});
+const params = ref();
+const handleQuery = () => {};
 
-const dealRef = ref()
+const dealRef = ref();
+const getData = () => {
+  const params = {
+    obj: {},
+    page: 1,
+    size: 999,
+  };
+  getRoleList(params).then((res: any) => {
+    roleList.value = res.rows;
+  });
+}
 // 新增
 const handleAdd = () => {
-  dealRef.value.open()
-}
+  dealRef.value.open();
+};
+// 修改、查看
+const handleModify = (data: any, type: string) => {
+  dealRef.value.open(data, type);
+};
+// 删除
+const handleDet = (row: { id: Record<string, unknown>; }) => {
+  console.log(row);
+  ElMessageBox.confirm("确定要删除该角色吗？", "提示", {
+    type: "warning",
+    closeOnClickModal: false,
+    confirmButtonText: "确定",
+  }).then(() => {
+    sysRoleRemoveIids(row.id).then((res) => {
+      if (res.code === "200") {
+        ElMessage({
+          type: "success",
+          message: res.message,
+        });
+        getData()
+      }
+    });
+  });
+};
 </script>
 
 <style scoped lang="scss">

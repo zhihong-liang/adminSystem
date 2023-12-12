@@ -101,6 +101,7 @@ declare namespace CnPage {
    */
   interface TableProps<T = Record<string, any>> extends ElTableProps<T> {
     columns: TableColumnProps<T>[]
+    selectionChange?: (selection: any) => void
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
     ElTableColumnCtx<T> & {
@@ -163,6 +164,7 @@ declare namespace CnPage {
     props?: undefined
     prop?: string | string[]
     span?: number
+    display?: string
     /**
      * 字典
      */

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <CnPage v-bind="props">
+    <CnPage v-bind="props" ref="pageRef">
       <template #matterStatus="{ row }">
         <el-text :type="row.matterStatus === '1' ? 'success' : ''">
           {{ row.matterStatus === '1' ? '有效' : '无效' }}
@@ -19,12 +19,16 @@
           <el-radio-button label="configInfo">配置信息</el-radio-button>
         </el-radio-group>
       </template>
+      <template #footer v-if="openDialogHandle === 'detail'">
+        <div></div>
+      </template>
     </CnDialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref, toRaw, onMounted, computed } from 'vue'
+
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 
@@ -34,41 +38,47 @@ import getTollbarConifg from './config/tollbar-config'
 import { getDialogConfig } from './config/dialog-config'
 import type { ActionType, tabsActivateName } from './config/type'
 
-import { getMatterList, addMatter, editMatter, getDictBySysCoverage } from '@/api/matter'
+import {
+  getMatterList,
+  addMatter,
+  editMatter,
+  exportMatterList,
+  getMatterLabelList,
+  infoLabel
+} from '@/api/matter'
+import { getDictionary } from '@/api'
 import useDictionary from '@/hooks/useDictionary'
-import { isString } from 'lodash-es'
+import { handlesysCoverageOptionsTree, stringToArray } from '../utils/index'
 
-onMounted(async () => {
-  const res = await getDictBySysCoverage()
-  const data = res.data['SYS_COVERAGE']
-  const list = data
-    .filter((v: any) => v.subtype.length <= 4)
-    .map((item: any) => {
-      const value = item.subtype
-      let parentId
-      if (value.length === 2) {
-        parentId = '0'
-      } else {
-        parentId = value.substring(0, 2)
-      }
-      return { parentId, value: item.subtype, label: item.description }
-    })
-  createTree([...list])
-})
-
-const sysCoverAgeList = ref<any[]>([])
+// 系统覆盖范围options
+const sysCoverageOptions = ref<any[]>()
+// 身份认证方式options
+const identityAuthItemOptions = ref<any[]>()
+// 支付方式options
+const payWayOptions = ref<any[]>()
 
 const detailAndEditorModel = ref<any>({})
 const openDialogHandle = ref<ActionType>('detail')
 
+const tableSelection = ref<any[]>()
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
 
 const activeName = ref<tabsActivateName>('basicInfo')
 
+onMounted(async () => {
+  const res = await getDictionary(['SYS_COVERAGE', 'IDENTITY_AUTH_ITEM', 'PAY_WAY'])
+  const { data } = res
+  sysCoverageOptions.value = handlesysCoverageOptionsTree(data['SYS_COVERAGE'])
+  identityAuthItemOptions.value = data['IDENTITY_AUTH_ITEM'].map((i) => ({
+    value: i.subtype,
+    label: i.description
+  }))
+  payWayOptions.value = data['PAY_WAY'].map((i) => ({ value: i.subtype, label: i.description }))
+})
+
 const props = reactive<CnPage.Props>({
   transformRequest: (params) => {
-    console.log(params)
     const sysCoverage = params.sysCoverage ? params.sysCoverage.join(',') : ''
     const obj = { ...params, sysCoverage }
     return { page: 1, size: 10, obj }
@@ -77,9 +87,9 @@ const props = reactive<CnPage.Props>({
   init: undefined,
   params: { page: 1, size: 10 },
   action: getMatterList,
-  search: getSearchConfig(computed(() => sysCoverAgeList.value)),
+  search: getSearchConfig(computed(() => sysCoverageOptions.value)),
   toolbar: getTollbarConifg(showDialogByAddOrLabel),
-  table: getTableConfig(showDialogByEdit),
+  table: getTableConfig(showDialogByEdit, selectionChange),
   pagination: {
     page: 1,
     size: 10
@@ -88,7 +98,11 @@ const props = reactive<CnPage.Props>({
 
 // 弹窗确定按钮的点击
 function dialogSubmitSuccess() {
-  props.refresh = new Date().getDate()
+  props.refresh = new Date().getTime()
+}
+
+function selectionChange(selection: any) {
+  tableSelection.value = selection
 }
 
 // 控制是否显示支付方式
@@ -107,17 +121,9 @@ function handleTabChange() {
   else showDialogByDetail(openDialogHandle.value, detailAndEditorModel.value, false)
 }
 
-// 查询事项列表
-function getMatterListAction() {
-  const model: any = props.params
-  console.log(model)
-  return getMatterList(model)
-}
-
 // 新增事项
 function addMatterAction() {
   const model = dialogProps.formProps?.model || {}
-  console.log(model)
   model.hardwareModule = model.hardwareModule.join(',')
   model.identityAuthItem = model.identityAuthItem.join(',')
   model.networdPolicy = model.networdPolicy.join(',')
@@ -126,7 +132,7 @@ function addMatterAction() {
   return addMatter(model)
 }
 
-// 修改事项
+// 编辑事项
 function editMatterAction() {
   const model = dialogProps.formProps?.model || {}
   const obj = {
@@ -139,16 +145,95 @@ function editMatterAction() {
   return editMatter({ ...model, ...obj })
 }
 
-// 显示新建事项/所属标签窗口
-function showDialogByAddOrLabel(handle: ActionType) {
-  const dialogConfig = getDialogConfig(handle)({
-    dialogSubmitSuccess: dialogSubmitSuccess,
-    sysCoverAgeList: computed(() => sysCoverAgeList.value)
-  })
-  for (const key of Object.keys(dialogConfig)) {
-    dialogProps[key] = dialogConfig[key]
+// 导出事项列表
+async function exportMatterListAction() {
+  if (tableSelection.value && tableSelection.value.length) {
+    const mattersIds: any[] = []
+    const filedList = [
+      'matterCode',
+      'matterAlias',
+      'matterName',
+      'businessUnit',
+      'sysCoverage',
+      'handleType',
+      'matterStatus'
+    ]
+    const filedNameList = [
+      '粤智助事项编码',
+      '事项别名',
+      '事项名称',
+      '业务部门',
+      '系统覆盖范围',
+      '办理类型',
+      '事项状态'
+    ]
+    tableSelection.value.forEach((item) => {
+      mattersIds.push(item.id)
+    })
+    const result: any = await exportMatterList({ mattersIds: mattersIds, filedList, filedNameList })
+    let blob = new Blob([result], {
+      type: `application/vnd.ms-excel`
+    })
+    let href = window.URL.createObjectURL(blob)
+    let downloadElement = document.createElement('a')
+    downloadElement.href = href
+    downloadElement.download = '事项列表.xlsx'
+    document.body.appendChild(downloadElement)
+    downloadElement.click() //点击下载
+    document.body.removeChild(downloadElement) //下载完成移除元素
   }
-  dialogProps.action = () => addMatterAction()
+}
+
+// 所属标签
+function infoLabelAction() {
+  const model = dialogProps.formProps?.model || {}
+  const mattersIds = tableSelection.value!.map((item) => item.id)
+  const { label } = model
+  return infoLabel({
+    labelId: label,
+    mattersIds
+  })
+}
+
+// 显示新建事项/所属标签窗口/导出事项列表
+async function showDialogByAddOrLabel(handle: ActionType) {
+  openDialogHandle.value = handle
+  if (handle === 'export') {
+    exportMatterListAction()
+    return
+  } else if (handle === 'label') {
+    if (!tableSelection.value || !tableSelection.value.length) return
+    const result = await getMatterLabelList({ page: 1, size: 1000, obj: {} })
+    const options = result.rows.map((item: any) => ({ label: item.lableName, value: item.id }))
+    const matterNameList = tableSelection.value.map((item) => item.matterName)
+    const dialogConfig = getDialogConfig(handle)({
+      dialogSubmitSuccess: dialogSubmitSuccess,
+      model: {
+        matterName: matterNameList.join('、')
+      },
+      optionsMap: {
+        label: options
+      }
+    })
+    for (const key of Object.keys(dialogConfig)) {
+      dialogProps[key] = dialogConfig[key]
+    }
+    dialogProps.action = () => infoLabelAction()
+  } else {
+    const dialogConfig = getDialogConfig(handle)({
+      dialogSubmitSuccess: dialogSubmitSuccess,
+      optionsMap: {
+        sysCoverage: computed(() => sysCoverageOptions.value),
+        identityAuthItem: computed(() => identityAuthItemOptions.value),
+        payWay: computed(() => payWayOptions.value)
+      },
+      visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible }
+    })
+    for (const key of Object.keys(dialogConfig)) {
+      dialogProps[key] = dialogConfig[key]
+    }
+    dialogProps.action = () => addMatterAction()
+  }
   dialogRef.value?.open()
 }
 
@@ -162,10 +247,13 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
   model.payWay = stringToArray(model.payWay)
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
-  console.log(model.matterStatus)
   const dialogConfig = getDialogConfig(handle)({
     dialogSubmitSuccess: dialogSubmitSuccess,
-    sysCoverAgeList: computed(() => sysCoverAgeList.value),
+    optionsMap: {
+      sysCoverage: computed(() => sysCoverageOptions.value),
+      identityAuthItem: computed(() => identityAuthItemOptions.value),
+      payWay: computed(() => payWayOptions.value)
+    },
     activeName: activeName.value,
     model: model
   })
@@ -181,21 +269,23 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
   if (firstOpen) activeName.value = 'basicInfo'
   const model = window.structuredClone(toRaw(row))
   const obj = {
-    hardwareModule: useDictionary('HARDWARE_MODULE', stringToArray(model.hardwareModule)),
-    identityAuthItem: useDictionary('IDENTITY_AUTH_ITEM', stringToArray(model.identityAuthItem)),
-    networdPolicy: useDictionary('NETWORD_POLICY', stringToArray(model.networdPolicy)),
-    payWay: useDictionary('PAY_WAY', stringToArray(model.payWay)),
-    handleType: useDictionary('HANDLE_TYPE', stringToArray(model.handleType)),
-    matterType: useDictionary('MATTER_TYPE', model.matterType),
-    serviceObject: useDictionary('SERVICE_OBJECT', stringToArray(model.serviceObject)),
-    sysLevel: useDictionary('SYS_LEVEL', stringToArray(model.sysLevel)),
+    hardwareModule: useDictionary('HARDWARE_MODULE', stringToArray(model.hardwareModule)).value,
+    identityAuthItem: useDictionary('IDENTITY_AUTH_ITEM', stringToArray(model.identityAuthItem))
+      .value,
+    networdPolicy: useDictionary('NETWORD_POLICY', stringToArray(model.networdPolicy)).value,
+    payWay: useDictionary('PAY_WAY', stringToArray(model.payWay)).value,
+    handleType: useDictionary('HANDLE_TYPE', stringToArray(model.handleType)).value,
+    matterType: useDictionary('MATTER_TYPE', stringToArray(model.matterType)).value,
+    serviceObject: useDictionary('SERVICE_OBJECT', stringToArray(model.serviceObject)).value,
+    sysLevel: useDictionary('SYS_LEVEL', stringToArray(model.sysLevel)).value,
     matterStatus: model.matterStatus === '1' ? '有效' : '无效'
   }
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
   const dialogConfig = getDialogConfig(handle)({
-    dialogSubmitSuccess: dialogSubmitSuccess,
-    sysCoverAgeList: computed(() => sysCoverAgeList.value),
+    optionsMap: {
+      sysCoverage: computed(() => sysCoverageOptions.value)
+    },
     activeName: activeName.value,
     model: {
       ...model,
@@ -207,30 +297,6 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
   }
   dialogProps.action = () => editMatterAction()
   dialogRef.value?.open()
-}
-
-function stringToArray(value: any) {
-  return isString(value) ? value.split(',') : value
-}
-
-function createTree(list: any) {
-  const len = list.length
-  for (let i = 0; i < len; i++) {
-    let arrTemp = []
-    for (let j = 0; j < list.length; j++) {
-      if (list[i].value == list[j].parentId) {
-        list[i].childen = arrTemp
-        arrTemp.push(list[j])
-      }
-    }
-  }
-  const result = []
-  for (let i = 0; i < list.length; i++) {
-    if (list[i].parentId == 0) {
-      result.push(list[i])
-    }
-  }
-  sysCoverAgeList.value = result
 }
 </script>
 
