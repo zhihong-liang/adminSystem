@@ -2,9 +2,7 @@
   <div>
     <CnPage v-bind="props">
       <template #lableName="{ row }">
-        <el-button type="text" @click="showDialogByAddAndEditAndDetail('detail', row)">{{
-          row.lableName
-        }}</el-button>
+        <el-button type="text" @click="showDialog('detail', row)">{{ row.lableName }}</el-button>
       </template>
       <template #status="{ row }">
         <span>{{ row.id }}</span>
@@ -13,7 +11,7 @@
     <CnDialog ref="dialogRef" v-bind="dialogProps">
       <template #deleteTitle v-if="handleType === 'delete'">
         <div class="deleteTitle">
-          确定删除"<span class="labelName"> {{ labelName }} </span>"标签
+          确定删除 "<span class="labelName"> {{ labelName }} </span>" 标签
         </div>
       </template>
       <template #footer v-if="handleType === 'delete'">
@@ -67,8 +65,8 @@ const props = reactive<CnPage.Props>({
   },
   action: getMatterLabelList,
   search: searchConfig,
-  toolbar: getTollbarConifg(showDialogByAddAndEditAndDetail),
-  table: getTableConfig(showDialogByAddAndEditAndDetail),
+  toolbar: getTollbarConifg(showDialog),
+  table: getTableConfig(showDialog),
   pagination: {
     page: 1,
     size: 10
@@ -94,13 +92,14 @@ async function removeMatterLabelAction() {
   ElMessage.success('操作成功')
 }
 
+// 修改标签
 function editMatterLabelAction() {
   const model = dialogProps.formProps?.model || {}
   return editMatterLabel(model)
 }
 
 // 显示添加/删除/标签弹窗
-function showDialogByAddAndEditAndDetail(handle: ActionType, row?: any) {
+function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
     const model = handle === 'edit' ? window.structuredClone(toRaw(row)) : undefined

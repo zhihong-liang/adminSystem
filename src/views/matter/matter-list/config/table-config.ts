@@ -1,6 +1,4 @@
-import type { ActionType } from './type'
 export default function getTableConfig(
-  editClickCb: (params: any, handle: ActionType) => void,
   selectionChange?: (selection: any) => void
 ): CnPage.TableProps {
   return {
@@ -19,15 +17,7 @@ export default function getTableConfig(
         label: '操作',
         prop: 'action',
         align: 'center',
-        buttons: [
-          {
-            label: '编辑',
-            type: 'text',
-            onClick: (params: any) => {
-              editClickCb('edit', params.row)
-            }
-          }
-        ]
+        slot: 'action'
       }
     ]
   }

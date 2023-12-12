@@ -1,4 +1,12 @@
-export type ActionType = 'add' | 'label' | 'export' | 'detail' | 'edit'
+export type ActionType =
+  | 'add'
+  | 'label'
+  | 'export'
+  | 'detail'
+  | 'edit'
+  | 'online'
+  | 'Offline'
+  | 'deactivate'
 
 export type tabsActivateName = 'basicInfo' | 'configInfo'
 
