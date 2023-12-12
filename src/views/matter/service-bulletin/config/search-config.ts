@@ -2,20 +2,13 @@ const config: CnPage.SearchProps = {
   model: {},
   labelPosition: 'left',
   items: [
-    { label: '公告标题', prop: 'itemId', component: 'input' },
-    { label: '类型', prop: 'sex1', component: 'input' },
+    { label: '公告标题', prop: 'noticeName', component: 'input' },
+    { label: '类型', prop: 'noticeTyle', component: 'select', dict: 'NOTICE_TYPE' },
     {
       label: '发布状态',
-      prop: 'status',
+      prop: 'noticeStatus',
       component: 'select',
-      props: {
-        options: [
-          { label: '已婚', value: 0 },
-          { label: '未婚', value: 1 },
-          { label: '离异', value: 2 },
-          { label: '丧偶', value: 3 }
-        ]
-      }
+      dict: 'NOTICE_STATUS'
     }
   ],
   colSpan: 8,

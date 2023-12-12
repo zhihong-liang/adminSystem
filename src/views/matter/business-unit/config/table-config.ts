@@ -1,14 +1,14 @@
-import type { handleType } from './type'
+import type { ActionType } from './type'
 
 export default function getTableConfig(
-  tableClickCb: (handleType: handleType, params: any) => void
+  tableClickCb: (handleType: ActionType, params: any) => void
 ): CnPage.TableProps {
   return {
     data: [],
 
     columns: [
       { type: 'selection' },
-      { label: '业务部门', prop: 'businessDeptName' },
+      { label: '业务部门', prop: 'businessDeptName', slot: 'businessDeptName' },
       { label: '备注', prop: 'remark' },
       { label: '事项数', prop: 'mattersCount' },
       { label: '创建时间', prop: 'createTime' },

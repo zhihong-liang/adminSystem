@@ -1,10 +1,39 @@
 <template>
   <div>
     <CnPage v-bind="props" ref="pageRef">
+      <!-- 操作 -->
+      <template #action="{ row }">
+        <div class="action-con">
+          <el-link :underline="false" type="primary" @click="showDialogByEdit('edit', row)"
+            >编辑</el-link
+          >
+          <el-link
+            v-if="row.matterStatus !== '1'"
+            :underline="false"
+            type="primary"
+            @click="editMatterStatusAction('online', row)"
+            >上线</el-link
+          >
+          <el-link
+            v-if="row.matterStatus !== '0'"
+            :underline="false"
+            type="primary"
+            @click="editMatterStatusAction('deactivate', row)"
+            >停用</el-link
+          >
+          <el-link
+            v-if="row.matterStatus !== '2'"
+            :underline="false"
+            type="primary"
+            @click="editMatterStatusAction('Offline', row)"
+            >下线</el-link
+          >
+        </div>
+      </template>
       <template #matterStatus="{ row }">
-        <el-text :type="row.matterStatus === '1' ? 'success' : ''">
-          {{ row.matterStatus === '1' ? '有效' : '无效' }}
-        </el-text>
+        <el-text v-if="row.matterStatus === '1'" type="success"> 上线 </el-text>
+        <el-text v-else-if="row.matterStatus === '2'"> 下线 </el-text>
+        <el-text v-else="row.matterStatus === '2'"> 停用 </el-text>
       </template>
       <template #matterCode="{ row }">
         <el-button type="text" @click="showDialogByDetail('detail', row)">{{
@@ -28,6 +57,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref, toRaw, onMounted, computed } from 'vue'
+import { ElMessage } from 'element-plus'
 
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
@@ -39,6 +69,7 @@ import { getDialogConfig } from './config/dialog-config'
 import type { ActionType, tabsActivateName } from './config/type'
 
 import {
+  getDeptList,
   getMatterList,
   addMatter,
   editMatter,
@@ -56,6 +87,8 @@ const sysCoverageOptions = ref<any[]>()
 const identityAuthItemOptions = ref<any[]>()
 // 支付方式options
 const payWayOptions = ref<any[]>()
+// 业务部门options
+const businessUnitOptions = ref<any[]>()
 
 const detailAndEditorModel = ref<any>({})
 const openDialogHandle = ref<ActionType>('detail')
@@ -75,6 +108,11 @@ onMounted(async () => {
     label: i.description
   }))
   payWayOptions.value = data['PAY_WAY'].map((i) => ({ value: i.subtype, label: i.description }))
+  const { rows } = await getDeptList({ page: 1, size: 1000, obj: {} })
+  businessUnitOptions.value = rows.map((i) => ({
+    value: i.businessDeptName,
+    label: i.businessDeptName
+  }))
 })
 
 const props = reactive<CnPage.Props>({
@@ -87,9 +125,12 @@ const props = reactive<CnPage.Props>({
   init: undefined,
   params: { page: 1, size: 10 },
   action: getMatterList,
-  search: getSearchConfig(computed(() => sysCoverageOptions.value)),
+  search: getSearchConfig(
+    computed(() => sysCoverageOptions.value),
+    computed(() => businessUnitOptions.value)
+  ),
   toolbar: getTollbarConifg(showDialogByAddOrLabel),
-  table: getTableConfig(showDialogByEdit, selectionChange),
+  table: getTableConfig(selectionChange),
   pagination: {
     page: 1,
     size: 10
@@ -143,6 +184,20 @@ function editMatterAction() {
     sysCoverage: model.sysCoverage.join(',')
   }
   return editMatter({ ...model, ...obj })
+}
+
+// 上线/下线/停用事项
+async function editMatterStatusAction(handle: ActionType, row: any) {
+  let matterStatus
+  if (handle === 'online') matterStatus = '1'
+  if (handle === 'Offline') matterStatus = '2'
+  if (handle === 'deactivate') matterStatus = '0'
+  const model = window.structuredClone(toRaw(row))
+  model.sysCoverage = model.sysCoverageCode
+  model.sysCoverageCode = ''
+  const result = await editMatter({ ...model, matterStatus })
+  props.refresh = new Date().getTime()
+  ElMessage.success(result.message || '操作成功')
 }
 
 // 导出事项列表
@@ -225,7 +280,8 @@ async function showDialogByAddOrLabel(handle: ActionType) {
       optionsMap: {
         sysCoverage: computed(() => sysCoverageOptions.value),
         identityAuthItem: computed(() => identityAuthItemOptions.value),
-        payWay: computed(() => payWayOptions.value)
+        payWay: computed(() => payWayOptions.value),
+        businessUnit: computed(() => businessUnitOptions.value)
       },
       visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible }
     })
@@ -245,6 +301,7 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
   model.identityAuthItem = stringToArray(model.identityAuthItem)
   model.networdPolicy = stringToArray(model.networdPolicy)
   model.payWay = stringToArray(model.payWay)
+  model.sysCoverage = model.sysCoverageCode.split(',')
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
   const dialogConfig = getDialogConfig(handle)({
@@ -252,7 +309,8 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
     optionsMap: {
       sysCoverage: computed(() => sysCoverageOptions.value),
       identityAuthItem: computed(() => identityAuthItemOptions.value),
-      payWay: computed(() => payWayOptions.value)
+      payWay: computed(() => payWayOptions.value),
+      businessUnit: computed(() => businessUnitOptions.value)
     },
     activeName: activeName.value,
     model: model
@@ -275,10 +333,9 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
     networdPolicy: useDictionary('NETWORD_POLICY', stringToArray(model.networdPolicy)).value,
     payWay: useDictionary('PAY_WAY', stringToArray(model.payWay)).value,
     handleType: useDictionary('HANDLE_TYPE', stringToArray(model.handleType)).value,
-    matterType: useDictionary('MATTER_TYPE', stringToArray(model.matterType)).value,
     serviceObject: useDictionary('SERVICE_OBJECT', stringToArray(model.serviceObject)).value,
     sysLevel: useDictionary('SYS_LEVEL', stringToArray(model.sysLevel)).value,
-    matterStatus: model.matterStatus === '1' ? '有效' : '无效'
+    matterStatus: useDictionary('MATTER_STATUS', stringToArray(model.matterStatus)).value
   }
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
@@ -300,4 +357,9 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
 }
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.action-con {
+  display: flex;
+  justify-content: space-between;
+}
+</style>

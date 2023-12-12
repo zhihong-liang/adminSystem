@@ -12,6 +12,15 @@ export interface Division {
 }
 export const getDivisionList = (): Promise<Res<Division[]>> => axios.get('/api/admin/area/tree')
 
+
+// 地区信息-获取区域信息List(不分页)
+export interface AreaList {
+  parentId?: string | number
+}
+
+export const areaList = (data: ListReq<AreaList>): Promise<ListRes> =>
+  axios.post('/api/admin/area/list', data)
+
 /**
  * 单位管理
  */
@@ -111,7 +120,7 @@ export interface UserTs {
   email?: string
   status: string
   id?: number
-  roleAuthList?:UserAuthTs[]
+  roleAuthList?: UserAuthTs[]
   userName?: string
 }
 interface UserAuthTs {

@@ -6,9 +6,9 @@
     </template>
 
     <template #authSlot>
-      <el-form :model="model" ref="authRef">
+      <el-form :model="model" ref="authRef" :disabled="titleType ==='look'">
         <div v-for="(item, index) in model.authList" :key="index">
-          <div>授权{{index + 1}}<span v-if="index !== 0" style="float: right;color:red;cursor:pointer;" @click="delAuth(index)">删除</span></div>
+          <div>授权{{index + 1}}<span v-if="index !== 0 && titleType !=='look'" style="float: right;color:red;cursor:pointer;" @click="delAuth(index)">删除</span></div>
           <el-row :gutter="20" class="aublock">
             <el-col :span="12">
               <el-form-item label="单位类型" :prop="'authList.' + index + '.unitType'" :rules="{ required: true, message: '请选择单位类型', trigger: 'change'}" style="margin-bottom: 18px">
@@ -83,8 +83,8 @@
 
     </template>
     <template v-slot:footer="slotProp">
-      <el-button @click="dialogRef?.close()">{{dialogProps.title === "查看用户" ? "关闭" : "取消"}}</el-button>
-      <el-button v-if="dialogProps.title !== '查看用户'" type="primary" :loading="setLoading" @click="handleSubmit(slotProp)">提交</el-button>
+      <el-button @click="dialogRef?.close()">{{titleType === "look" ? "关闭" : "取消"}}</el-button>
+      <el-button v-if="titleType !== 'look'" type="primary" :loading="setLoading" @click="handleSubmit(slotProp)">提交</el-button>
     </template>
   </CnDialog>
 </template>
@@ -156,6 +156,7 @@ const model = reactive<{
 })
 const authRef = ref();
 const setLoading = ref(false)
+const titleType = ref()
 
 const addAuth = () => {
   model.authList.push({
@@ -278,7 +279,7 @@ const changeRole = (val: number, index: number) => {
 }
 
 function operateUser(type = 'add', data = {} as UserTs) {
-  console.log('data', data)
+  titleType.value = type
   queryPostList();
   queryUnitList();
   queryRoleList();
@@ -337,7 +338,7 @@ const handleSubmit = (val: any) => {
   Promise.all([valid1, valid2]).then(() => {
     setLoading.value = true
     const params = dialogProps.formProps!.model || {}
-    const apiName = dialogProps.title === '新增用户' ? addUserInfor : editUserInfor
+    const apiName = titleType.value === 'add' ? addUserInfor : editUserInfor
     const roleAuthList: any[] = []
     model.authList.forEach((v: AuthTs, i:number) => {
       roleAuthList.push({

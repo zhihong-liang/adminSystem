@@ -1,44 +1,20 @@
-import type { dialogActionType } from './type'
-export default function getTableConfig(
-  editClickCb: (params: any, handle: dialogActionType) => void
-): CnPage.TableProps {
+export default function getTableConfig(): CnPage.TableProps {
   return {
     data: [],
     columns: [
-      { label: '粤智助事项编码', prop: 'id', slot: 'itemId' },
-      { label: '事项别名', prop: 'rename' },
-      { label: '事项名称', prop: 'name' },
-      { label: '业务部门', prop: 'department' },
-      { label: '系统覆盖范围', prop: 'round' },
-      { label: '办理类型', prop: 'type' },
-      { label: '事项状态', prop: 'status', slot: 'status' },
+      { label: '公告标题', prop: 'noticeName', slot: 'noticeName' },
+      { label: '类型', prop: 'noticeTyle', dict: 'NOTICE_TYPE' },
+      { label: '开始时间', prop: 'startDate' },
+      { label: '结束时间', prop: 'endDate' },
+      { label: '来源', prop: 'noticeSource' },
+      { label: '发布时间', prop: 'pushDate' },
+      { label: '发布状态', prop: 'noticeStatus', slot: 'noticeStatus' },
       {
         label: '操作',
         prop: 'action',
-        width: 200,
-        buttons: [
-          {
-            label: '编辑',
-            type: 'text',
-            onClick: (params: any) => {
-              editClickCb(params, 'edit')
-            }
-          },
-          {
-            label: '下架',
-            type: 'text',
-            onClick: (params: any) => {
-              editClickCb(params, 'offShelf')
-            }
-          },
-          {
-            label: '删除',
-            type: 'text',
-            onClick: (params: any) => {
-              editClickCb(params, 'delete')
-            }
-          }
-        ]
+        slot: 'action',
+        width: 140,
+        align: 'center'
       }
     ]
   }
