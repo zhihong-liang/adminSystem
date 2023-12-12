@@ -3,14 +3,15 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive } from 'vue';
+import { reactive } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
-import { getDivisionList } from '@/api/admin';
+import { areaList } from '@/api/admin'
 
 const props = reactive<CnPage.Props>({
-  params: {},
-  action: getDivisionList,
+  params: { parentId: 0 },
+  action: areaList,
   transformRequest: (params) => {
+    console.log('params: ', params)
     return params
   },
   transformResponse: (data) => {
@@ -28,6 +29,13 @@ const props = reactive<CnPage.Props>({
   },
   table: {
     rowKey: 'id',
+    load: (row: any, treeNode: unknown, resolve: any) => {
+      areaList({ parentId: row.id }).then((res: any) => {
+        resolve(res.data)
+      })
+    },
+    lazy: true,
+    treeProps: { children: 'children', hasChildren: 'open' },
     columns: [
       { label: '区划名称', prop: 'areaName' },
       { label: '区划编号', prop: 'areaCode' },
