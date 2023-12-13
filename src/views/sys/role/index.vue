@@ -35,6 +35,7 @@
         </div>
       </div>
     </div>
+    <i></i><i></i><i></i><i></i><i></i>
   </div>
 
   <Deal ref="dealRef" />
@@ -124,7 +125,7 @@ onUnmounted(() => {
   margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  justify-content: space-between;
   .box-card {
     width: 200px;
     height: 160px;
@@ -155,6 +156,7 @@ onUnmounted(() => {
   }
 }
 .role-card {
+  margin-bottom: 15px;
   width: 226px;
   height: 156px;
   background: #ffffff;
@@ -225,5 +227,8 @@ onUnmounted(() => {
       }
     }
   }
+}
+i {
+  width: 222px;
 }
 </style>
