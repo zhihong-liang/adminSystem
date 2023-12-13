@@ -38,5 +38,5 @@ export function createTree(list: any) {
 }
 
 export function stringToArray(value: any) {
-  return isString(value) ? value.split(',') : value
+  return isString(value) ? value.split(',').filter((v) => v) : value
 }

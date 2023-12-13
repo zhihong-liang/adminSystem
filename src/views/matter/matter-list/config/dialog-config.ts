@@ -129,7 +129,7 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
           label: '',
           prop: 'identityAuthItem',
           component: 'checkbox',
-          visible: visible?.['identityAuthItem'] || undefined,
+          visible: visible?.['identityAuthItem'],
           props: {
             options: optionsMap!.identityAuthItem
           }
@@ -144,7 +144,7 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
           label: '',
           prop: 'payWay',
           component: 'checkbox',
-          visible: visible?.['payWay'] || undefined,
+          visible: visible?.['payWay'],
           props: {
             options: optionsMap!.payWay
           }
@@ -317,10 +317,23 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       labelSuffix: '：',
       model: model ?? {},
       labelPosition: 'left',
-      requireAsteriskPosition: 'right',
+      requireAsteriskPosition: 'left',
       items: [...(activeName === 'basicInfo' ? basicInfoItems : configInfoItems)],
-      labelWidth: 120,
-      colSpan: 12
+      labelWidth: 140,
+      colSpan: 12,
+      rules: {
+        matterName: [{ required: true, message: '请输入事项名称' }],
+        entryUnit: [{ required: true, message: '请输入事项进驻单位' }],
+        businessUnit: [{ required: true, message: '请输入业务部门' }],
+        businessSystemName: [{ required: true, message: '请输入业务系统名称' }],
+        matterType: [{ required: true, message: '请选择事项类型' }],
+        handleType: [{ required: true, message: '请选择办理类型' }],
+        serviceObject: [{ required: true, message: '请选择服务对象' }],
+        sysCoverage: [{ required: true, message: '请选择系统覆盖范围' }],
+        sysLevel: [{ required: true, message: '请选择系统层级' }],
+        hardwareModule: [{ required: true, message: '请选择硬件模块' }],
+        networdPolicy: [{ required: true, message: '请选择网络策略' }]
+      }
     },
     onSuccess: dialogSubmitSuccess
   }

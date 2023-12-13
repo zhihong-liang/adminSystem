@@ -89,14 +89,16 @@ defineExpose({ formRef })
   >
     <el-row :gutter="colSpan ? 20 : 0">
       <el-col
-        v-for="({ data, span, component, dict, props, display, ...rest }, index) in items.filter((v) =>
-          v.visible!()
-        )"
+        v-for="({ data, span, component, dict, props, display, ...rest }, index) in items"
         :key="index"
         :class="display"
         :span="span || colSpan"
       >
-        <el-form-item v-bind="rest" :rules="readonly ? undefined : rest.rules">
+        <el-form-item
+          v-bind="rest"
+          :rules="readonly ? undefined : rest.rules"
+          v-if="rest.visible!()"
+        >
           <slot v-if="component === 'slot'" :name="rest.prop" />
           <CnAdministrativeDivision
             v-else-if="component === 'ad'"

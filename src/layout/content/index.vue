@@ -3,13 +3,13 @@
     <!-- 面包屑 -->
     <div class="flex flex-between">
       <el-breadcrumb class="cn-breadcrumb" separator="/">
-        <el-breadcrumb-item v-for="item in breadcrumbList" :to="{ path: item.path }" :key="item.id">{{
+        <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.id">{{
           item.name
         }}</el-breadcrumb-item>
       </el-breadcrumb>
 
       <div class="flex flex-center">
-        <CnIcon size="20px" html="SwitchFilled"/>
+        <CnIcon size="20px" html="SwitchFilled" />
       </div>
     </div>
 
@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { RouterView } from 'vue-router'
-import { useHomeStore } from '@/stores';
+import { useHomeStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 
 import CnIcon from '@/components/cn-page/CnIcon.vue'

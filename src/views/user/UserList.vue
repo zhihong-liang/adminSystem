@@ -2,7 +2,10 @@
   <CnPage v-bind="props" />
   <CnDialog v-bind="dialogProps" ref="dialogRef">
     <template #add>
-      <el-button type="success" @click="addAuth">增加授权</el-button>
+      <div class="sqtitle">
+        <span>授权信息</span>
+        <el-button size="small" :icon="Plus" type="primary" @click="addAuth" class="sqtitle-but">增加授权</el-button> 
+      </div>
     </template>
 
     <template #authSlot>
@@ -107,6 +110,8 @@ import {
   type Unit, type UserTs
 } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
+import { phone, mobile } from '@/utils/pattern'
+import { Plus } from '@element-plus/icons-vue'
 
 const handleCheckChange = (data: Division2, checked: boolean, index: number) => {
   if (checked) {
@@ -389,27 +394,6 @@ const dialogProps = reactive<CnPage.DialogProps>({
         span: 24,
         component: 'radio',
         dict: 'USER_STATUS'
-        // props: {
-        //   options: [
-        //     { label: '启用', value: '1' },
-        //     { label: '禁用', value: '0' }
-        //   ]
-        // }
-      },
-      { label: '授权信息', component: 'subtitle', span: 24 },
-      {
-        prop: 'auth',
-        component: 'group',
-        props: {
-          children: [
-            { label: '单位类型', prop: 'type', component: 'select' },
-            { label: '单位', prop: 'unit', component: 'select' },
-            { label: '角色', prop: 'role', component: 'select' },
-            { label: '岗位', prop: 'position', component: 'input' },
-            { label: '功能权限', prop: 'porperty', component: 'select' },
-            { label: '数据权限', prop: 'data', component: 'select' }
-          ]
-        }
       },
       { prop: 'add', component: 'slot', span: 24 },
       { prop: 'authSlot', component: 'slot', span: 24 },
@@ -418,8 +402,14 @@ const dialogProps = reactive<CnPage.DialogProps>({
     rules: {
       userNo: [{ required: true, message: '请输入用户编号'}],
       name: [{ required: true, message: '请输入用户名称'}],
-      phone: [{ required: true, message: '请输入登录手机号'}],
-      telephone: [{ required: true, message: '请输入联系电话'}],
+      phone: [
+        { required: true, message: '请输入登录手机号'},
+        { pattern: mobile, message: '请输入正确的手机号'}
+      ],
+      telephone: [
+        { required: true, message: '请输入联系电话'},
+        { pattern: phone, message: '请输入正确的联系电话'}
+      ],
       status: [{ required: true, message: '请选择状态'}],
     }
   },
@@ -447,9 +437,6 @@ const props: CnPage.Props = reactive({
       {
         label: '新增',
         type: 'primary',
-        // onClick: () => {
-        //   dialogRef.value?.open()
-        // },
           onClick: () => operateUser()
       }
     ]
@@ -501,15 +488,12 @@ const props: CnPage.Props = reactive({
 .tree_auth {
   margin-left: 10px;
 }
-// :deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner ){
-//   background-color: #409eff;
-//   border-color: #409eff;
-// }
-// :deep(.defTreecs .el-checkbox__input.is-disabled.is-indeterminate .el-checkbox__inner::before) {
-//   background-color: #409eff;
-//   border-color: #409eff;
-// }
-// :deep(.defTreecs .el-checkbox__input.is-disabled.is-checked .el-checkbox__inner::after) {
-//   border-color: #fff;
-// }
+.sqtitle {
+  position: relative;
+  &-but {
+    position: absolute;
+    right: -1500%;
+    top: 16%;
+  }
+}
 </style>

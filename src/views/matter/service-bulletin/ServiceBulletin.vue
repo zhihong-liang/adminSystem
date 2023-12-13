@@ -69,6 +69,10 @@
           >
         </div>
       </template>
+      <!-- 公告内容 -->
+      <template #content>
+        <div v-html="dialogProps.formProps!.model.content"></div>
+      </template>
     </CnDialog>
   </div>
 </template>
