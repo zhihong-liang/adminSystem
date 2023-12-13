@@ -3,10 +3,9 @@
     <!-- 面包屑 -->
     <div class="flex flex-between">
       <el-breadcrumb class="cn-breadcrumb" separator="/">
-        <template v-for="(item) in breadcrumbList" :key="item.id">
-          <el-breadcrumb-item v-if="item.type === 'menu'">{{ item.name }}</el-breadcrumb-item>
-          <el-breadcrumb-item v-else :to="{ path: item.path }">{{ item.name }}</el-breadcrumb-item>
-        </template>
+        <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.id">{{
+          item.name
+        }}</el-breadcrumb-item>
       </el-breadcrumb>
 
       <div class="flex flex-center">
