@@ -70,16 +70,25 @@ const subnodes = []
 const open = (data?: any, _type?: string) => {
   dialogRef.value.open()
   allsubs = getAllKeys(menuList.value)
+  if (_type === 'view') {
+    dialogProps.formProps!.disabled = true
+  } else {
+    dialogProps.formProps!.disabled = false
+  }
   if (!_type) {
     // 新增
     dialogProps.action = () => handleSubmit('add')
     type.value = 'add'
     indeterminate.value = false
     allCheck.value = false
+    dialogProps.formProps!.disabled = false
   } else {
     if (_type === 'view') {
       dialogProps.formProps!.disabled = true
+    } else {
+      dialogProps.formProps!.disabled = false
     }
+
     sysRoleGetId(data.id).then((res: any) => {
       if (res.code === '200') {
         dialogProps.formProps!.model = res.data
