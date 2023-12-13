@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { clearToken, getToken } from '@/utils/auth'
-import { queryUserInfo, type UserInfo } from '@/api'
+import { type UserInfo } from '@/api'
 
 const storeSetup = () => {
   const token = ref(getToken() || '')

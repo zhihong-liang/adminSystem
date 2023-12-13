@@ -58,11 +58,11 @@ function filterMenu(list: Array<string>) {
 
   return list.map((title: string) => {
     const target = array.find((menu) => menu.path === title)
-    const { id, path = '', name = '', childList = [] } = target || {} as Menu
+    const { id, path = '', name = '', type, childList = [] } = target || {} as Menu
 
     array = childList
 
-    return { path, name, id }
+    return { path, name, id, type }
   })
 }
 
