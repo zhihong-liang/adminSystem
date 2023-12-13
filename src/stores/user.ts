@@ -1,10 +1,9 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import { clearToken, getToken } from '@/utils/auth'
-import type { UserInfo } from '@/api'
+import { queryUserInfo, type UserInfo } from '@/api'
 
 const storeSetup = () => {
-
   const token = ref(getToken() || '')
   // 重置token
   const resetToken = () => {
@@ -18,8 +17,8 @@ const storeSetup = () => {
   }
 
   // 获取用户信息
-  const getUserInfo = async () => {
-    //  const res = await getUserInfoApi()
+  const getUserInfo =  () => {
+    
   }
 
   // 退出
