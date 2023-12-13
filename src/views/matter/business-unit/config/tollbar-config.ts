@@ -15,7 +15,7 @@ export default function getTollbarConifg(
         label: '删除',
         type: '',
         onClick: () => {
-          clickCb('delete')
+          clickCb('manyDelete')
         }
       }
     ]

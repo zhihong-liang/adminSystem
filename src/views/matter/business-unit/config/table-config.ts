@@ -1,11 +1,12 @@
 import type { ActionType } from './type'
 
 export default function getTableConfig(
-  tableClickCb: (handleType: ActionType, params: any) => void
+  tableClickCb: (handleType: ActionType, params: any) => void,
+  selectionChange?: (selection: any) => void
 ): CnPage.TableProps {
   return {
     data: [],
-
+    selectionChange,
     columns: [
       { type: 'selection' },
       { label: '业务部门', prop: 'businessDeptName', slot: 'businessDeptName' },

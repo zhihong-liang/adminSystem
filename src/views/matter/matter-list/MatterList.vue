@@ -75,7 +75,8 @@ import {
   editMatter,
   exportMatterList,
   getMatterLabelList,
-  infoLabel
+  infoLabel,
+  pushDownDept
 } from '@/api/matter'
 import { getDictionary } from '@/api'
 import useDictionary from '@/hooks/useDictionary'
@@ -110,7 +111,7 @@ onMounted(async () => {
   payWayOptions.value = data['PAY_WAY'].map((i) => ({ value: i.subtype, label: i.description }))
   const { rows } = await getDeptList({ page: 1, size: 1000, obj: {} })
   businessUnitOptions.value = rows.map((i) => ({
-    value: i.businessDeptName,
+    value: i.id,
     label: i.businessDeptName
   }))
 })
@@ -166,9 +167,9 @@ function handleTabChange() {
 function addMatterAction() {
   const model = dialogProps.formProps?.model || {}
   model.hardwareModule = model.hardwareModule.join(',')
-  model.identityAuthItem = model.identityAuthItem.join(',')
+  model.identityAuthItem = model.identityAuthType === '1' ? model.identityAuthItem.join(',') : ''
   model.networdPolicy = model.networdPolicy.join(',')
-  model.payWay = model.payWay.join(',')
+  model.payWay = model.payStatus === '1' ? model.payWay.join(',') : ''
   model.sysCoverage = model.sysCoverage.join(',')
   return addMatter(model)
 }
@@ -179,10 +180,13 @@ function editMatterAction() {
   const obj = {
     hardwareModule: model.hardwareModule.join(','),
     identityAuthItem: model.identityAuthItem.join(','),
+    identityAuthType: model.identityAuthItem.length ? '1' : '0',
     networdPolicy: model.networdPolicy.join(','),
     payWay: model.payWay.join(','),
+    payStatus: model.payWay.length ? '1' : '0',
     sysCoverage: model.sysCoverage.join(',')
   }
+
   return editMatter({ ...model, ...obj })
 }
 
@@ -195,7 +199,7 @@ async function editMatterStatusAction(handle: ActionType, row: any) {
   const model = window.structuredClone(toRaw(row))
   model.sysCoverage = model.sysCoverageCode
   model.sysCoverageCode = ''
-  const result = await editMatter({ ...model, matterStatus })
+  const result = await pushDownDept({ ...model, matterStatus })
   props.refresh = new Date().getTime()
   ElMessage.success(result.message || '操作成功')
 }
