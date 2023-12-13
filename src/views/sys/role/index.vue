@@ -41,7 +41,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onBeforeMount, onMounted } from 'vue'
+import { reactive, ref, onUnmounted, onBeforeMount, onMounted } from 'vue'
 import CnSearch from '@/components/cn-page/CnSearch.vue'
 import { Plus } from '@element-plus/icons-vue'
 import Deal from './deal.vue'
@@ -108,6 +108,9 @@ onBeforeMount(() => {
     'background-color': 'var(--system-container-background)',
     padding: '0px'
   })
+})
+onUnmounted(() => {
+  updateContainerStyle({})
 })
 </script>
 
