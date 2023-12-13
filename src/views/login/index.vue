@@ -64,16 +64,18 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-// import { useUserStore } from '@/stores'
 // import { useLoading } from '@/hooks'
 import { ElMessage as Message } from 'element-plus'
-import { useRouter } from 'vue-router'
 import LoginBg from './components/LoginBg/index.vue'
+import { setToken } from '@/utils/auth'
+import { useUserStore } from '@/stores'
+import { useRouter } from 'vue-router'
 import CryptoJS from 'crypto-js'
 import { login } from '@/api'
-import { setToken } from '@/utils/auth'
 
-const router = useRouter()
+const [router, userStore] = [useRouter(), useUserStore()]
+
+const { updateUserInfo } = userStore
 
 const form = reactive({
   username: localStorage.getItem('userName') || '',
@@ -104,8 +106,10 @@ const handleLogin = async () => {
       login({
         userName: form.username,
         password: password
-      }).then((res) => {
+      }).then(async (res) => {
         setToken(res.data.accessToken)
+        updateUserInfo(res.data)
+
         if (form.remember) {
           localStorage.setItem('userInfo', JSON.stringify(res.data))
           localStorage.setItem('userName', form.username)
@@ -119,7 +123,7 @@ const handleLogin = async () => {
         }
         Message.success('登录成功')
 
-        router.push('/home')
+        router.push('/system/usercenter') // 默认跳到个人中心
       })
     }
   })

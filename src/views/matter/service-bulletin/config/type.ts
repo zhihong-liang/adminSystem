@@ -1,5 +1,11 @@
-export type dialogActionType = 'add' | 'edit' | 'delete' | 'offShelf' | 'detail'
+export type ActionType = 'add' | 'edit' | 'delete' | 'offShelf' | 'detail' | 'grounding'
 
-export type tableActionType = 'detail' | 'edit' | 'delete' | 'offShelf'
+export interface optionsMap {
+  [key: string]: any
+}
 
-export type tabsActivateName = 'basicInfo' | 'configInfo'
+export interface getDialogConfigParams {
+  dialogSubmitSuccess?: () => void
+  optionsMap?: optionsMap
+  model?: Record<string, any>
+}

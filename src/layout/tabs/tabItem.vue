@@ -8,7 +8,6 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import { last } from 'lodash-es'
@@ -17,16 +16,15 @@ import { useRouter } from 'vue-router'
 import type { TabItem } from '@/layout/tabs/type'
 
 const props = defineProps<{
-  value: TabItem
+  value: TabItem,
+  isActive: boolean
 }>()
 
 const emits = defineEmits(['close'])
 
 const [router, store] = [useRouter(), useHomeStore()]
-const { tabList, activeTab } = storeToRefs(store)
+const { tabList } = storeToRefs(store)
 const { updateTabList, updateActiveTab } = store
-
-const isActive = computed(() => activeTab.value === props.value.id)
 
 const handleTabClick = () => {
   props.value.id && updateActiveTab(props.value.id)

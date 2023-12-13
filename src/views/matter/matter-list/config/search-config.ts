@@ -1,5 +1,7 @@
-import type { ComputedRef } from 'vue'
-export function getSearchConfig(sysCoverAgeList: any): CnPage.SearchProps {
+export function getSearchConfig(
+  sysCoverAgeList: any,
+  businessUnitOptions: any
+): CnPage.SearchProps {
   return {
     model: {},
     labelPosition: 'left',
@@ -42,7 +44,10 @@ export function getSearchConfig(sysCoverAgeList: any): CnPage.SearchProps {
       {
         label: '业务部门',
         prop: 'businessUnit',
-        component: 'input'
+        component: 'select',
+        props: {
+          options: businessUnitOptions
+        }
       },
       {
         label: '办理类型',
@@ -54,12 +59,7 @@ export function getSearchConfig(sysCoverAgeList: any): CnPage.SearchProps {
         label: '事项状态',
         prop: 'matterStatus',
         component: 'select',
-        props: {
-          options: [
-            { label: '有效', value: '1' },
-            { label: '无效', value: '0' }
-          ]
-        }
+        dict: 'MATTER_STATUS'
       }
     ],
     colSpan: 8,

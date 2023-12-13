@@ -22,9 +22,9 @@ export const useHomeStore = defineStore('home', () => {
 
     const menuList = ref<Menu[]>([])  // 菜单列表
     const finalMenuList = computed(() => menuList.value)
-    
+
     // const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-    
+
     // 请求菜单列表
     async function getMenuList({ manual = false, params }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
@@ -84,8 +84,12 @@ export const useHomeStore = defineStore('home', () => {
 
     // 当前激活状态的tab，跟菜单的id关联
     const activeTab = ref<number | undefined>()
-    function updateActiveTab(id: number) {
-        activeTab.value = id
+    function updateActiveTab(id?: number) {
+        if (id) {
+            activeTab.value = id
+        } else {
+            activeTab.value = undefined
+        }
     }
 
     /*

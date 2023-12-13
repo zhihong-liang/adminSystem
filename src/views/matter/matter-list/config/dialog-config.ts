@@ -69,7 +69,10 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
         {
           label: '业务部门',
           prop: 'businessUnit',
-          component: 'input'
+          component: 'select',
+          props: {
+            options: optionsMap!.businessUnit
+          }
         },
         {
           label: '业务系统名称',
@@ -198,13 +201,7 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
     {
       label: '状态',
       prop: 'matterStatus',
-      component: 'select',
-      props: {
-        options: [
-          { value: '1', label: '有效' },
-          { value: '0', label: '无效' }
-        ]
-      }
+      dict: 'MATTER_STATUS'
     },
     {
       label: '事项别名',
@@ -212,37 +209,16 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       component: 'input'
     },
     {
-      label: '粤智助事项编码',
+      label: '事项编号',
       prop: 'matterCode'
-    },
-    {
-      label: '办理类型',
-      prop: 'handleType',
-      component: 'select',
-      dict: 'HANDLE_TYPE'
-    },
-    {
-      label: '事项类型',
-      prop: 'matterType',
-      component: 'select',
-      dict: 'MATTER_TYPE'
-    },
-    {
-      label: '服务对象',
-      prop: 'serviceObject',
-      component: 'select',
-      dict: 'SERVICE_OBJECT'
-    },
-    {
-      label: '网络策略',
-      prop: 'networdPolicy',
-      component: 'checkbox',
-      dict: 'NETWORD_POLICY'
     },
     {
       label: '业务部门',
       prop: 'businessUnit',
-      component: 'input'
+      component: 'select',
+      props: {
+        options: optionsMap!.businessUnit
+      }
     },
     {
       label: '事项进驻单位',
@@ -250,17 +226,11 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       component: 'input'
     },
     {
-      label: '系统层级',
-      prop: 'sysLevel',
-      component: 'select',
-      dict: 'SYS_LEVEL'
-    },
-    {
       label: '业务系统名称',
       prop: 'businessSystemName',
-      component: 'input'
+      component: 'input',
+      span: 24
     },
-
     {
       label: '系统覆盖范围',
       prop: 'sysCoverage',
@@ -276,11 +246,38 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
           children: 'childen'
         }
       }
+    },
+    {
+      label: '系统层级',
+      prop: 'sysLevel',
+      component: 'select',
+      dict: 'SYS_LEVEL'
+    },
+    {
+      label: '事项类型',
+      prop: 'matterType',
+      component: 'select',
+      dict: 'MATTER_TYPE'
+    },
+    {
+      label: '办理类型',
+      prop: 'handleType',
+      component: 'select',
+      dict: 'HANDLE_TYPE'
+    },
+
+    {
+      label: '服务对象',
+      prop: 'serviceObject',
+      component: 'select',
+      dict: 'SERVICE_OBJECT'
     }
   ]
 
   const configInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
+    { label: '中文编码', prop: 'cnCode', component: 'input', span: 12 },
+    { label: '访问路径', prop: 'accessPath', component: 'input', span: 12 },
     { label: '搜索关键词', prop: 'searchKeywords', component: 'input', span: 24 },
     {
       label: '身份认证方式',
@@ -306,11 +303,18 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       component: 'checkbox',
       dict: 'HARDWARE_MODULE',
       span: 24
+    },
+    {
+      label: '网络策略',
+      prop: 'networdPolicy',
+      component: 'checkbox',
+      dict: 'NETWORD_POLICY'
     }
   ]
   return {
     title: '事项详情',
     formProps: {
+      labelSuffix: '：',
       model: model ?? {},
       labelPosition: 'left',
       requireAsteriskPosition: 'right',
@@ -328,30 +332,14 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
   const basicInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
     { label: '事项名称', prop: 'matterName' },
-    { label: '状态', prop: 'matterStatus' },
+    { label: '状态', prop: 'matterStatus', dict: 'MATTER_STATUS' },
     {
       label: '事项别名',
       prop: 'matterAlias'
     },
     {
-      label: '粤智助事项编码',
+      label: '事项编号',
       prop: 'matterCode'
-    },
-    {
-      label: '办理类型',
-      prop: 'handleType'
-    },
-    {
-      label: '事项类型',
-      prop: 'matterType'
-    },
-    {
-      label: '服务对象',
-      prop: 'serviceObject'
-    },
-    {
-      label: '网络策略',
-      prop: 'networdPolicy'
     },
     {
       label: '业务部门',
@@ -362,21 +350,39 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
       prop: 'entryUnit'
     },
     {
+      label: '业务系统名称',
+      prop: 'businessSystemName',
+      span: 24
+    },
+
+    {
+      label: '系统覆盖范围',
+      prop: 'sysCoverage'
+    },
+    {
       label: '系统层级',
       prop: 'sysLevel'
     },
     {
-      label: '业务系统名称',
-      prop: 'businessSystemName'
+      label: '事项类型',
+      prop: 'matterType',
+      dict: 'MATTER_TYPE'
     },
     {
-      label: '系统覆盖范围',
-      prop: 'sysCoverage'
+      label: '办理类型',
+      prop: 'handleType'
+    },
+
+    {
+      label: '服务对象',
+      prop: 'serviceObject'
     }
   ]
 
   const configInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
+    { label: '中文编码', prop: 'cnCode', span: 12 },
+    { label: '访问路径', prop: 'accessPath', span: 12 },
     { label: '搜索关键词', prop: 'searchKeywords', span: 24 },
     {
       label: '身份认证方式',
@@ -392,12 +398,17 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
       label: '硬件模块',
       prop: 'hardwareModule',
       span: 24
+    },
+    {
+      label: '网络策略',
+      prop: 'networdPolicy'
     }
   ]
   return {
     title: '事项详情',
 
     formProps: {
+      labelSuffix: '：',
       readonly: true,
       model: model ?? {},
       labelPosition: 'left',
