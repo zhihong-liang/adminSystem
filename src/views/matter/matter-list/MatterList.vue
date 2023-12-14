@@ -229,6 +229,7 @@ async function exportMatterListAction() {
     mattersIds.push(item.id)
   })
   const res: any = await exportMatterList({ mattersIds: mattersIds, filedList, filedNameList })
+  console.log(res)
   let blob = new Blob([res.data], {
     type: res.headers['content-type'] || 'application/vnd.ms-excel'
   })
