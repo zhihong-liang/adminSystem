@@ -6,7 +6,7 @@ const admin = "/api/admin"
 // 设备列表（分页）
 export const devBaseInfoListPage = (data: ListReq): Promise<ListRes> =>
   axios.post(device + '/devBaseInfo/listPage', data)
-// 设备列表（bu分页）
+// 设备列表（不分页）
 export const devBaseInfoList = (data: any): Promise<ListRes> =>
   axios.post(device + '/devBaseInfo/list', data)
 // 启用
@@ -18,6 +18,9 @@ export const devBaseInfoStop = (ids: string): Promise<ListRes> =>
 // 注销
 export const devBaseInfoLogoff = (ids: string): Promise<ListRes> =>
   axios.get(device + `/devBaseInfo/logoff/${ids}`)
+// 获取设备基本信息详细信息
+export const getDevBaseInfo = (ids: string): Promise<ListRes> =>
+  axios.get(device + `/devBaseInfo/${ids}`)
 // 设备单位列表
 export const getUnitList = (data: ListReq): Promise<ListRes> =>
   axios.post(admin + `/unit/list`, data)
@@ -30,3 +33,10 @@ export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
 // 批量修改
 export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
   axios.post(`/devBaseInfo/editList`, data)
+// 查询方案列表
+export const mattersProgrammeList = (data: any): Promise<ListRes> =>
+  axios.post('/api/matters/mattersProgramme/list', data)
+// 查询方案-事项关联表列表(分页)
+export const mattersProgrammeRelationList = (data: any): Promise<ListRes> =>
+  axios.post('/api/matters/mattersProgrammeRelation/listPage', data)
+  
