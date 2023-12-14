@@ -67,11 +67,7 @@ function filterMenu(list: Array<string>) {
   })
 }
 
-const handleMenuItemClick = (instance: any) => {
-  // 更新面包屑
-  const { indexPath = [] } = instance || {}
-  updateBreadcrumb(filterMenu(indexPath))
-
+const handleMenuItemClick = () => {
   // 更新tab
   const { name, id, path } = props.menuItem
   const tab = { name, id, path: path as string }
