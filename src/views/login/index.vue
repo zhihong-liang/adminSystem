@@ -109,14 +109,13 @@ const handleLogin = async () => {
       }).then(async (res) => {
         setToken(res.data.accessToken)
         updateUserInfo(res.data)
-        console.log(res.data)
+        localStorage.setItem('userInfo', JSON.stringify(res.data))
         if (form.remember) {
-          localStorage.setItem('userInfo', JSON.stringify(res.data))
           localStorage.setItem('userName', form.username)
           localStorage.setItem('password', form.password)
           localStorage.setItem('remember', form.remember ? '1' : '0')
         } else {
-          localStorage.removeItem('userInfo')
+          // localStorage.removeItem('userInfo')
           localStorage.removeItem('username')
           localStorage.removeItem('password')
           localStorage.removeItem('remember')

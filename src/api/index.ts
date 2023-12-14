@@ -19,7 +19,7 @@ axios.interceptors.response.use(
     const { data } = res
     close()
     if (res.config.responseType === 'blob') {
-      return data
+      return res
     }
     if (data.code === '200') {
       return data

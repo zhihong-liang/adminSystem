@@ -60,7 +60,12 @@ export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.
         {
           label: '公告内容',
           prop: 'content',
-          component: 'editor'
+          component: 'editor',
+          props: {
+            toolbarConfig: {
+              excludeKeys: ['group-image', 'group-video'] // 去掉图片/视频
+            }
+          }
         }
       ],
       rules: {
@@ -146,8 +151,7 @@ export function getEditOrEditActionConfig(params: getDialogConfigParams): CnPage
         },
         {
           label: '设备类型',
-          prop: 'deviceType',
-          dict: 'DEV_TYPE'
+          prop: 'deviceType'
         },
         {
           label: '信息展示期',
