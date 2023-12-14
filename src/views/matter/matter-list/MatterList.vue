@@ -206,41 +206,40 @@ async function editMatterStatusAction(handle: ActionType, row: any) {
 
 // 导出事项列表
 async function exportMatterListAction() {
-  if (tableSelection.value && tableSelection.value.length) {
-    const mattersIds: any[] = []
-    const filedList = [
-      'matterCode',
-      'matterAlias',
-      'matterName',
-      'businessUnit',
-      'sysCoverage',
-      'handleType',
-      'matterStatus'
-    ]
-    const filedNameList = [
-      '粤智助事项编码',
-      '事项别名',
-      '事项名称',
-      '业务部门',
-      '系统覆盖范围',
-      '办理类型',
-      '事项状态'
-    ]
-    tableSelection.value.forEach((item) => {
-      mattersIds.push(item.id)
-    })
-    const result: any = await exportMatterList({ mattersIds: mattersIds, filedList, filedNameList })
-    let blob = new Blob([result], {
-      type: `application/vnd.ms-excel`
-    })
-    let href = window.URL.createObjectURL(blob)
-    let downloadElement = document.createElement('a')
-    downloadElement.href = href
-    downloadElement.download = '事项列表.xlsx'
-    document.body.appendChild(downloadElement)
-    downloadElement.click() //点击下载
-    document.body.removeChild(downloadElement) //下载完成移除元素
-  }
+  const mattersIds: any[] = []
+  const filedList = [
+    'matterCode',
+    'matterAlias',
+    'matterName',
+    'businessUnit',
+    'sysCoverage',
+    'handleType',
+    'matterStatus'
+  ]
+  const filedNameList = [
+    '粤智助事项编码',
+    '事项别名',
+    '事项名称',
+    '业务部门',
+    '系统覆盖范围',
+    '办理类型',
+    '事项状态'
+  ]
+  tableSelection.value?.forEach((item) => {
+    mattersIds.push(item.id)
+  })
+  const res: any = await exportMatterList({ mattersIds: mattersIds, filedList, filedNameList })
+  let blob = new Blob([res.data], {
+    type: res.headers['content-type'] || 'application/vnd.ms-excel'
+  })
+  const fileName = decodeURI(res.headers['content-disposition'].split(';filename=')[1])
+  let href = window.URL.createObjectURL(blob)
+  let downloadElement = document.createElement('a')
+  downloadElement.href = href
+  downloadElement.download = fileName || '事项列表.xlsx'
+  document.body.appendChild(downloadElement)
+  downloadElement.click() //点击下载
+  document.body.removeChild(downloadElement) //下载完成移除元素
 }
 
 // 所属标签
