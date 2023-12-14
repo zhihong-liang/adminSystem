@@ -229,7 +229,6 @@ async function exportMatterListAction() {
     mattersIds.push(item.id)
   })
   const res: any = await exportMatterList({ mattersIds: mattersIds, filedList, filedNameList })
-  console.log(res)
   let blob = new Blob([res.data], {
     type: res.headers['content-type'] || 'application/vnd.ms-excel'
   })
@@ -306,6 +305,7 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
   model.networdPolicy = stringToArray(model.networdPolicy)
   model.payWay = stringToArray(model.payWay)
   model.sysCoverage = model.sysCoverageCode.split(',')
+  model.businessUnit = businessUnitOptions.value?.find((v) => v.label === model.businessUnit).value
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
   const dialogConfig = getDialogConfig(handle)({
