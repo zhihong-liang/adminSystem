@@ -71,6 +71,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
 function handleLogOut() {
   clearToken()
   store.updateUserInfo({})
+  localStorage.removeItem('userInfo')
   router.push('/login')
 }
 function switchRoles() {
