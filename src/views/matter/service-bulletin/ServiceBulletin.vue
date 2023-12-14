@@ -98,8 +98,9 @@ import {
   deleteServiceNotice,
   pushDownServiceNotice
 } from '@/api/matter'
-import type { ActionType } from './config/type.ts'
+import type { ActionType } from './config/type'
 import { handlesysCoverageOptionsTree, stringToArray } from '../utils/index'
+import useDictionary from '@/hooks/useDictionary'
 
 const cascaderRef = ref<InstanceType<typeof ElCascader>>()
 
@@ -151,11 +152,13 @@ function dialogSubmitSuccess() {
 
 // 新建服务公告
 function addServiceNoticeAction() {
+  const { userInfo } = JSON.parse(localStorage.getItem('user')!)
   const model = dialogProps.formProps?.model || {}
   model.startDate = model.date[0] + ' 00:00:00'
   model.endDate = model.date[1] + ' 00:00:00'
   model.pushAreaCode = model.pushAreaCode.join(',')
   model.deviceType = model.deviceType.join(',')
+  model.createUser = userInfo.name
   let nodesInfo = cascaderRef.value?.getCheckedNodes(true)
   const labelList = nodesInfo?.map((item) => item.label)
   model.pushAreaName = labelList?.join(',')
@@ -201,8 +204,10 @@ function pushDownServiceNoticeAction() {
 function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
+    // 新建/编辑
     const model = handle === 'edit' ? { ...window.structuredClone(toRaw(row)) } : undefined
     if (model) {
+      // 编辑
       model.date = [model.startDate, model.endDate]
       model.pushAreaCode = model.pushAreaCode.split(',')
       model.deviceType = model.deviceType.split(',')
@@ -217,6 +222,7 @@ function showDialog(handle: ActionType, row?: any) {
     dialogProps.action = () =>
       handle === 'add' ? addServiceNoticeAction() : editServiceNoticeAction()
   } else if (handle === 'delete' || handle === 'offShelf') {
+    // 删除/下架
     const model = window.structuredClone(toRaw(row))
     serviceBulletinIds.value = model.id
     serviceBulletinName.value = model.noticeName
@@ -225,12 +231,14 @@ function showDialog(handle: ActionType, row?: any) {
       dialogProps[key] = dialogConfig[key]
     }
   } else {
+    // 查看详情
     const model = window.structuredClone(toRaw(row))
     model.date =
       moment(model.startDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日') +
       ' 至 ' +
       moment(model.endDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日')
     noticeStatus.value = model.noticeStatus
+    model.deviceType = useDictionary('DEV_TYPE', stringToArray(model.deviceType)).value
     const dialogConfig = getDialogConfig(handle)({ model })
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]

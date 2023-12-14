@@ -117,10 +117,10 @@ onMounted(async () => {
 })
 
 const props = reactive<CnPage.Props>({
-  transformRequest: (params) => {
+  transformRequest: (params: any, page: number, size: number) => {
     const sysCoverage = params.sysCoverage ? params.sysCoverage.join(',') : ''
     const obj = { ...params, sysCoverage }
-    return { page: 1, size: 10, obj }
+    return { page, size, obj }
   },
   refresh: 0,
   init: undefined,
