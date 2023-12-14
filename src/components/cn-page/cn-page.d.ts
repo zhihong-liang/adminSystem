@@ -43,7 +43,7 @@ declare namespace CnPage {
     /**
      * 修改请求参数
      */
-    transformRequest?: (params: Params, type?: string) => Params
+    transformRequest?: (params: Params, page: number, size: number) => Params
     /**
      * 修改响应数据
      */

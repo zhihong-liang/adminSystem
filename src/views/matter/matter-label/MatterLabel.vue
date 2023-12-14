@@ -9,6 +9,17 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
+      <!-- 新建标签 -->
+      <template #footer v-if="handleType === 'add' || handleType === 'edit'">
+        <div class="btns">
+          <el-button
+            type="primary"
+            size="large"
+            @click="() => (handleType === 'add' ? addMatterLabelAction() : editMatterLabelAction())"
+            >确定</el-button
+          >
+        </div>
+      </template>
       <!-- 删除单个标签 -->
       <template #deleteTitle v-if="handleType === 'delete'">
         <div class="deleteTitle">
@@ -99,9 +110,23 @@ function selectionChange(selection: any[]) {
 }
 
 // 新建标签
-function addMatterLabelAction() {
+async function addMatterLabelAction() {
   const model = dialogProps.formProps?.model || {}
-  return addMatterLabel(model)
+  const { userInfo } = JSON.parse(localStorage.getItem('user')!)
+  model.createUser = userInfo.name
+  await addMatterLabel(model)
+  dialogRef.value?.close()
+  props.refresh = new Date().getTime()
+  ElMessage.success('操作成功')
+}
+
+// 修改标签
+async function editMatterLabelAction() {
+  const model = dialogProps.formProps?.model || {}
+  await editMatterLabel(model)
+  dialogRef.value?.close()
+  props.refresh = new Date().getTime()
+  ElMessage.success('操作成功')
 }
 
 // 删除标签
@@ -122,12 +147,6 @@ async function removeManyMatterLabelAction() {
   ElMessage.success('操作成功')
 }
 
-// 修改标签
-function editMatterLabelAction() {
-  const model = dialogProps.formProps?.model || {}
-  return editMatterLabel(model)
-}
-
 // 显示添加/删除/标签弹窗
 function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
@@ -137,7 +156,6 @@ function showDialog(handle: ActionType, row?: any) {
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]
     }
-    dialogProps.action = () => (handle === 'add' ? addMatterLabelAction() : editMatterLabelAction())
   } else if (handle === 'delete' || handle === 'manyDelete') {
     if (handle === 'delete') {
       const model = window.structuredClone(toRaw(row))
