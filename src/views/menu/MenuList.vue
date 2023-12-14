@@ -18,9 +18,8 @@ import { useHomeStore } from '@/stores/home'
 import { storeToRefs } from 'pinia'
 import { dymanicAddRoute } from '@/router'
 import moment from 'moment'
+import useConfirm from '@/hooks/useConfirm'
 import { addMenu, removeMenu, editMenu, getMenuList as queryMenuTree, type Res } from '@/api'
-
-import { ElMessageBox, ElMessage } from 'element-plus'
 
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
@@ -190,8 +189,6 @@ function Action(params: any) {
 function handleTransformResp(res: Res) {
   const { code, data } = res
 
-  if (code !== '200') return ElMessage.error({ message: '查询失败' })
-
   // 如果是 删除(delete) 或 新增(add)，则需要更新 pinia 的 menuList
   if (step.value === 'delete' || step.value === 'add') {
     updateMenuList(data)
@@ -239,44 +236,21 @@ function handleEdit({ row }: any) {
 }
 
 function handleRemove({ row }: any) {
-  ElMessageBox.confirm(`确定要删除${row.name}?`, {
+  const opts = {
+    message: `确定要删除${row.name}?`,
     title: '删除',
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    beforeClose: (action, instance, done) => {
-      if (action === 'confirm') {
-        instance.confirmButtonLoading = true
-        instance.confirmButtonText = 'Loading...'
-
-        const params = {
-          ids: row.id || ''
-        }
-
-        removeMenu(params)
-          .then((res) => {
-            const { code, message } = res
-
-            if (code == '200') {
-              // 更新tab
-              updateTabList(tabList.value.filter(t => t.id !== row.id))
-
-              done()
-            } else {
-              ElMessage.error({ message: `${message}` })
-            }
-          })
-          .finally(() => {
-            instance.confirmButtonLoading = false
-          })
-      } else {
-        done()
-      }
+    action: () =>
+      removeMenu({
+        ids: row.id || ''
+      }),
+    success: () => {
+      // 更新tab
+      updateTabList(tabList.value.filter((t) => t.id !== row.id))
+      step.value = 'delete'
+      props.refresh = new Date().getTime()
     }
-  }).then(() => {
-    ElMessage.success({ message: '删除成功' })
-    step.value = 'delete'
-    props.refresh = new Date().getTime()
-  })
+  }
+  useConfirm(opts)
 }
 
 function queryMenuList() {

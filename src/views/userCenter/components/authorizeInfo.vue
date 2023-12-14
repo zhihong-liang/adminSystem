@@ -79,6 +79,7 @@ const formData = computed(() => {
   }
 })
 
+// 递归取出menulist中的names
 function recursion(names: any, list: any) {
   list.forEach((item: any) => {
     names.push(item.name)
