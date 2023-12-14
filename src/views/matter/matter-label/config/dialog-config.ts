@@ -3,7 +3,7 @@ import type { ActionType, getDialogConfigParams } from './type'
 export function getDialogConfig(actionType: ActionType) {
   if (actionType === 'add' || actionType === 'edit') {
     return getAddOrEditActionDialogConfig
-  } else if (actionType === 'delete') {
+  } else if (actionType === 'delete' || actionType === 'manyDelete') {
     return getDeleteActionDialogConfig
   } else {
     return getDetailActionDialogConfig
@@ -59,7 +59,7 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
         { label: '标签编号', prop: 'id' },
         { label: '标签名称', prop: 'lableName' },
         { label: '状态', prop: 'status' },
-        { label: '备注', prop: 'remake' },
+        { label: '备注', prop: 'remark' },
         { label: '图标', prop: 'lableIcon' },
         { label: '使用事项数', prop: 'mattersCount' },
         { label: '创建人', prop: 'createUser' },

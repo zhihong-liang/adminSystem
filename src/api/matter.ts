@@ -50,6 +50,9 @@ export const removeDept = (ids: string): Promise<Res> =>
   axios.delete(`/api/matters/dept/remove/${ids}`)
 // 修改业务部门
 export const editDept = (data: any): Promise<Res> => axios.put(`/api/matters/dept/edit`, data)
+// 停用-上线-下线事项信息
+export const pushDownDept = (data: any): Promise<Res> =>
+  axios.put(`/api/matters/info/pushDown`, data)
 
 /**
  * 事项标签管理

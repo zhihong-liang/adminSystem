@@ -14,30 +14,17 @@
       </div>
     </div>
 
-    <CnForm v-bind="formProps"></CnForm>
-
-    <slot></slot>
+    <slot name="content">
+      <CnForm v-bind="formProps"></CnForm>
+    </slot>
+    <slot name="footer"></slot>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
-import type CnPage from '@/components/cn-page/cn-page'
+import { computed } from 'vue'
 
-export interface InfoBoxProps {
-  title?: string
-  width?: number
-  styles?: Object
-  edit?: boolean
-  formProps: CnPage.FormProps
-}
-
-const props = defineProps(['title', 'width', 'styles', 'edit', 'formProps'])
-const preComponentType = ref(props.formProps.items.map((c: any) => c.component))
-
-watchEffect(() => {
-  transformComponent(props.edit, props.formProps.items)
-})
+const props = defineProps(['title', 'width', 'styles', 'formProps'])
 
 const finalStyle = computed(() => {
   return props.styles ?? {}
@@ -54,18 +41,6 @@ const finalWidth = computed(() => {
     return {}
   }
 })
-
-function transformComponent(status: boolean, items: any) {
-  if (status === undefined || (items && !items.length)) return
-
-  items.forEach((item: any, index: number) => {
-    if (status) {
-      item.component = preComponentType.value[index]
-    } else {
-      item.component = undefined
-    }
-  })
-}
 </script>
 
 <style lang="scss" scoped>

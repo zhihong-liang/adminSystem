@@ -1,13 +1,12 @@
 <template>
-  <CnSearch
-    v-bind="search"
-    :model="params"
-    @search="handleQuery()"
-    @reset="handleQuery()"
-  />
+  <div class="search">
+    <CnSearch v-bind="search" :model="params" @search="handleQuery()" @reset="handleQuery()" />
+  </div>
+
   <div class="role-list">
     <div class="add-card pointer" @click="handleAdd">
       <el-icon class="add-icon"><Plus /></el-icon>
+      <div class="add-role">新增角色</div>
     </div>
     <div class="role-card" v-for="(item, index) in roleList" :key="index">
       <div class="role-main">
@@ -36,78 +35,97 @@
         </div>
       </div>
     </div>
+    <i></i><i></i><i></i><i></i><i></i>
   </div>
+
   <Deal ref="dealRef" />
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, onMounted } from "vue";
-import CnSearch from "@/components/cn-page/CnSearch.vue";
-import { Plus } from "@element-plus/icons-vue";
-import Deal from "./deal.vue";
-import { getRoleList, sysRoleRemoveIids } from "@/api/admin";
+import { reactive, ref, onUnmounted, onBeforeMount, onMounted } from 'vue'
+import CnSearch from '@/components/cn-page/CnSearch.vue'
+import { Plus } from '@element-plus/icons-vue'
+import Deal from './deal.vue'
+import { getRoleList, sysRoleRemoveIids } from '@/api/admin'
+import { useHomeStore } from '@/stores/home'
 
+const { updateContainerStyle } = useHomeStore()
 // 搜索
-const inited = ref(false);
+const inited = ref(false)
 const search = ref({
   params: {},
   items: [
-    { label: "主类", prop: "type", component: "input" },
-    { label: "角色状态", prop: "status", component: "select", dict: "ROLE_STATUS"  },
-  ],
-});
-const roleList = ref();
+    { label: '主类', prop: 'type', component: 'input' },
+    { label: '角色状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS' }
+  ]
+})
+const roleList = ref()
 onMounted(() => {
   getData()
-});
-const params = ref();
-const handleQuery = () => {};
+})
+const params = ref()
+const handleQuery = () => {}
 
-const dealRef = ref();
+const dealRef = ref()
 const getData = () => {
   const params = {
     obj: {},
     page: 1,
-    size: 999,
-  };
+    size: 999
+  }
   getRoleList(params).then((res: any) => {
-    roleList.value = res.rows;
-  });
+    roleList.value = res.rows
+  })
 }
 // 新增
 const handleAdd = () => {
-  dealRef.value.open();
-};
+  dealRef.value.open()
+}
 // 修改、查看
 const handleModify = (data: any, type: string) => {
-  dealRef.value.open(data, type);
-};
+  dealRef.value.open(data, type)
+}
 // 删除
-const handleDet = (row: { id: Record<string, unknown>; }) => {
-  console.log(row);
-  ElMessageBox.confirm("确定要删除该角色吗？", "提示", {
-    type: "warning",
+const handleDet = (row: { id: Record<string, unknown> }) => {
+  ElMessageBox.confirm('确定要删除该角色吗？', '提示', {
+    type: 'warning',
     closeOnClickModal: false,
-    confirmButtonText: "确定",
+    confirmButtonText: '确定'
   }).then(() => {
     sysRoleRemoveIids(row.id).then((res) => {
-      if (res.code === "200") {
+      if (res.code === '200') {
         ElMessage({
-          type: "success",
-          message: res.message,
-        });
+          type: 'success',
+          message: res.message
+        })
         getData()
       }
-    });
-  });
-};
+    })
+  })
+}
+
+onBeforeMount(() => {
+  updateContainerStyle({
+    'background-color': 'var(--system-container-background)',
+    padding: '0px'
+  })
+})
+onUnmounted(() => {
+  updateContainerStyle({})
+})
 </script>
 
 <style scoped lang="scss">
+.search {
+  background: #fff;
+  padding: 20px;
+  border-radius: 6px;
+}
 .role-list {
+  margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
+  justify-content: space-between;
   .box-card {
     width: 200px;
     height: 160px;
@@ -117,34 +135,46 @@ const handleDet = (row: { id: Record<string, unknown>; }) => {
   }
 }
 .add-card {
-  width: 200px;
-  height: 160px;
-  border: 1px dashed #e4e7ed;
+  width: 222px;
+  height: 156px;
+  background: #ffffff;
+  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  border-radius: 6px;
+  overflow: hidden;
+  color: #303133;
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
+  color: #165dff;
   .add-icon {
     font-size: 40px;
-    color: rgba(0, 0, 0, 0.45);
+    font-weight: bold;
+  }
+  .add-role {
+    line-height: 30px;
   }
 }
 .role-card {
-  width: 200px;
-  height: 160px;
-  box-shadow: var(--el-box-shadow-light);
-  border-radius: 4px;
-  border: 1px solid #e4e7ed;
-  background-color: #fff;
+  margin-bottom: 15px;
+  width: 226px;
+  height: 156px;
+  background: #ffffff;
+  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  border-radius: 6px;
   overflow: hidden;
   color: #303133;
   transition: 0.3s;
   box-sizing: border-box;
   padding: 2px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 
   .role-main {
-    height: 75%;
+    height: 70%;
     overflow: hidden;
-    border-bottom: 1px solid #e8e8e8;
     box-sizing: border-box;
     .role-name {
       text-align: center;
@@ -152,36 +182,53 @@ const handleDet = (row: { id: Record<string, unknown>; }) => {
       margin-top: 15px;
     }
     .role-desc {
-      padding: 10px;
+      padding: 10px 20px;
       font-size: 14px;
-      color: rgba(0, 0, 0, 0.65);
+      color: #4e5969;
+      line-height: 22px;
+      display: inline-block;
+      margin: 0 auto;
     }
   }
   .card-footer {
-    height: 25%;
+    height: 30%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     box-sizing: border-box;
     text-align: center;
+    gap: 10px;
+
     .card-footer-item {
       flex: 1;
       padding: 2px;
-      border-right: 1px solid #e8e8e8;
-      font-size: 14px;
+      width: 60px;
+      height: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-sizing: border-box;
+
+      border-radius: 6px;
       &:last-child {
         border: none;
       }
       &.card-show {
-        color: #67c23a;
+        background: #dae5ff;
+        color: #165dff;
       }
       &.card-edit {
-        color: #409eff;
+        background: #ffefdd;
+        color: #ff9a2e;
       }
       &.card-del {
-        color: #f56c6c;
+        background: #f2b8b8;
+        color: #ec3535;
       }
     }
   }
+}
+i {
+  width: 222px;
 }
 </style>

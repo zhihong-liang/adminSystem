@@ -160,7 +160,8 @@ export function getEditOrEditActionConfig(params: getDialogConfigParams): CnPage
         },
         {
           label: '公告内容',
-          prop: 'content'
+          prop: 'content',
+          component: 'slot'
         },
         {
           label: '发布人',

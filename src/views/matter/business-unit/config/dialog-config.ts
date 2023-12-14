@@ -3,7 +3,7 @@ import type { ActionType, getDialogConfigParams } from './type'
 export function getDialogConfig(actionType: ActionType) {
   if (actionType === 'add' || actionType === 'edit') {
     return getAddOrEditActionDialogConfig
-  } else if (actionType === 'delete') {
+  } else if (actionType === 'delete' || actionType === 'manyDelete') {
     return getDeleteActionDialogConfig
   } else {
     return getDetailActionDialogConfig

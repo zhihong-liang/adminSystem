@@ -9,6 +9,7 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
+      <!-- 删除单个标签 -->
       <template #deleteTitle v-if="handleType === 'delete'">
         <div class="deleteTitle">
           确定删除 "<span class="labelName"> {{ labelName }} </span>" 标签
@@ -17,6 +18,19 @@
       <template #footer v-if="handleType === 'delete'">
         <div class="btns">
           <el-button type="primary" size="large" @click="removeMatterLabelAction">删除</el-button>
+        </div>
+      </template>
+      <!-- 删除多个标签 -->
+      <template #deleteTitle v-if="handleType === 'manyDelete'">
+        <div class="deleteTitle">
+          确定删除 "<span class="labelName"> {{ (labelName as any).join('，') }} </span>" 标签
+        </div>
+      </template>
+      <template #footer v-if="handleType === 'manyDelete'">
+        <div class="btns">
+          <el-button type="primary" size="large" @click="removeManyMatterLabelAction"
+            >删除</el-button
+          >
         </div>
       </template>
       <template #footer v-if="handleType === 'detail'">
@@ -50,8 +64,10 @@ import {
 const handleType = ref<ActionType>()
 
 // 标题名称
-const labelName = ref('')
-const labelIds = ref('')
+const labelName = ref<string | any[]>('')
+const labelIds = ref<string | any[]>('')
+
+const tableSelection = ref<any[]>()
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
@@ -66,7 +82,7 @@ const props = reactive<CnPage.Props>({
   action: getMatterLabelList,
   search: searchConfig,
   toolbar: getTollbarConifg(showDialog),
-  table: getTableConfig(showDialog),
+  table: getTableConfig(showDialog, selectionChange),
   pagination: {
     page: 1,
     size: 10
@@ -78,6 +94,10 @@ function dialogSubmitSuccess() {
   props.refresh = new Date().getTime()
 }
 
+function selectionChange(selection: any[]) {
+  tableSelection.value = selection
+}
+
 // 新建标签
 function addMatterLabelAction() {
   const model = dialogProps.formProps?.model || {}
@@ -86,7 +106,17 @@ function addMatterLabelAction() {
 
 // 删除标签
 async function removeMatterLabelAction() {
-  await removeMatterLabel(labelIds.value)
+  await removeMatterLabel(labelIds.value as string)
+  dialogRef.value?.close()
+  props.refresh = new Date().getTime()
+  ElMessage.success('操作成功')
+}
+
+// 删除多个标签
+async function removeManyMatterLabelAction() {
+  for (const ids of labelIds.value) {
+    await removeMatterLabel(ids)
+  }
   dialogRef.value?.close()
   props.refresh = new Date().getTime()
   ElMessage.success('操作成功')
@@ -108,11 +138,24 @@ function showDialog(handle: ActionType, row?: any) {
       dialogProps[key] = dialogConfig[key]
     }
     dialogProps.action = () => (handle === 'add' ? addMatterLabelAction() : editMatterLabelAction())
-  } else if (handle === 'delete') {
-    if (!row) return
-    const model = window.structuredClone(toRaw(row))
-    labelName.value = model.lableName
-    labelIds.value = model.id
+  } else if (handle === 'delete' || handle === 'manyDelete') {
+    if (handle === 'delete') {
+      const model = window.structuredClone(toRaw(row))
+      if (model.mattersCount)
+        return ElMessage.warning(`${model.lableName}，存在使用事项数，无法删除。`)
+      labelName.value = model.lableName
+      labelIds.value = model.id
+    } else {
+      if (!tableSelection.value?.length) return
+      // 存在使用事项数，无法删除
+      const hasMattersCountList = tableSelection.value.filter((item) => item.mattersCount)
+      if (hasMattersCountList.length) {
+        const labelNames = hasMattersCountList.map((i: any) => i.lableName).join('，')
+        return ElMessage.warning(`${labelNames}，存在使用事项数，无法删除。`)
+      }
+      labelName.value = tableSelection.value.map((item) => item.lableName)
+      labelIds.value = tableSelection.value.map((item) => item.id)
+    }
     const dialogConfig = getDialogConfig(handle)({})
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]

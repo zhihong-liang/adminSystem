@@ -91,6 +91,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       // 发现没有菜单列表数据，先请求菜单接口，再重新跑一次守卫逻辑，下一次就不会跑进这里
       if (!menuList.value.length) {
         await getMenuList({})
+
         next({ path: to.path })
       } else {
         addTabToList({
