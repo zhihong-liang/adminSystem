@@ -38,7 +38,14 @@
     <i></i><i></i><i></i><i></i><i></i>
   </div>
 
-  <Deal ref="dealRef" />
+  <Deal
+    ref="dealRef"
+    @success="
+      () => {
+        getData()
+      }
+    "
+  />
 </template>
 
 <script setup lang="ts">
