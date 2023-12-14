@@ -72,6 +72,7 @@ import { useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import CryptoJS from 'crypto-js'
 import { login } from '@/api'
+import { queryAreaAll } from '@/hooks/useDivision'
 
 const [router, userStore] = [useRouter(), useUserStore()]
 
@@ -121,6 +122,7 @@ const handleLogin = async () => {
           localStorage.removeItem('remember')
         }
         Message.success('登录成功')
+        queryAreaAll()
 
         router.push('/system/usercenter') // 默认跳到个人中心
       })

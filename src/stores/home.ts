@@ -1,5 +1,6 @@
 import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
+import { Tree2Flat } from '@/utils'
 import { getMenuList as queryMenuList } from '@/api'
 
 import type { TabItem, Menu, BreadcrumbItem } from '@/layout/type'
@@ -28,6 +29,9 @@ export const useHomeStore = defineStore('home', () => {
     if (userInfo) {
         currentRoleId = userInfo.currentRoleId
     }
+    const flatMenuList = computed<Menu[]>(() => {  // 扁平化菜单列表
+        return Tree2Flat(menuList.value, { children: 'childList'})
+    })
     // 请求菜单列表
     async function getMenuList({ manual = false, params = { currentRoleId: currentRoleId } }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
@@ -108,13 +112,23 @@ export const useHomeStore = defineStore('home', () => {
         containerStyle.value = style
     }
 
+    function resetAll() {
+        collapse.value = false
+        updateMenuList([])
+        updateModules([])
+        updateTabList([])
+        updateActiveTab()
+        updateBreadcrumb([])
+        updateContainerStyle({})
+    }
+
     return {
         collapse,
         tabList,
         menuList,
+        flatMenuList,
         activeTab,
         modules,
-        finalMenuList,
         breadcrumbList,
         containerStyle,
         getMenuList,
@@ -125,7 +139,8 @@ export const useHomeStore = defineStore('home', () => {
         updateMenuList,
         updateModules,
         updateBreadcrumb,
-        updateContainerStyle
+        updateContainerStyle,
+        resetAll
     }
 },
     {

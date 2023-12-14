@@ -108,29 +108,13 @@ function handleSubmit(action: 'add' | 'edit') {
       ...dialogProps.formProps!.model,
       menuIds: treeData.value
     }
-    sysRoleAdd(params).then((res) => {
-      if (res.code === '200') {
-        ElMessage({
-          type: 'success',
-          message: res.message
-        })
-        dialogRef.value.close()
-      }
-    })
+    return sysRoleAdd(params)
   } else {
     const params: any = {
       ...dialogProps.formProps!.model,
       menuIds: treeData.value
     }
-    sysRoleEdit(params).then((res) => {
-      if (res.code === '200') {
-        ElMessage({
-          type: 'success',
-          message: res.message
-        })
-        dialogRef.value.close()
-      }
-    })
+    return sysRoleEdit(params)
   }
 }
 

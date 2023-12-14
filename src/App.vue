@@ -4,6 +4,7 @@ import { ElConfigProvider } from 'element-plus'
 import { RouterView } from 'vue-router'
 import { useHomeStore } from '@/stores'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
+import { queryAreaAll } from '@/hooks/useDivision'
 
 const { updateModules} = useHomeStore()
 const local = computed(() => zhCn)
@@ -16,6 +17,8 @@ const components = Object.keys(modules).reduce<Record<string, any>>((prev, cur) 
 }, {}) as any
 
 updateModules(components)
+
+queryAreaAll()
 </script>
 
 <template>
