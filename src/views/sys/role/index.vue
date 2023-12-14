@@ -1,6 +1,11 @@
 <template>
   <div class="search">
-    <CnSearch v-bind="search" :model="params" @search="handleQuery()" @reset="handleQuery()" />
+    <CnSearch
+      v-bind="search"
+      :model="search.params"
+      @search="handleQuery()"
+      @reset="handleQuery()"
+    />
   </div>
 
   <div class="role-list">
@@ -62,21 +67,23 @@ const inited = ref(false)
 const search = ref({
   params: {},
   items: [
-    { label: '主类', prop: 'type', component: 'input' },
-    { label: '角色状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS' }
+    { label: '角色名称', prop: 'name', component: 'input' },
+    { label: '状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS' }
   ]
 })
 const roleList = ref()
 onMounted(() => {
   getData()
 })
-const params = ref()
-const handleQuery = () => {}
+
+const handleQuery = () => {
+  getData(search.value.params)
+}
 
 const dealRef = ref()
-const getData = () => {
+const getData = (obj = {}) => {
   const params = {
-    obj: {},
+    obj: obj,
     page: 1,
     size: 999
   }
