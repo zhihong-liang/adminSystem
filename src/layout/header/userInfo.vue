@@ -47,6 +47,7 @@ const roleIdList = JSON.parse(localStorage.getItem("userInfo")).roleIdList;
 const currentRoleId = JSON.parse(localStorage.getItem("userInfo")).currentRoleId;
 const userId = JSON.parse(localStorage.getItem("userInfo")).userId;
 const dialogRef = ref<InstanceType<typeof CnDialog>>();
+  
 const dialogProps = reactive<CnPage.DialogProps>({
   title: "角色切换",
   formProps: {
@@ -71,6 +72,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
 function handleLogOut() {
   clearToken();
   store.updateUserInfo({});
+  localStorage.removeItem('userInfo')
   router.push("/login");
 }
 function switchRoles() {
