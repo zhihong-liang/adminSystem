@@ -42,8 +42,7 @@ export const useHomeStore = defineStore('home', () => {
                 }
             })
             return list
-        }
-
+        }        
         const _res = await queryMenuList(params ?? {})  // TODO 接口失败也要做对应的处理
         const { data = [], code } = _res || {}
 

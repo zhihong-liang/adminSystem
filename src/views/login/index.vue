@@ -109,7 +109,7 @@ const handleLogin = async () => {
       }).then(async (res) => {
         setToken(res.data.accessToken)
         updateUserInfo(res.data)
-
+        console.log(res.data)
         if (form.remember) {
           localStorage.setItem('userInfo', JSON.stringify(res.data))
           localStorage.setItem('userName', form.username)

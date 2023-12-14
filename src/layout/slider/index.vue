@@ -35,6 +35,7 @@ const [route, store] = [useRoute(), useHomeStore()]
 
 const { collapse, menuList } = storeToRefs(store)
 
+
 const { updateCollapse } = store
 
 const activeMenuItem = computed(() => route.path as string)

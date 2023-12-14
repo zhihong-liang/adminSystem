@@ -160,3 +160,5 @@ export const sysRoleRemoveIids = (id: Record<string, unknown>): Promise<Res> => 
 export const sysRoleGetId = (id: Record<string, unknown>): Promise<Res> => axios.get(`/api/admin/sysRole/get/${id}`)
 // 修改 
 export const sysRoleEdit = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/sysRole/edit', data)
+// 切换角色 
+export const userRoleSwitch = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/user/roleSwitch', data)

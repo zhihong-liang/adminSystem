@@ -1,6 +1,7 @@
 import axios from 'axios'
 import type { ListReq, ListRes, Res } from '.'
 const device = "/api/device"
+const admin = "/api/admin"
 
 // 设备列表（分页）
 export const devBaseInfoListPage = (data: ListReq): Promise<ListRes> =>
@@ -17,3 +18,15 @@ export const devBaseInfoStop = (ids: string): Promise<ListRes> =>
 // 注销
 export const devBaseInfoLogoff = (ids: string): Promise<ListRes> =>
   axios.get(device + `/devBaseInfo/logoff/${ids}`)
+// 设备单位列表
+export const getUnitList = (data: ListReq): Promise<ListRes> =>
+  axios.post(admin + `/unit/list`, data)
+// 设备分组列表
+export const devGroupList = (data: ListReq): Promise<ListRes> =>
+  axios.post(device + `/devGroup/list`, data)
+// 设备分组列表
+export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
+  axios.post('/api/matters/mattersProgramme/listPage', data)
+// 批量修改
+export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
+  axios.post(`/devBaseInfo/editList`, data)

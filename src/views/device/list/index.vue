@@ -51,7 +51,7 @@
       </CnForm>
     </div>
     <div v-if="step1 === 3">
-      <CnForm ref="stpeThreeBulkEditFromRef"  v-bind="stpeThreeBulkEditFrom">
+      <CnForm ref="stpeThreeBulkEditFromRef" v-bind="stpeThreeBulkEditFrom">
         <template #deviceInfo>
           <h3>设备信息</h3>
         </template>
@@ -61,15 +61,95 @@
         <template #networkInfo>
           <h3>网络信息</h3>
         </template>
+        <template #businessHoursSlot>
+          <h3>设备营业时间</h3>
+        </template>
+        <template #timeSlot>
+          <el-form :model="bulkForm" label-width="120px">
+            <div v-for="(item, index) in timeSlotList" class="time-slotlit">
+              <el-row :gutter="20">
+                <el-col :span="21">
+                  <el-form-item :label="'时间段' + (index + 1)">
+                    <!-- <el-select
+                      clearable
+                      filterable
+                      placeholder="请选择"
+                      v-model="item.time1"
+                      style="width: 30%"
+                    >
+                      <el-option
+                        v-for="option in timeList"
+                        :key="option.value"
+                        :label="option.lable"
+                        :value="option.value"
+                      />
+                    </el-select> -->
+                    <!-- <span style="margin: 0px 10px 0px 10px">至</span>
+                    <el-select
+                      clearable
+                      filterable
+                      placeholder="请选择"
+                      v-model="item.time2"
+                      style="width: 30%"
+                    >
+                      <el-option
+                        v-for="option in timeList2"
+                        :key="option.value"
+                        :label="option.lable"
+                        :value="option.value"
+                      />
+                    </el-select> -->
+                    <el-checkbox v-model="item.checked" :label="timeList[index].lable" size="large" />
+                    <span> &nbsp;&nbsp;&nbsp; </span>
+                    <el-time-select
+                      v-model="item.startTime"
+                      :max-time="item.endTime"
+                      class="mr-4"
+                      placeholder="开始时间"
+                      start="00:00"
+                      step="00:15"
+                      end="23:45"
+                      style="width: 40%"
+                    />
+                    <el-time-select
+                      v-model="item.endTime"
+                      :min-time="item.startTime"
+                      placeholder="结束时间"
+                      start="00:00"
+                      step="00:15"
+                      end="23:45"
+                      style="width: 40%"
+                    />
+                    <!-- <div class="demo-time-range"></div> -->
+                  </el-form-item>
+                </el-col>
+                <el-col :span="3">
+                  <div class="time-det">
+                    <el-button type="danger" :icon="Delete" circle @click="deleteTime(index)" />
+                  </div>
+                </el-col>
+              </el-row>
+            </div>
+            <el-form-item>
+              <el-button type="primary" :icon="Plus" @click="addTime">时间段</el-button>
+            </el-form-item>
+          </el-form>
+        </template>
         <template #configInfo>
           <h3>配置信息</h3>
         </template>
       </CnForm>
     </div>
-    <div v-if="step1 === 4">44444</div>
+    <div v-if="step1 === 4">
+      <div style="text-align:center;">此次修改将影响{{propsTable.data.length}}台设备，是否确认修改？</div>
+    </div>
     <template #footer>
       <el-button type="primary" @click="BackStep" v-if="step1 !== 1">上一步</el-button>
-      <el-button type="primary" @click="nextStep" :disabled="propsTable.data.length === 0" v-if="step1 !== 4 && step1 !== 3"
+      <el-button
+        type="primary"
+        @click="nextStep"
+        :disabled="propsTable.data.length === 0"
+        v-if="step1 !== 4 && step1 !== 3"
         >下一步</el-button
       >
       <el-button type="primary" @click="submitTo" v-if="step1 === 3">提交</el-button>
@@ -79,7 +159,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, onMounted } from "vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
 import CnTable from "@/components/cn-page/CnTable.vue";
@@ -88,6 +168,7 @@ import BasicInfo from "./child/basicInfo.vue";
 import DeploymentSite from "./child/deploymentSite.vue";
 import ConfigInfo from "./child/configInfo.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { Plus, Delete } from "@element-plus/icons-vue";
 // import { getTollBarActionDialogConfig, getTableActionConfig } from './config/dialog-config';
 import {
   devBaseInfoListPage,
@@ -95,22 +176,95 @@ import {
   devBaseInfoStart,
   devBaseInfoStop,
   devBaseInfoLogoff,
+  getUnitList,
+  devGroupList,
+  mattersProgrammeListPage,
+  devBaseInfoEditList,
 } from "@/api/device";
 const activeName = ref("1");
 const loading = ref(false);
 const step1 = ref(1);
+const bulkForm: any = reactive({});
 const selectionIds = ref([]);
 const bulkEditFromRef = ref();
-
+const supList: any = [];
+const gupList: any = [];
+const matList: any = [];
 const dialogRef = ref<InstanceType<typeof CnDialog>>();
 const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
+const bulkEditTitle = ref('批量编辑')
+const timeSlotList = reactive([{ checked: "", timeName: "周一", startTime: "", endTime: "" }]);
+const timeList = reactive([
+  { lable: "周一", value: 0 },
+  { lable: "周二", value: 1 },
+  { lable: "周三", value: 2 },
+  { lable: "周四", value: 3 },
+  { lable: "周五", value: 4 },
+  { lable: "周六", value: 5 },
+  { lable: "周日", value: 6 },
+]);
+// 获取单位列表
+const getUnitListFun = async () => {
+  const params = {
+    obj: {},
+    page: 1,
+    size: 10,
+  };
+  await getUnitList(params).then((res) => {
+    if (res.code === "200") {
+      res.rows.map((item) => {
+        item.label = item.fullName;
+        item.value = item.id;
+        supList.push(item);
+      });
+    }
+  });
+};
+const devGroupListFun = () => {
+  const params = {
+    obj: {},
+    page: 1,
+    size: 10,
+  };
+  devGroupList(params).then((res: any) => {
+    if (res.code === "200") {
+      res.data.map((item: any) => {
+        item.label = item.groupName;
+        item.value = item.id;
+        gupList.push(item);
+      });
+    }
+  });
+};
+const mattersProgrammeListPageFun = () => {
+  const params = {
+    obj: {},
+    page: 1,
+    size: 10,
+  };
+  mattersProgrammeListPage(params).then((res) => {
+    if (res.code === "200") {
+      res.rows.map((item) => {
+        item.label = item.programmeName;
+        item.value = item.id;
+        matList.push(item);
+      });
+    }
+  });
+};
+onMounted(async () => {
+  getUnitListFun();
+  devGroupListFun();
+  mattersProgrammeListPageFun();
+  // const aaa = getUnitListFun().then(res => {return res})
+});
 
 const dialogProps = reactive<CnPage.DialogProps>({
   title: "设备详情",
 });
 
 const bulkEditProps = reactive<CnPage.DialogProps>({
-  title: "批量编辑",
+  title: step1.value === 4 ? "确认修改" : "批量编辑",
 });
 
 const propsTable = reactive<CnPage.TableProps>({
@@ -201,14 +355,16 @@ const stpeTowBulkEditFrom = reactive({
     },
     { prop: "networkInfo", component: "slot", span: 24 },
     {
-      prop: "networkInfo",
+      label: "网络策略",
+      prop: "networdPolicy",
       component: "checkbox",
+      dict: "NETWORD_POLICY",
       span: 24,
-      props: {
-        options: [
-          { label: "网络策略", value: 0 },
-        ],
-      },
+      // props: {
+      //   options: [
+      //     { label: "网络策略", value: 0 },
+      //   ],
+      // },
     },
     { prop: "configInfo", component: "slot", span: 24 },
     {
@@ -229,45 +385,121 @@ const stpeThreeBulkEditFrom = reactive({
   labelWidth: 120,
   colSpan: 8,
   model: {},
+  rules: {
+    supportingUnit: [{ required: true, message: '请选择设备管理单位' }],
+    devModelNo: [{ required: true, message: '请输入设备型号' }],
+    hardware: [{ required: true, message: '请选择硬件模块' }],
+    operationPersonName: [{ required: true, message: '请输入运维人员名称' }],
+    operationPersonContact: [{ required: true, message: '请输入运维人员联系方式' }],
+    groupId: [{ required: true, message: '请选择设备分组' }],
+    provinceCode: [{ required: true, message: '请选择行政区划' }],
+    detailAddress: [{ required: true, message: '请输入详细地址' }],
+    pointLatLng: [{ required: true, message: '请输入地理坐标' }],
+    siteName: [{ required: true, message: '请选择部署场所名称' }],
+    devUsage: [{ required: true, message: '请选择设备用途' }],
+  },
   items: [
     { prop: "deviceInfo", component: "slot", span: 24 },
-    { label: "设备管理单位", prop: "managePersonName", component: "select", span: 24 },
-    { label: "设备技术支撑单位", prop: "managePersonName", component: "select", span: 24 },
-    { label: "设备型号", prop: "managePersonName", component: "input", span: 24 },
-    { label: "硬件模块", prop: "managePersonName", component: "select", span: 24 },
-    { label: "运维人员", prop: "managePersonName", component: "input", span: 24 },
-    { label: "运维人员联系方式", prop: "managePersonName", component: "input", span: 24 },
-    { label: "设备分组", prop: "managePersonName", component: "select", span: 24 },
+    {
+      label: "设备管理单位",
+      prop: "supportingUnit",
+      component: "select",
+      span: 24,
+      props: { options: supList },
+    },
+    { label: "设备型号", prop: "devModelNo", component: "input", span: 24 },
+    {
+      label: "硬件模块",
+      prop: "hardware",
+      component: "select",
+      span: 24,
+      props: { multiple: true },
+      dict: "HARDWARE_MODULE",
+    },
+    { label: "运维人员", prop: "operationPersonName", component: "input", span: 24 },
+    {
+      label: "运维人员联系方式",
+      prop: "operationPersonContact",
+      component: "input",
+      span: 24,
+    },
+    {
+      label: "设备分组",
+      prop: "groupId",
+      component: "select",
+      span: 24,
+      props: { options: gupList },
+    },
     { prop: "venueInfo", component: "slot", span: 24 },
-    { label: "行政区划", prop: "managePersonName", component: "ad", span: 24 },
-    { label: "详细地址", prop: "managePersonName", component: "input", span: 24 },
-    { label: "地理坐标", prop: "managePersonName", component: "input", span: 24 },
-    { label: "部署场所名称", prop: "managePersonName", component: "input", span: 24 },
-    { label: "部署场所类型", prop: "managePersonName", component: "select", span: 24 },
-    { label: "设备用途", prop: "managePersonName", component: "select", span: 24 },
+    { label: "行政区划", prop: "provinceCode", component: "ad", span: 24 },
+    { label: "详细地址", prop: "detailAddress", component: "input", span: 24 },
+    { label: "地理坐标", prop: "pointLatLng", component: "input", span: 24 },
+    { label: "部署场所名称", prop: "siteName", component: "input", span: 24 },
+    {
+      label: "部署场所类型",
+      prop: "siteType",
+      component: "select",
+      span: 24,
+      dict: "DEV_SITE_TYPE",
+    },
+    {
+      label: "设备用途",
+      prop: "devUsage",
+      component: "select",
+      span: 24,
+      dict: "DEV_USAGE",
+    },
     { prop: "networkInfo", component: "slot", span: 24 },
     {
       label: "网络策略",
-      prop: "venueInfo",
+      prop: "networdPolicy",
       component: "checkbox",
+      dict: "NETWORD_POLICY",
+      span: 24,
+    },
+    { prop: "businessHoursSlot", component: "slot", span: 24 },
+    {
+      label: "设备营业时间",
+      prop: "businessHours",
+      component: "select",
       span: 24,
       props: {
         options: [
-          { label: "政务外网", value: 0 },
-          { label: "政务内网", value: 1 },
-          { label: "公安网", value: 2 },
-          { label: "金融城域网", value: 3 },
-          { label: "银行内网", value: 4 },
-          { label: "互联网", value: 5 },
-          { label: "无线专网", value: 6 },
+          { lable: "7 * 24 小时", value: "7 * 24 小时" },
+          { lable: "自定义", value: "自定义" },
         ],
       },
     },
+    {
+      prop: "timeSlot",
+      component: "slot",
+      span: 24,
+      visible: () => stpeThreeBulkEditFrom.model?.businessHours === "自定义",
+    },
+    {
+      label: "定时开关机",
+      prop: "timerOnOff",
+      component: "select",
+      span: 24,
+      dict: "YES_NO",
+    },
     { prop: "configInfo", component: "slot", span: 24 },
-    { label: "设备分组", prop: "managePersonName", component: "select", span: 24 },
-    { label: "方案", prop: "managePersonName", component: "select", span: 24 },
+    {
+      label: "设备分组",
+      prop: "groupId",
+      component: "select",
+      span: 24,
+      props: { options: gupList },
+    },
+    {
+      label: "方案",
+      prop: "programmeId",
+      component: "select",
+      span: 24,
+      props: { options: matList },
+    },
   ],
-})
+});
 
 const props = reactive<CnPage.Props>({
   params: {},
@@ -485,10 +717,6 @@ function handleReset() {
   bulkEditFrom.model = {};
   propsTable.data = [];
 }
-// 批量编辑
-function handleSubmit({ row }: any) {
-  console.log(row);
-}
 // 下一步
 const nextStep = () => {
   step1.value = step1.value + 1;
@@ -503,13 +731,45 @@ const submitTo = () => {
 };
 // 确定
 const determine = () => {
-  console.log(3333);
+  const params = {
+    ...stpeThreeBulkEditFrom.model,
+  };
+  console.log(params);
+
+  devBaseInfoEditList(params).then((res) => {
+    if (res.code === "200") {
+      bulkEditRef.value?.close()
+    }
+  });
 };
+// 添加时间段
+const addTime = () => {
+  console.log("添加时间段");
+  // const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
+  if (timeSlotList.length < 7) {
+    timeSlotList.push(
+      { checked: "", timeName: "", startTime: "", endTime: "" }
+    )
+  } else {
+    return
+  }
+};
+// 删除时间段
+const deleteTime = (index: number) => {
+  timeSlotList.splice(index, 1)
+}
 </script>
 <style>
 .blurtext {
   color: #409eff;
   text-decoration: underline;
   cursor: pointer;
+}
+.time-slotlit {
+  margin-bottom: 20px;
+}
+.time-det {
+  position: relative;
+  top: 20px
 }
 </style>
