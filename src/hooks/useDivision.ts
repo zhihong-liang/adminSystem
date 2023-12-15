@@ -11,6 +11,8 @@ const division = ref<Division2[]>([])
 let divisionFlat: Division2[] = []
 
 export function queryAreaAll () {
+  division.value = []
+  divisionFlat = []
   getDivisionList().then((res) => {
     division.value.push(...trans(res.data))
   })
