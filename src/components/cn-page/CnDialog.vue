@@ -41,7 +41,7 @@ const props = defineProps({
   loading: { type: Boolean, default: false },
   action: { type: Function as PropType<() => Promise<Res<any>>> }
 })
-const emits = defineEmits(['success'])
+const emits = defineEmits(['success', 'close'])
 
 const slots = ref<CnPage.FormItemSlotProps[]>([])
 watchEffect(() => {
@@ -84,6 +84,7 @@ function handleSubmit() {
 
 const formWrapRef = ref()
 function handleClosed() {
+  emits('close')
   formWrapRef.value?.formRef?.resetFields()
 }
 function open() {
