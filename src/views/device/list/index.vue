@@ -7,18 +7,22 @@
   <CnDialog ref="dialogRef" v-bind="dialogProps">
     <el-tabs v-model="activeName" class="demo-tabs">
       <el-tab-pane label="基本信息" name="1">
-        <BasicInfo :model="basicInfoData"></BasicInfo>
+        <BasicInfo ref="basicInfoRef" :model="basicInfoData"></BasicInfo>
       </el-tab-pane>
       <el-tab-pane label="硬件信息" name="2">
-        <HardwareModule :model="hardwareModuleData"></HardwareModule>
+        <HardwareModule ref="hardwareModuleRef" :model="hardwareModuleData"></HardwareModule>
       </el-tab-pane>
       <el-tab-pane label="部署场所" name="3">
-        <DeploymentSite :model="deploymentSiteData"></DeploymentSite>
+        <DeploymentSite ref="deploymentSiteRef" :model="deploymentSiteData"></DeploymentSite>
       </el-tab-pane>
       <el-tab-pane label="配置信息" name="4">
-        <ConfigInfo :model="configInfoData"></ConfigInfo>
+        <ConfigInfo ref="configInfoRef" :model="configInfoData"></ConfigInfo>
       </el-tab-pane>
     </el-tabs>
+    <template #footer>
+      <el-button @click="handleCancel">取消</el-button>
+      <el-button type="primary" @click="handleSubmit">提交</el-button>
+    </template>
   </CnDialog>
   <CnDialog ref="bulkEditRef" v-bind="bulkEditProps">
     <div v-if="step1 === 1">
@@ -176,7 +180,6 @@
     </template>
   </CnDialog>
 </template>
-
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from "vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
@@ -220,7 +223,11 @@ const basicInfoData = ref();
 const hardwareModuleData = ref();
 const deploymentSiteData = ref();
 const configInfoData = ref();
-const dialoTitle = ref("设备详情")
+const basicInfoRef = ref();
+const hardwareModuleRef = ref();
+const deploymentSiteRef = ref();
+const configInfoRef = ref();
+const dialoTitle = ref("设备详情");
 const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
 const timeList = reactive([
   { lable: "周一", value: 0 },
@@ -288,9 +295,6 @@ onMounted(async () => {
 
 const dialogProps = reactive<CnPage.DialogProps>({
   title: dialoTitle.value, // "设备详情",
-  onSubmit: () => {
-    console.log(333);
-  }
 });
 
 const bulkEditProps = reactive<CnPage.DialogProps>({
@@ -824,6 +828,49 @@ const BackStep = () => {
 const submitTo = () => {
   step1.value = 4;
 };
+// 取消
+const handleCancel = () => {
+  dialogRef.value?.close()
+}
+// 提交编辑 
+const handleSubmit = () => {
+  const flagArr = [basicInfoRef.value.validateForm(), hardwareModuleRef.value.validateForm(), deploymentSiteRef.value.validateForm(), configInfoRef.value.validateForm()]
+  // console.log("3", flagArr);
+  // console.log("4", basicInfoRef.value.validateForm());
+  // const aaaa = hardwareModuleRef.value.validateForm().then((res: any) => { return res})
+  // console.log("4", aaaa);
+  let isValidate = false
+  const params = {
+    baseInfo: basicInfoRef.value.getFormData(),
+    devConf: configInfoRef.value.getFormData(),
+    devDeploymentSite: deploymentSiteRef.value.getFormData(),
+    devUnitInFo: hardwareModuleRef.value.getFormData(),
+  }
+  Promise.all(flagArr).then((res: any) => {
+    for (let index = 0; index < res.length; index++) {
+      const element = res[index];
+      if (element) {
+        isValidate = true
+      } else {
+        activeName.value = String(index + 1)
+        break;
+      }
+    }
+    console.log(isValidate);
+    
+    if (isValidate) {
+      devBaseInfo(params).then(res => {
+        console.log(res);
+      })
+    }
+  })
+  
+  // console.log("basicInfoRef", basicInfoRef.value.validateForm())
+  // console.log("bbb", basicInfoRef.value.getFormData())
+  // console.log("hardwareModuleRef", hardwareModuleRef.value.getFormData())
+  // console.log("deploymentSiteRef", deploymentSiteRef.value.getFormData())
+  // console.log("configInfoRef", configInfoRef)
+}
 // 确定
 const determine = () => {
   const params = {

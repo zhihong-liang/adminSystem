@@ -19,12 +19,17 @@ const props = defineProps({
     default: () => ({}),
   },
 });
+const basisRef = ref()
 const mattersList: any = ref([])
 const configForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
   disabled: props.model.type === "edit" ? true : false,
+  rules: {
+    groupId: [{ required: true, message: "请选择设备分组" }],
+    programmeId: [{ required: true, message: "请选择方案名称" }],
+  },
   items: [
     {
       label: "设备分组",
@@ -69,10 +74,32 @@ const configTable = reactive<CnPage.Props>({
   pagination: false,
 }) 
 
+const validateForm = () => {
+  // let flag = null;
+  // basisRef.value.formRef.validate((valid: boolean) => {
+  //   if (valid) {
+  //     flag = true;
+  //   } else {
+  //     flag = false;
+  //   }
+  // });
+  // return flag;
+  return basisRef.value.formRef.validate((valid: boolean) => {
+    if (valid) {
+      return true
+    } else {
+      return false
+    }
+  });
+};
+const getFormData = () => {
+  return configForm.model
+}
+defineExpose({ validateForm, getFormData });
+
 watchEffect(async () => {
   if (props.model) {
     configForm.model = props.model
-    const groupList = await devGroupListUtils().then(res => { return res})
     mattersList.value = await mattersProgrammeListPageUtils().then(res => { return res})
   }
 })

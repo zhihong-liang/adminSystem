@@ -31,7 +31,7 @@ export async function devGroupListUtils() {
   await devGroupList(params).then((res: any) => {
     if (res.code === "200") {
       res.data.map((item: any) => {
-        item.label = item.fullName;
+        item.label = item.groupName;
         item.value = item.id;
         supList.push(item);
       });
