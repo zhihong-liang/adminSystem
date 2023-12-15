@@ -10,9 +10,11 @@ export interface Division2 {
 const division = ref<Division2[]>([])
 let divisionFlat: Division2[] = []
 
-getDivisionList().then((res) => {
-  division.value.push(...trans(res.data))
-})
+export function queryAreaAll () {
+  getDivisionList().then((res) => {
+    division.value.push(...trans(res.data))
+  })
+}
 
 function trans(list: Division[]) {
   const division: Division2[] = []

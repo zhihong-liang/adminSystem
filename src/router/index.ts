@@ -1,4 +1,10 @@
-import { createRouter, createWebHistory, type NavigationGuardNext, type RouteLocationNormalized } from 'vue-router'
+import { ref } from 'vue'
+import {
+  createRouter,
+  createWebHistory,
+  type NavigationGuardNext,
+  type RouteLocationNormalized
+} from 'vue-router'
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
 import Demo from './demo'
@@ -8,15 +14,11 @@ import { getToken } from '@/utils/auth'
 
 import BaseLayout from '../layout/index.vue'
 
-import type { Menu } from '@/layout/slider/type'
-import { ref } from 'vue'
+import type { BreadcrumbItem, Menu } from '@/layout/type'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
-  routes: [
-    ...Routes,
-    ...(import.meta.env.MODE === 'development' ? Demo : [])
-  ]
+  routes: [...Routes, ...(import.meta.env.MODE === 'development' ? Demo : [])]
 })
 
 // 菜单转换为路由
@@ -54,12 +56,8 @@ const formatMenus = (menus: Menu[], modules: any) => {
 // 动态路由
 export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   const _children = [
-    ...formatMenus(menuList, modules),
-    // {
-    //   path: '/home',
-    //   name: 'home',
-    //   component: () => import('../views/HomeView.vue')
-    // }
+    ...formatMenus(menuList, modules)
+    // TODO 添加404
   ]
 
   const baseRoute: any = {
@@ -73,12 +71,35 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   router.addRoute(baseRoute)
 }
 
+// 处理面包屑组件数据
+function searchParentNode(id?: number): BreadcrumbItem[] {
+  if (!id) return []
+
+  const home = useHomeStore()
+  const { flatMenuList } = storeToRefs(home)
+
+  let _id = id
+  const result: BreadcrumbItem[] = []
+
+  while (_id !== 0) {
+    const target = flatMenuList.value.find((m) => m.id === _id) || {}
+    const isEmpty = !Object.keys(target).length
+    if (!isEmpty) {
+      const { id, name, path } = target
+      result.unshift({ id, name, path: path as string })
+    }
+    _id = target.parentId as number
+  }
+
+  return result
+}
+
 const refresh = ref(true)
 
 const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
   const home = useHomeStore()
   const { menuList, modules } = storeToRefs(home)
-  const { getMenuList, updateTabList, updateBreadcrumb, updateActiveTab, addTabToList } = home
+  const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
   if (hasToken) {
@@ -94,18 +115,19 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
         next({ path: to.path })
       } else {
-        addTabToList({
-          id: to.meta.id as number,
-          name: to.meta.name as string,
-          path: to.path
-        })
+        if (to.path !== '/login') {
+          addTabToList({
+            id: to.meta.id as number,
+            name: to.meta.name as string,
+            path: to.path
+          })
+        }
+        updateBreadcrumb(searchParentNode(to.meta.id as number))
         next()
       }
     }
   } else {
-    updateTabList([])
-    updateBreadcrumb([])
-    updateActiveTab()
+    resetAll()
 
     if (to.path !== '/login') {
       next('/login')
@@ -116,13 +138,13 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 }
 
 router.beforeEach((to, from, next) => {
-  start();
+  start()
 
   handleRouterBeforeEach(to, next)
 })
 
 router.afterEach(() => {
-  close();
+  close()
 })
 
 export default router

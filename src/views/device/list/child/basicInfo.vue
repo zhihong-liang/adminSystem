@@ -1,68 +1,99 @@
 <template>
-  <CnForm ref="basisRef" v-bind="basisForm"></CnForm>
+  <CnForm ref="basisRef" v-bind="basisForm" :value="basisForm.model"></CnForm>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
+
+const props = defineProps({
+  model: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 const basisForm = reactive({
   labelWidth: 120,
   colSpan: 12,
+  model: {},
+  disabled: props.model.type === "edit" ? true : false,
   items: [
     {
       label: "省统一设备编号",
-      prop: "fileds",
+      prop: "proDevCode",
+      component: "input" 
     },
     {
       label: "状态",
-      prop: "fileds",
+      prop: "status",
+      component: "select",
+      dict: "DEV_STATUS" 
     },
     {
       label: "设备接入单位设备编号",
-      prop: "fileds",
+      prop: "unitDevCode",
+      component: "input",
     },
     {
       label: "设备接入单位",
-      prop: "fileds",
+      prop: "devUnit",
+      component: "select",
+      dict: "DEV_STATUS" 
     },
     {
       label: "设备类型",
-      prop: "fileds",
+      prop: "devType",
+      component: "select",
+      dict: "DEV_TYPE" 
     },
     {
       label: "设备型号",
-      prop: "fileds",
+      prop: "devModelNo",
+      component: "input",
     },
-    {
-      label: "硬件模块",
-      prop: "fileds",
-    },
+    // {
+    //   label: "硬件模块",
+    //   prop: "hardware",
+    //   component: "select",
+    //   // dict: "HARDWARE_MODULE" 
+    // },
     {
       label: "设备来源",
-      prop: "fileds",
+      prop: "devSource",
+      component: "input",
     },
     {
       label: "政务程序版本号",
-      prop: "fileds",
+      prop: "procedureVersion",
+      component: "input",
     },
     {
       label: "操作系统",
-      prop: "fileds",
+      prop: "operSystem",
+      component: "input",
     },
     {
       label: "设备用途",
-      prop: "fileds",
+      prop: "devUsage",
+      component: "input",
     },
     {
       label: "到货时间",
-      prop: "fileds",
+      prop: "comeTime",
+      component: "input",
     },
     {
       label: "安装激活时间",
-      prop: "fileds",
+      prop: "installActivateTime",
+      component: "input",
     },
   ],
 });
+watchEffect(() => {
+  if (props.model) {
+    basisForm.model = props.model
+  }
+})
 </script>
 <style lang="scss" scoped>
 .refuse-bottom {
