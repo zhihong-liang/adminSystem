@@ -24,7 +24,7 @@ const props = reactive<CnPage.Props>({
     items: [
       { label: '区划名称', prop: 'areaName', component: 'input' },
       { label: '区划编号', prop: 'areaCode', component: 'input' },
-      { label: '状态', prop: 'status', component: 'select', dict: 'STATUS' }
+      { label: '状态', prop: 'status', component: 'select', dict: 'AREA_STATUS' }
     ]
   },
   table: {
@@ -39,7 +39,7 @@ const props = reactive<CnPage.Props>({
     columns: [
       { label: '区划名称', prop: 'areaName' },
       { label: '区划编号', prop: 'areaCode' },
-      { label: '状态', prop: 'status', dict: 'STATUS' },
+      { label: '状态', prop: 'status', dict: 'AREA_STATUS' },
       { label: '备注', prop: 'remark' }
     ]
   },
