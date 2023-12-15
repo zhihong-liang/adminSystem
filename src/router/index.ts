@@ -115,11 +115,13 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
         next({ path: to.path })
       } else {
-        addTabToList({
-          id: to.meta.id as number,
-          name: to.meta.name as string,
-          path: to.path
-        })
+        if (to.path !== '/login') {
+          addTabToList({
+            id: to.meta.id as number,
+            name: to.meta.name as string,
+            path: to.path
+          })
+        }
         updateBreadcrumb(searchParentNode(to.meta.id as number))
         next()
       }
