@@ -21,12 +21,19 @@ export const useHomeStore = defineStore('home', () => {
         collapse.value = !collapse.value
     }
 
-    const menuList = ref<Menu[]>([])  // 树形菜单列表
+    const menuList = ref<Menu[]>([])  // 菜单列表
+    const finalMenuList = computed(() => menuList.value)
+
+    const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    let currentRoleId: number
+    if (userInfo) {
+        currentRoleId = userInfo.currentRoleId
+    }
     const flatMenuList = computed<Menu[]>(() => {  // 扁平化菜单列表
         return Tree2Flat(menuList.value, { children: 'childList'})
     })
     // 请求菜单列表
-    async function getMenuList({ manual = false, params }: getMenuListPayloadOptions): Promise<Menu[]> {
+    async function getMenuList({ manual = false, params = { currentRoleId: currentRoleId } }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
         const formatMenu = (menus: Menu[]): Menu[] => {
             const list: Menu[] = []

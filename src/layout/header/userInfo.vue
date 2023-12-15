@@ -28,6 +28,7 @@
       <el-button type="primary" @click="handleScreen">确定</el-button>
     </template>
   </CnDialog>
+  <!-- <div v-if="roleDia"></div> -->
 </template>
 
 <script setup lang="ts">
@@ -69,10 +70,10 @@ const dialogProps = reactive<CnPage.DialogProps>({
 })
 
 function handleLogOut() {
-  clearToken()
-  store.updateUserInfo({})
-  localStorage.removeItem('userInfo')
-  router.push('/login')
+  clearToken();
+  store.updateUserInfo({});
+  localStorage.removeItem("userInfo");
+  router.push("/login");
 }
 function switchRoles() {
   const params = {
@@ -81,14 +82,15 @@ function switchRoles() {
     size: 999
   }
   getRoleList(params).then((res: any) => {
-    if (res.code === '200') {
+    if (res.code === "200") {
+      roleList.value = [];
       res.rows.map((item: any) => {
         item.label = item.name
         item.value = item.id
         for (let index = 0; index < roleIdList.length; index++) {
           const element = roleIdList[index]
           if (item.id === element) {
-            roleList.push(item)
+            roleList.value.push(item);
           }
         }
       })
@@ -105,27 +107,27 @@ function handleScreen() {
   } else {
     const params = {
       id: userId,
-      currentRoleId: dialogProps.formProps!.model.currentRoleId
-    }
+      currentRoleId: dialogProps.formProps!.model.currentRoleId,
+    };
     userRoleSwitch(params).then((res: any) => {
-      if (res.code === '200') {
+      if (res.code === "200") {
         ElMessage({
-          type: 'error',
-          message: res.message
-        })
+          type: "error",
+          message: res.message,
+        });
 
-        getSysMenuTree({ currentRoleId: dialogProps.formProps!.model.currentRoleId }).then(
-          (res) => {
-            // console.log("新的菜单树", res.data);
-            menuList.$state.menuList = res.data
-          }
-        )
-        localStorage.removeItem('userInfo')
-        localStorage.setItem('userInfo', JSON.stringify(res.data))
-        router.push('/system/usercenter')
-        dialogRef.value?.close()
+        getSysMenuTree({
+          currentRoleId: dialogProps.formProps!.model.currentRoleId,
+        }).then((res) => {
+          // console.log("新的菜单树", res.data);
+          menuList.$state.menuList = res.data;
+        });
+        localStorage.removeItem("userInfo");
+        localStorage.setItem("userInfo", JSON.stringify(res.data));
+        router.push("/system/usercenter");
+        dialogRef.value?.close();
       }
-    })
+    });
   }
 }
 </script>

@@ -1,94 +1,145 @@
 <template>
-  <CnForm ref="basisRef" v-bind="basisForm"> </CnForm>
+  <CnForm ref="basisRef" v-bind="basisForm" :value="basisForm.model">
+    <template #divider>
+      <h3>部署场所</h3>
+    </template>
+    <template #coordinate>
+      <!-- <el-form :model="basisForm.model" label-width="120px">
+        <el-form-item label="经度">
+          <el-input v-model="basisForm.model.pointLat" />
+          <el-input v-model="basisForm.model.pointLng" />
+        </el-form-item>
+      </el-form> -->
+      <span>经度：{{basisForm.model?.pointLat}}</span>，
+      <span>纬度：{{basisForm.model?.pointLng}}</span>
+    </template>
+    <template #divider2>
+      <h3>管理单位、技术支持单位</h3>
+    </template>
+  </CnForm>
 </template>
 <script lang="ts" setup>
-import { reactive, ref } from "vue";
+import { reactive, ref, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
+
+const props = defineProps({
+  model: {
+    type: Object,
+    default: () => ({}),
+  },
+});
 
 const basisForm = reactive({
   labelWidth: 120,
   colSpan: 12,
+  model: {},
+  disabled: props.model.type === "edit" ? true : false,
   items: [
     {
-      label: "部署场所",
-      component: "divider", 
+      component: "slot",
+      prop: "divider",
       span: 24 
     },
     {
       label: "行政区划",
-      prop: "fileds",
+      prop: "regionDetail",
+      component: "input" 
     },
     {
       label: "详细地址",
-      prop: "fileds",
+      prop: "detailAddress",
+      component: "input"
     },
     {
       label: "地理坐标",
-      prop: "fileds",
+      prop: "coordinate",
+      component: "slot",
     },
     {
       label: "部署场所名称",
-      prop: "fileds",
+      prop: "siteName",
+      component: "input"
     },
     {
       label: "部署场所类型",
-      prop: "fileds",
+      prop: "siteType",
+      component: "select",
+      dict: "DEV_SITE_TYPE" 
     },
     {
       label: "网络策略",
-      prop: "fileds",
+      prop: "networkPolicy",
+      component: "select",
+      dict: "NETWORD_POLICY"
     },
     {
       label: "mac地址",
-      prop: "fileds",
+      prop: "mac",
+      component: "input"
     },
     {
       label: "IP地址",
-      prop: "fileds",
+      prop: "ip",
+      component: "input"
     },
     {
       label: "设备营业时间",
       prop: "fileds",
+      component: "input"
     },
     {
       label: "定时开关机",
-      prop: "fileds",
+      prop: "timerOnOff",
+      component: "select",
+      dict: "YES_NO"
     },
     {
-      label: "管理单位、技术支持单位",
-      component: "divider", 
+      component: "slot",
+      prop: "divider2",
       span: 24 
     },
     {
       label: "设备管理单位",
-      prop: "fileds",
+      prop: "devManageUnit",
+      component: "select",
     },
     {
       label: "自助终端管理员",
-      prop: "fileds",
+      prop: "managePersonName",
+      component: "input"
     },
     {
       label: "自助终端管理员联系方式",
-      prop: "fileds",
+      prop: "managePersonContact",
+      component: "input"
     },
     {
       label: "生产厂商",
-      prop: "fileds",
+      prop: "manufacturer",
+      component: "input"
     },
     {
       label: "设备技术支撑单位",
-      prop: "fileds",
+      prop: "supportingUnit",
+      component: "input"
     },
     {
       label: "运维人员",
-      prop: "fileds",
+      prop: "operationPersonName",
+      component: "input"
     },
     {
       label: "运维人员联系方式",
-      prop: "fileds",
+      prop: "operationPersonContact",
+      component: "input"
     },
   ],
 });
+watchEffect(() => {
+  if (props.model) {
+    basisForm.model = props.model
+  }
+})
 </script>
 <style lang="scss" scoped>
 .refuse-bottom {

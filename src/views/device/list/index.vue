@@ -1,19 +1,22 @@
 <template>
   <CnPage v-bind="props">
-    <template #proDevCode="slotProps">
-      <span class="blurtext" @click="viewDetail"> {{ slotProps.row.proDevCode }}</span>
+    <template #proDevCode="{row}">
+      <span class="blurtext" @click="viewDetail(row)"> {{ row.proDevCode }}</span>
     </template>
   </CnPage>
   <CnDialog ref="dialogRef" v-bind="dialogProps">
     <el-tabs v-model="activeName" class="demo-tabs">
       <el-tab-pane label="基本信息" name="1">
-        <BasicInfo></BasicInfo>
+        <BasicInfo :model="basicInfoData"></BasicInfo>
       </el-tab-pane>
-      <el-tab-pane label="部署场所" name="2">
-        <DeploymentSite></DeploymentSite>
+      <el-tab-pane label="硬件信息" name="2">
+        <HardwareModule :model="hardwareModuleData"></HardwareModule>
       </el-tab-pane>
-      <el-tab-pane label="配置信息" name="3">
-        <ConfigInfo></ConfigInfo>
+      <el-tab-pane label="部署场所" name="3">
+        <DeploymentSite :model="deploymentSiteData"></DeploymentSite>
+      </el-tab-pane>
+      <el-tab-pane label="配置信息" name="4">
+        <ConfigInfo :model="configInfoData"></ConfigInfo>
       </el-tab-pane>
     </el-tabs>
   </CnDialog>
@@ -165,6 +168,7 @@ import CnDialog from "@/components/cn-page/CnDialog.vue";
 import CnTable from "@/components/cn-page/CnTable.vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 import BasicInfo from "./child/basicInfo.vue";
+import HardwareModule from "./child/hardwareModule.vue";
 import DeploymentSite from "./child/deploymentSite.vue";
 import ConfigInfo from "./child/configInfo.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
@@ -180,6 +184,7 @@ import {
   devGroupList,
   mattersProgrammeListPage,
   devBaseInfoEditList,
+  getDevBaseInfo,
 } from "@/api/device";
 const activeName = ref("1");
 const loading = ref(false);
@@ -192,8 +197,11 @@ const gupList: any = [];
 const matList: any = [];
 const dialogRef = ref<InstanceType<typeof CnDialog>>();
 const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
-const bulkEditTitle = ref('批量编辑')
-const timeSlotList = reactive([{ checked: "", timeName: "周一", startTime: "", endTime: "" }]);
+const basicInfoData = ref();
+const hardwareModuleData = ref();
+const deploymentSiteData = ref();
+const configInfoData = ref();
+const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
 const timeList = reactive([
   { lable: "周一", value: 0 },
   { lable: "周二", value: 1 },
@@ -255,8 +263,7 @@ const mattersProgrammeListPageFun = () => {
 onMounted(async () => {
   getUnitListFun();
   devGroupListFun();
-  mattersProgrammeListPageFun();
-  // const aaa = getUnitListFun().then(res => {return res})
+  mattersProgrammeListPageFun(); 
 });
 
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -692,13 +699,28 @@ const props = reactive<CnPage.Props>({
 });
 
 // 查看详情
-function viewDetail() {
-  dialogRef.value?.open();
+function viewDetail(row : any) {
+  getDevBaseInfo(row.id).then((res: any) => {
+    if(res.code === "200") {    
+      res.data.baseInfo.type = "edit"  
+      res.data.devDeploymentSite.type = "edit"  
+      res.data.devConf.type = "edit"  
+      basicInfoData.value = res.data.baseInfo
+      hardwareModuleData.value = res.data.baseInfo
+      deploymentSiteData.value = res.data.devDeploymentSite
+      configInfoData.value = res.data.devConf
+      dialogRef.value?.open();
+    }
+  })
 }
 
 // 编辑
 function handleEdit({ row }: any) {
-  console.log("编辑");
+  basicInfoData.value = {}
+  hardwareModuleData.value = {}
+  deploymentSiteData.value = {}
+  configInfoData.value = {}
+  dialogRef.value?.open();
 }
 // 筛选
 function handleScreen() {
@@ -748,7 +770,7 @@ const addTime = () => {
   // const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
   if (timeSlotList.length < 7) {
     timeSlotList.push(
-      { checked: "", timeName: "", startTime: "", endTime: "" }
+      { checked: "", startTime: "", endTime: "" }
     )
   } else {
     return
