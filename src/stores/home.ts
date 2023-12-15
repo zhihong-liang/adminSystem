@@ -2,8 +2,8 @@ import { computed, ref } from 'vue'
 import { defineStore } from 'pinia'
 import { Tree2Flat } from '@/utils'
 import { getMenuList as queryMenuList } from '@/api'
-
 import type { TabItem, Menu, BreadcrumbItem } from '@/layout/type'
+import { useLoginStore } from '@/stores'
 
 export interface getMenuListPayloadOptions {
     manual?: boolean // 手动更新，默认自动更新
@@ -23,12 +23,14 @@ export const useHomeStore = defineStore('home', () => {
 
     const menuList = ref<Menu[]>([])  // 菜单列表
     const finalMenuList = computed(() => menuList.value)
-
-    const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+    const loginInfo: any = useLoginStore() // JSON.parse(localStorage.getItem('userInfo'))
     let currentRoleId: number
-    if (userInfo) {
-        currentRoleId = userInfo.currentRoleId
+    
+    if (loginInfo.$state.userInfo) {
+        currentRoleId = loginInfo.$state.userInfo.currentRoleId
     }
+    console.log("是不是每次都更新了", loginInfo.$state.userInfo);
+    
     const flatMenuList = computed<Menu[]>(() => {  // 扁平化菜单列表
         return Tree2Flat(menuList.value, { children: 'childList'})
     })

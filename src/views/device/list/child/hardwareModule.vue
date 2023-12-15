@@ -4,9 +4,6 @@
 <script lang="ts" setup>
 import { reactive, ref, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { useUserStore, useHomeStore } from "@/stores";
-
-const [store, menuList] = [useUserStore(), useHomeStore()];
 const props = defineProps({
   model: {
     type: Object,
@@ -41,8 +38,6 @@ const hardwareForm = reactive({
 watchEffect(() => {
   if (props.model) {
     hardwareForm.model = props.model;
-    console.log(store);
-    console.log(menuList);
   }
 });
 </script>

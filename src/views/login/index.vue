@@ -68,15 +68,16 @@ import { ref, reactive } from 'vue'
 import { ElMessage as Message } from 'element-plus'
 import LoginBg from './components/LoginBg/index.vue'
 import { setToken } from '@/utils/auth'
-import { useUserStore } from '@/stores'
+import { useLoginStore, useUserStore } from '@/stores'
 import { useRouter } from 'vue-router'
 import CryptoJS from 'crypto-js'
 import { login } from '@/api'
 import { queryAreaAll } from '@/hooks/useDivision'
 
-const [router, userStore] = [useRouter(), useUserStore()]
+const [router, userStore, loginInfo] = [useRouter(), useUserStore(), useLoginStore()]
 
 const { updateUserInfo } = userStore
+const { getLoginInfo } = loginInfo
 
 const form = reactive({
   username: localStorage.getItem('userName') || '',
@@ -110,13 +111,13 @@ const handleLogin = async () => {
       }).then(async (res) => {
         setToken(res.data.accessToken)
         updateUserInfo(res.data)
-        localStorage.setItem('userInfo', JSON.stringify(res.data))
+        getLoginInfo(res.data)
+        // localStorage.setItem('userInfo', JSON.stringify(res.data))
         if (form.remember) {
           localStorage.setItem('userName', form.username)
           localStorage.setItem('password', form.password)
           localStorage.setItem('remember', form.remember ? '1' : '0')
         } else {
-          // localStorage.removeItem('userInfo')
           localStorage.removeItem('username')
           localStorage.removeItem('password')
           localStorage.removeItem('remember')

@@ -15,6 +15,9 @@ const storeSetup = () => {
   function updateUserInfo(info: UserInfo) {
     userInfo.value = info
   }
+  function getLoginInfo(info: UserInfo) {
+    userInfo.value = info
+  }
 
   // 获取用户信息
   const getUserInfo =  () => {
@@ -25,9 +28,13 @@ const storeSetup = () => {
   const logout = async () => {
     token.value = ''
   }
-  return { token, userInfo, logout, resetToken, updateUserInfo }
+  return { token, userInfo, logout, resetToken, updateUserInfo, getLoginInfo }
 }
 
 export const useUserStore = defineStore('user', storeSetup, {
   persist: { paths: ['userInfo'] }
 })
+export const useLoginStore = defineStore('loginInfo', storeSetup, {
+  persist: { paths: ['userInfo'] }
+})
+

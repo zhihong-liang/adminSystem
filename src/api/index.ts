@@ -144,6 +144,9 @@ export interface UserInfo {
   userName?: string
   userNo?: string
   userType?: string
+  roleIdList?: []
+  currentRoleId?: number
+  userId?: any
 }
 export interface RoleAuthList {
   authName?: string

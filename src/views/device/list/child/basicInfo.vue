@@ -2,7 +2,7 @@
   <CnForm ref="basisRef" v-bind="basisForm" :value="basisForm.model"></CnForm>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, defineProps, watchEffect } from "vue";
+import { reactive, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 
 const props = defineProps({
@@ -51,12 +51,6 @@ const basisForm = reactive({
       prop: "devModelNo",
       component: "input",
     },
-    // {
-    //   label: "硬件模块",
-    //   prop: "hardware",
-    //   component: "select",
-    //   // dict: "HARDWARE_MODULE" 
-    // },
     {
       label: "设备来源",
       prop: "devSource",
@@ -80,12 +74,12 @@ const basisForm = reactive({
     {
       label: "到货时间",
       prop: "comeTime",
-      component: "input",
+      component: "datepicker",
     },
     {
       label: "安装激活时间",
       prop: "installActivateTime",
-      component: "input",
+      component: "datepicker",
     },
   ],
 });
