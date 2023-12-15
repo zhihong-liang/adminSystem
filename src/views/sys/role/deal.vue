@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed, watch, onMounted } from 'vue'
+import { reactive, ref, nextTick, watch, onMounted } from 'vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { useHomeStore } from '@/stores/home'
 import CnPage from '@/components/cn-page/CnPage.vue'
@@ -45,6 +45,15 @@ const type = ref()
 const treeData = ref([])
 const elTreeRef = ref()
 
+const checkMemuIds = (rule: any, value: any, callback: any) => {
+  console.log('treeData.value: ', treeData.value)
+  if (!treeData.value.includes(45)) {
+    callback(new Error('个人中心必选'))
+  } else {
+    callback()
+  }
+}
+
 const dialogProps: CnPage.DialogProps = reactive({
   title: '新增',
   formProps: {
@@ -59,14 +68,14 @@ const dialogProps: CnPage.DialogProps = reactive({
     ],
     colSpan: 24,
     rules: {
-      type: [{ required: true, message: '请输入类型' }],
-      description: [{ required: true, message: '请输入描述' }]
+      name: [{ required: true, message: '请输入角色名称' }],
+      status: [{ required: true, message: '请选中状态', trigger: 'change' }],
+      menuIds: [{ validator: checkMemuIds, trigger: 'change' }]
     }
   }
 })
 
 const dialogRef = ref()
-const subnodes = []
 const open = (data?: any, _type?: string) => {
   dialogRef.value.open()
   allsubs = getAllKeys(menuList.value)
@@ -82,6 +91,11 @@ const open = (data?: any, _type?: string) => {
     indeterminate.value = false
     allCheck.value = false
     dialogProps.formProps!.disabled = false
+    // 个人中心默认选中
+    dialogProps.formProps!.model = { menuIds: ['45'] }
+    nextTick(() => {
+      elTreeRef.value.setCheckedKeys(['45'], false)
+    })
   } else {
     if (_type === 'view') {
       dialogProps.formProps!.disabled = true
@@ -155,6 +169,8 @@ const handleChaneAllCheck = (val) => {
 }
 
 // 全选 反选 回显
+// 多个子菜单时，不全选不会返回父级菜单ID
+// 若返回父级菜单ID，子菜单会被全部选中
 watch(
   () => treeData.value,
   (val) => {
