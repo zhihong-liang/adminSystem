@@ -97,3 +97,15 @@ export const deleteServiceNotice = (ids: string): Promise<Res> =>
 // 发布-下架服务公告
 export const pushDownServiceNotice = (data: any): Promise<Res> =>
   axios.put('/api/matters/serviceNotice/pushDown', data, {})
+
+/**
+ * 办理须知管理
+ */
+// 查询办理需知管理列表
+export interface HandleNotice {
+  matterCode?: string
+  matterName?: string
+  mattersHandleNoticeStatus?: string
+}
+export const getHandleNoticeList = (data: ListReq<ServiceNotice>): Promise<ListRes> =>
+  axios.post('/api/matters/handleNotice/list', data)
