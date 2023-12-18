@@ -77,6 +77,9 @@ function handleLogOut() {
   router.push("/login");
 }
 function switchRoles() {
+  console.log(",a", loginInfo)
+  console.log("currentRoleId", currentRoleId);
+  console.log(userId);
   const params = {
     obj: {},
     page: 1,
@@ -100,6 +103,7 @@ function switchRoles() {
   })
 }
 function handleScreen() {
+  
   if (currentRoleId === dialogProps.formProps!.model.currentRoleId) {
     ElMessage({
       type: 'error',
@@ -119,14 +123,17 @@ function handleScreen() {
 
         getSysMenuTree({
           currentRoleId: dialogProps.formProps!.model.currentRoleId,
-        }).then((res) => {
+        }).then((tree) => {
           // console.log("新的菜单树", res.data);
-          menuList.$state.menuList = res.data;
-        });
-        localStorage.removeItem("userInfo");
-        localStorage.setItem("userInfo", JSON.stringify(res.data));
+          menuList.$state.menuList = tree.data;
+        });     
+        console.log("是不是每次都一样", res.data);
+        loginInfo.getLoginInfo(res.data)
         router.push("/system/usercenter");
         dialogRef.value?.close();
+        setTimeout(() => {
+          location.reload();
+        }, 100);
       }
     });
   }

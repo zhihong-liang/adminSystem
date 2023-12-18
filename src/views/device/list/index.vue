@@ -835,10 +835,6 @@ const handleCancel = () => {
 // 提交编辑 
 const handleSubmit = () => {
   const flagArr = [basicInfoRef.value.validateForm(), hardwareModuleRef.value.validateForm(), deploymentSiteRef.value.validateForm(), configInfoRef.value.validateForm()]
-  // console.log("3", flagArr);
-  // console.log("4", basicInfoRef.value.validateForm());
-  // const aaaa = hardwareModuleRef.value.validateForm().then((res: any) => { return res})
-  // console.log("4", aaaa);
   let isValidate = false
   const params = {
     baseInfo: basicInfoRef.value.getFormData(),
@@ -857,19 +853,12 @@ const handleSubmit = () => {
       }
     }
     console.log(isValidate);
-    
     if (isValidate) {
       devBaseInfo(params).then(res => {
         console.log(res);
       })
     }
   })
-  
-  // console.log("basicInfoRef", basicInfoRef.value.validateForm())
-  // console.log("bbb", basicInfoRef.value.getFormData())
-  // console.log("hardwareModuleRef", hardwareModuleRef.value.getFormData())
-  // console.log("deploymentSiteRef", deploymentSiteRef.value.getFormData())
-  // console.log("configInfoRef", configInfoRef)
 }
 // 确定
 const determine = () => {

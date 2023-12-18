@@ -16,6 +16,8 @@ const storeSetup = () => {
     userInfo.value = info
   }
   function getLoginInfo(info: UserInfo) {
+    console.log("info", info);
+    
     userInfo.value = info
   }
 
