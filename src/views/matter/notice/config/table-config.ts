@@ -1,0 +1,35 @@
+import type { ActionType } from './type'
+
+export default function getTableConfig(
+  selectionChange?: (selection: any) => void
+): CnPage.TableProps {
+  return {
+    data: [],
+    selectionChange,
+    columns: [
+      { type: 'selection' },
+      { label: '事项编号', prop: 'matterCode', slot: 'matterCode' },
+      { label: '事项名称', prop: 'matterName' },
+      { label: '系统覆盖范围', prop: 'sysCoverage' },
+      { label: '办理类型', prop: 'handleType', dict: 'HANDLE_TYPE' },
+      { label: '办理须知状态', prop: 'status', slot: 'status' },
+      { label: '创建时间', prop: 'createTime' },
+      {
+        label: '操作',
+        prop: 'action',
+        buttons: [
+          {
+            label: '编辑',
+            type: 'text',
+            onClick: (params: any) => {}
+          },
+          {
+            label: '删除',
+            type: 'text',
+            onClick: (params: any) => {}
+          }
+        ]
+      }
+    ]
+  }
+}

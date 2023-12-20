@@ -129,3 +129,14 @@ export const queryMatterMenuRelation = (
   data: MatterMenuRes<MatterMenuRelation>
 ): Promise<ListRes<MatterMenuRelation>> =>
   axios.post('/api/matters/mattersMenuRelation/listPage', data)
+/*
+ * 办理须知管理
+ */
+// 查询办理需知管理列表
+export interface HandleNotice {
+  matterCode?: string
+  matterName?: string
+  mattersHandleNoticeStatus?: string
+}
+export const getHandleNoticeList = (data: ListReq<ServiceNotice>): Promise<ListRes> =>
+  axios.post('/api/matters/handleNotice/list', data)
