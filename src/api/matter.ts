@@ -1,5 +1,11 @@
 import axios from 'axios'
 import type { ListReq, ListRes, Res } from '.'
+import type {
+  MatterMenu,
+  MatterMenuResponse,
+  MatterMenuRelation,
+  MatterMenuRes
+} from '@/views/matter/menu-manage/config/type'
 
 /**
  * 事项列表管理
@@ -97,3 +103,29 @@ export const deleteServiceNotice = (ids: string): Promise<Res> =>
 // 发布-下架服务公告
 export const pushDownServiceNotice = (data: any): Promise<Res> =>
   axios.put('/api/matters/serviceNotice/pushDown', data, {})
+
+/**
+ * 菜单管理
+ */
+
+// 查询事项菜单列表(不分页)
+export const queryMatterMenulist_No = (data: MatterMenu): Promise<Res<MatterMenuResponse[]>> =>
+  axios.post('/api/matters/mattersMenu/list', data)
+
+// 查询事项菜单列表(分页)
+export const queryMatterMenulist = (data: MatterMenuRes<MatterMenu>): Promise<ListRes<MatterMenuResponse>> =>
+  axios.post('/api/matters/mattersMenu/listPage', data)
+
+// 新增事项菜单
+export const addMatterMenu = (data: MatterMenu): Promise<Res> =>
+  axios.post('/api/matters/mattersMenu', data)
+
+// 查询菜单-事项关联表列表(不分页)
+export const queryMatterMenuRelation_No = (data: MatterMenu): Promise<Res> =>
+  axios.post('/api/matters/mattersMenuRelation/listPage', data)
+
+// 查询菜单-事项关联表列表(分页)
+export const queryMatterMenuRelation = (
+  data: MatterMenuRes<MatterMenuRelation>
+): Promise<ListRes<MatterMenuRelation>> =>
+  axios.post('/api/matters/mattersMenuRelation/listPage', data)

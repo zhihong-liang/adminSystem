@@ -102,6 +102,10 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
+  if (to.path === '/login') {
+    resetAll()
+  }
+
   if (hasToken) {
     if (refresh.value && menuList.value.length) {
       await dymanicAddRoute(menuList.value, modules.value)
@@ -127,8 +131,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       }
     }
   } else {
-    resetAll()
-
     if (to.path !== '/login') {
       next('/login')
     } else {

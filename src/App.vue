@@ -14,7 +14,7 @@ const modules = import.meta.glob('./views/**/*.vue')
 const components = Object.keys(modules).reduce<Record<string, any>>((prev, cur) => {
   prev[cur.replace('.', '')] = modules[cur]
   return prev
-}, {}) as any
+}, {})
 
 updateModules(components)
 

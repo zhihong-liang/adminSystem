@@ -22,7 +22,6 @@ export const useHomeStore = defineStore('home', () => {
     }
 
     const menuList = ref<Menu[]>([])  // 菜单列表
-    const finalMenuList = computed(() => menuList.value)
     const loginInfo: any = useLoginStore() // JSON.parse(localStorage.getItem('userInfo'))
     let currentRoleId: number
     
