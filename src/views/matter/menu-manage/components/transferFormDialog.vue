@@ -1,9 +1,9 @@
 <template>
-  <CnDialog title="增加事项" width="70%" ref="dialogRef">
+  <CnDialog title="增加事项" width="75%" ref="dialogRef">
     <div class="transfer-form-dialog-root flex flex-around">
       <div>
         <h3>选择事项（共{{ leftTableProps.data.length }}项）</h3>
-        <CnTable v-bind="leftTableProps" />
+        <CnTable v-bind="leftTableProps"> </CnTable>
       </div>
 
       <div class="flex flex-center ml-lg mr-lg">
@@ -36,61 +36,22 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, reactive, ref } from 'vue'
+import { queryMatterRelationListThemeMenu } from '@/api/matter'
 
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import CnTable from '@/components/cn-page/CnTable.vue'
 
-const mockData = [
-  {
-    matterCode: '121',
-    matterName: '某某事项办理',
-    matterAlias: '社保清单打印',
-    entryUnitText: '某某单位',
-    handleType: '打印类',
-    status: 1
-  },
-  {
-    matterCode: '122',
-    matterName: '某某事项办理',
-    matterAlias: '社保清单打印',
-    entryUnitText: '某某单位',
-    handleType: '打印类',
-    status: 1
-  },
-  {
-    matterCode: '123',
-    matterName: '某某事项办理',
-    matterAlias: '社保清单打印',
-    entryUnitText: '某某单位',
-    handleType: '打印类',
-    status: 1
-  },
-  {
-    matterCode: '124',
-    matterName: '某某事项办理',
-    matterAlias: '社保清单打印',
-    entryUnitText: '某某单位',
-    handleType: '打印类',
-    status: 1
-  },
-  {
-    matterCode: '125',
-    matterName: '某某事项办理',
-    matterAlias: '社保清单打印',
-    entryUnitText: '某某单位',
-    handleType: '打印类',
-    status: 1
-  }
-]
+
+const emits = defineEmits(['submit'])
 
 const DEFAULT_TABLE_COLUMNS = [
-  { type: 'selection', width: '55' },
+  { type: 'selection' },
   { prop: 'matterCode', label: '事项编号' },
   { prop: 'matterName', label: '事项名称' },
   { prop: 'matterAlias', label: '事项别名', dict: 'MATTERS_MENU_LEVEL' },
   { prop: 'entryUnitText', label: '事项进驻单位', dict: 'MENU_STATUS' },
   { prop: 'handleType', label: '办理类型', dict: 'HANDLE_TYPE' },
-  { prop: 'status', label: '事项状态', dict: 'START_STOP' },
+  { prop: 'matterStatus', label: '事项状态', dict: 'START_STOP' },
   {
     prop: 'action',
     label: '操作',
@@ -101,20 +62,20 @@ const DEFAULT_TABLE_COLUMNS = [
 const leftTableProps = reactive<any>({
   data: [],
   columns: DEFAULT_TABLE_COLUMNS.filter((c) => c.prop !== 'action'),
+  rowKey: 'id',
+  reserveSelection: true,
+  maxHeight: '500px',
   selectionChange: handleSelectionChange,
   selectedList: []
 })
 
 const rightTableProps = reactive<any>({
   data: [],
-  columns: DEFAULT_TABLE_COLUMNS.filter((c) => !c.type)
+  columns: DEFAULT_TABLE_COLUMNS.filter((c) => !c.type),
+  maxHeight: '500px'
 })
 
 const buttons = reactive({
-  // left: {
-  //   disable: computed(() => !rightTableProps.data.length),
-  //   onClick: () => {}
-  // },
   right: {
     disable: computed(() => !leftTableProps.selectedList.length),
     onClick: transferData4LeftForm
@@ -132,23 +93,42 @@ function transferData4LeftForm() {
 function handleActionClick(params: any) {
   const { row } = params
   rightTableProps.data = rightTableProps.data.filter((t: any) => t.matterCode !== row.matterCode)
-  console.log(leftTableProps.selectedList)
-  // leftTableProps.selectedList = leftTableProps.selectedList.filter(
-  //   (t: any) => t.matterCode !== row.matterCode
-  // )
+}
+
+function handleCancel() {
+  reset()
+  close()
+}
+
+function reset() {
+  leftTableProps.selectedList = []
+  rightTableProps.data = []
+}
+
+function handleSubmit() {
+  emits('submit', rightTableProps.data)
+  reset()
+  close()
+}
+
+function getMatterMenuList() {
+  queryMatterRelationListThemeMenu({}).then((res) => {
+    if (res.code === '200') {
+      leftTableProps.data = res.data
+    }
+  })
 }
 
 const dialogRef = ref()
 function open() {
   dialogRef.value!.open()
 }
-
-function handleCancel() {}
-
-function handleSubmit() {}
+function close() {
+  dialogRef.value!.close()
+}
 
 onBeforeMount(() => {
-  leftTableProps.data = mockData
+  getMatterMenuList()
 })
 
 defineExpose({ open })

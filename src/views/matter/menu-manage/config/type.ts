@@ -28,7 +28,7 @@ export interface MatterMenu {
 }
 
 export interface MenuRelationItem {
-  id: number
+  id?: number
   matterCode?: string
   matterName?: string
   entryUnit?: number
@@ -68,6 +68,22 @@ export interface MatterMenuResponse {
 export interface MatterMenuRelation {
   entryUnit?: number
   entryUnitText?: string
+  handleType?: string
+  id?: number
+  matterAlias?: string
+  matterCode?: string
+  matterName?: string
+  matterStatus?: string
+  mattersId?: number
+  menuId?: number
+  sort?: number
+  sortTop?: number
+  status?: string
+}
+
+export interface MatterThemeMenuItem {
+  editStatus?: string
+  entryUnit?: number
   handleType?: string
   id?: number
   matterAlias?: string

@@ -102,6 +102,8 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
+  console.log('to: ', to)
+
   if (to.path === '/login') {
     resetAll()
   }
@@ -111,13 +113,13 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
 
-      next({ path: to.path }) // 动态添加路由后，要重新再调一次next(to.path)，不能直接next()
+      next({ path: to.path, query: to.query }) // 动态添加路由后，要重新再调一次next(to.path)，不能直接next()
     } else {
       // 发现没有菜单列表数据，先请求菜单接口，再重新跑一次守卫逻辑，下一次就不会跑进这里
       if (!menuList.value.length) {
         await getMenuList({})
 
-        next({ path: to.path })
+        next({ path: to.path, query: to.query })
       } else {
         if (to.path !== '/login') {
           addTabToList({

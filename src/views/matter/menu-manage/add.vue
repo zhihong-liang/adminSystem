@@ -10,13 +10,16 @@
 
     <h2 class="mb-lg">事项列表</h2>
     <CnPage v-bind="pageProps"></CnPage>
-    <TransferFormDialog ref="transferFormDialogRef" />
+    <TransferFormDialog ref="transferFormDialogRef" @submit="handleDialogSubmit" />
+
+    <el-button type="primary" @click="handleAddMatterMenu">添加</el-button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { onBeforeMount, reactive, ref } from 'vue'
-import { queryMatterMenuRelation, queryMatterMenulist_No } from '@/api/matter'
+import { computed, onBeforeMount, reactive, ref } from 'vue'
+import { useRoute } from 'vue-router'
+import { queryMatterMenuRelation, queryMatterMenulist_No, addMatterMenu } from '@/api/matter'
 import { getUnitList as queryUnitList } from '@/api/admin'
 
 import CnForm from '@/components/cn-page/CnForm.vue'
@@ -24,11 +27,25 @@ import CnPage from '@/components/cn-page/CnPage.vue'
 import CnIcon from '@/components/cn-page/CnIcon.vue'
 import TransferFormDialog from './components/transferFormDialog.vue'
 
-import type { MatterMenuResponse } from '@/views/matter/menu-manage/config/type'
+import type {
+MatterMenu,
+  MatterMenuResponse,
+  MatterThemeMenuItem
+} from '@/views/matter/menu-manage/config/type'
 import type { Resolve } from 'element-plus/lib/components/cascader-panel/index.js'
 
+const route = useRoute()
+
+const model = computed(() => route.query.action)
+
 const formProps: CnPage.FormProps = reactive({
-  model: {},
+  model: {
+    menuName: '社保测试菜单',
+    description: '这是测试的菜单',
+    remark: '这是社保测试菜单',
+    menuIcon: 'Odometer',
+    backColor: 'red'
+  },
   labelPosition: 'left',
   labelWidth: '100',
   items: [
@@ -53,6 +70,7 @@ const formProps: CnPage.FormProps = reactive({
       component: 'cascader',
       props: {
         props: {
+          checkStrictly: true,
           lazy: true,
           lazyLoad: handleLazyLoad
         }
@@ -62,7 +80,7 @@ const formProps: CnPage.FormProps = reactive({
   rules: {
     menuName: [{ required: true, message: '请输入菜单名称' }],
     backColor: [{ required: true, message: '请输入背景颜色' }],
-    parentId: [{ required: true, message: '请选择上级菜单' }]
+    // parentId: [{ required: true, message: '请选择上级菜单' }]
   }
 })
 
@@ -108,7 +126,7 @@ const pageProps: CnPage.Props = reactive({
       { prop: 'matterAlias', label: '事项别名', dict: 'MATTERS_MENU_LEVEL' },
       { prop: 'entryUnitText', label: '事项进驻单位', dict: 'MENU_STATUS' },
       { prop: 'handleType', label: '办理类型', dict: 'HANDLE_TYPE' },
-      { prop: 'status', label: '事项状态', dict: 'START_STOP' },
+      { prop: 'matterStatus', label: '事项状态', dict: 'START_STOP' },
       { prop: 'sort', label: '排序' },
       {
         prop: 'action',
@@ -118,10 +136,11 @@ const pageProps: CnPage.Props = reactive({
       }
     ]
   },
-  pagination: true,
+  pagination: model.value !== 'add',
   refresh: new Date().getTime(),
   transformRequest: (params) => ({ obj: params })
 })
+const tableData = ref<MatterThemeMenuItem[]>([])
 
 const transferFormDialogRef = ref()
 
@@ -144,6 +163,27 @@ function handleLazyLoad(node: any, resolve: Resolve) {
   })
 }
 
+function handleAddMatterMenu() {
+  const params: MatterMenu = {
+    ...formProps.model,
+    menuRelationList: tableData.value,
+    menuLevel: !!formProps.model.parentId ? formProps.model.parentId + 1 : 1
+  }
+
+  addMatterMenu(params).then(res => {
+    console.log('res: ', res);
+  })
+  console.log('params: ', params)
+}
+
+function handleDialogSubmit(list: MatterThemeMenuItem[]) {
+  if (model.value === 'add' && list.length) {
+    pageProps.action = () => Promise.resolve({ rows: list, total: null })
+    pageProps.refresh = new Date().getTime()
+    tableData.value = list
+  }
+}
+
 // 获取事项进驻单位
 function getUnitList() {
   const params = {
@@ -163,6 +203,10 @@ function getUnitList() {
 
 onBeforeMount(() => {
   getUnitList()
+
+  if (model.value === 'add') {
+    pageProps.action = () => Promise.resolve({ rows: [], total: null })
+  }
 })
 </script>
 

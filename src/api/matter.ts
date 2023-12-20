@@ -4,7 +4,8 @@ import type {
   MatterMenu,
   MatterMenuResponse,
   MatterMenuRelation,
-  MatterMenuRes
+  MatterMenuRes,
+  MatterThemeMenuItem
 } from '@/views/matter/menu-manage/config/type'
 
 /**
@@ -116,9 +117,13 @@ export const queryMatterMenulist_No = (data: MatterMenu): Promise<Res<MatterMenu
 export const queryMatterMenulist = (data: MatterMenuRes<MatterMenu>): Promise<ListRes<MatterMenuResponse>> =>
   axios.post('/api/matters/mattersMenu/listPage', data)
 
-// 新增事项菜单
+// 新增/复制 事项菜单
 export const addMatterMenu = (data: MatterMenu): Promise<Res> =>
   axios.post('/api/matters/mattersMenu', data)
+
+// 删除事项菜单
+export const delMatterMenu = (data: any): Promise<Res> =>
+  axios.delete(`/api/matters/mattersMenu/${data.ids}`)
 
 // 查询菜单-事项关联表列表(不分页)
 export const queryMatterMenuRelation_No = (data: MatterMenu): Promise<Res> =>
@@ -129,6 +134,13 @@ export const queryMatterMenuRelation = (
   data: MatterMenuRes<MatterMenuRelation>
 ): Promise<ListRes<MatterMenuRelation>> =>
   axios.post('/api/matters/mattersMenuRelation/listPage', data)
+
+// 查询菜单-未加入该标签主题(不分页)
+export const queryMatterRelationListThemeMenu = (
+  data: MatterThemeMenuItem
+): Promise<Res<MatterThemeMenuItem[]>> =>
+  axios.post('/api/matters/mattersMenuRelation/listMenuMatters', data)
+
 /*
  * 办理须知管理
  */

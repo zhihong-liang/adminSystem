@@ -1,18 +1,20 @@
 <template>
   <CnPage v-bind="props"></CnPage>
+  <MenuDialog ref="menuDialogRef" @success="() => (props.refresh = new Date().getTime())" />
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
-import { useRouter } from 'vue-router'
-import { queryMatterMenulist_No } from '@/api/matter'
+import { reactive, ref } from 'vue'
+import useConfirm from '@/hooks/useConfirm'
+import { queryMatterMenulist_No, delMatterMenu } from '@/api/matter'
+
+import CnPage from '@/components/cn-page/CnPage.vue'
+import MenuDialog from './components/menuDialog.vue'
 
 import type { MatterMenu, MatterMenuResponse } from '@/views/matter/menu-manage/config/type'
 
-import CnPage from '@/components/cn-page/CnPage.vue'
-
-const router = useRouter()
-
+const menuDialogRef = ref()
+const selectedList = ref<MatterMenuResponse[]>([]) // table选中的数据
 const props: CnPage.Props = reactive({
   params: {},
   action: queryMatterMenulist_No,
@@ -29,12 +31,17 @@ const props: CnPage.Props = reactive({
       {
         label: '新增',
         type: 'primary',
-        onClick: () => router.push('/matter/menuManage/add')
+        onClick: () => {
+          dialogProps.model = 'add'
+          dialogProps.data = {} as any
+          menuDialogRef.value.open(dialogProps)
+        }
       },
       {
         label: '删除',
         type: 'primary',
-        plain: true
+        plain: true,
+        onClick: () => handleDelete(selectedList.value)
       }
     ]
   },
@@ -53,23 +60,57 @@ const props: CnPage.Props = reactive({
       {
         prop: 'action',
         label: '操作',
-        minWidth: 120,
+        minWidth: 150,
         buttons: [
-          { label: '编辑', type: 'primary', text: true },
-          { label: '删除', type: 'primary', text: true },
+          { label: '编辑', type: 'primary', text: true, onClick: handleEdit },
+          { label: '选择事项', type: 'primary', text: true },
+          { label: '删除', type: 'primary', text: true, onClick: ({ row }) => handleDelete(row) },
           { label: '复制', type: 'primary', text: true }
         ]
       }
     ],
     lazy: true,
     load: TableLoad,
-    treeProps: { children: 'children', hasChildren: 'open' }
+    treeProps: { children: 'children', hasChildren: 'open' },
+    selectionChange: (list) => (selectedList.value = list)
   },
   pagination: false,
   refresh: new Date().getTime(),
   transformRequest: (params) => params,
   transformResponse: (params) => ({ rows: params.data, total: 0 })
 })
+
+const dialogProps = reactive({
+  model: 'add',
+  data: {
+    menuName: '社保测试菜单',
+    description: '这是测试的菜单',
+    remark: '这是社保测试菜单',
+    menuIcon: 'Odometer',
+    backColor: 'red'
+  }
+})
+
+function handleEdit({ row }: any) {
+  dialogProps.model = 'edit'
+  dialogProps.data = row
+  menuDialogRef.value.open(dialogProps)
+}
+
+function handleDelete(row: MatterMenu | Array<MatterMenuResponse>) {
+  const opts = {
+    message: '确定删除菜单吗?',
+    title: '删除',
+    action: () =>
+      delMatterMenu({
+        ids: Array.isArray(row) ? row.map((m) => m.id).join(',') : row.id || ''
+      }),
+    success: () => {
+      props.refresh = new Date().getTime()
+    }
+  }
+  useConfirm(opts)
+}
 
 function TableLoad(
   row: MatterMenuResponse,
