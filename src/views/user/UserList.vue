@@ -47,7 +47,6 @@
                 :data="item.limitsList"
                 :props="defaultProps"
                 node-key="id"
-                @node-click="handleNodeClick"
                 show-checkbox
                 :default-checked-keys="item.checkedKeys"
                 class="defTreecs"
@@ -55,6 +54,7 @@
             </el-col>
             <el-col :span="24">
               <div>数据权限</div>
+              <GetAuth :data="item.choseData" v-if="item.choseData?.length" />
               <el-tree
                 v-model="item.areaCode"
                 :key="item.areaCode"
@@ -74,6 +74,7 @@
                         v-model="item.authData[data.value]"
                         component="checkbox"
                         dict="DATA_PERMISSION_POLICY"
+                        @change="() => changeDict(index)"
                       />
                     </div>
                   </div>
@@ -93,7 +94,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, watch } from 'vue'
+import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import {
@@ -112,14 +113,7 @@ import {
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 import { phone, mobile } from '@/utils/pattern'
 import { Plus } from '@element-plus/icons-vue'
-
-const handleCheckChange = (data: Division2, checked: boolean, index: number) => {
-  if (checked) {
-    model.authList[index].areaCode.push(data.value)
-  } else {
-    model.authList[index].areaCode = model.authList[index].areaCode.filter((v: string) => v !== data.value)
-  }
-}
+import GetAuth from './child/getAuth.vue'
 
 interface Tree {
   name: string
@@ -143,6 +137,7 @@ interface AuthTs {
   cityCode?: string
   provinceCode?: string
   userAuthDataList?: any[]
+  choseData: any[]
 }
 
 const defaultProps = {
@@ -150,9 +145,7 @@ const defaultProps = {
   label: 'name',
   disabled: 'disabled'
 }
-const handleNodeClick = (data: Tree) => {
-  console.log(data)
-}
+
 const model = reactive<{
   authList: AuthTs[]
 }
@@ -163,126 +156,7 @@ const authRef = ref();
 const setLoading = ref(false)
 const titleType = ref()
 
-const addAuth = () => {
-  model.authList.push({
-    unitType: "",
-  } as AuthTs)
-}
-
-const delAuth = (index: number) => {
-  model.authList.splice(index, 1)
-}
-
-// 查询岗位
-const postList = ref([] as any)
-const queryPostList = () => {
-  getDeptpostList({
-    page: 1,
-    size: 999,
-    obj: {}
-  }).then((res) => {
-    postList.value = res.rows
-  })
-}
-
-// 查询单位类型
-const unitTypeList = ref([] as any)
-const queryUnitList = () => {
-  getUnitTypeList({
-    page: 1,
-    size: 999,
-    obj: {}
-  }).then((res) => {
-    unitTypeList.value = res.rows
-  })
-}
-
-// 查询单位
-const unitList = ref([] as any)
-function changeUnit(val: string, index: number, type: string) {
-  if(type !== 'detail'){
-    model.authList[index].unitId = ""
-    model.authList[index].areaCode = []
-    model.authList[index].division = []
-    model.authList[index].authData = {}
-  }
-  getUnitList({
-    page:1,
-    size:999,
-    obj: {
-      unitType: val
-    }
-  }).then((res) => {
-    unitList.value = res.rows
-  })
-}
-
-// 获取数据权限
-const getPermit = (val: number, index: number) => {
-  getUnitDetail(val).then((res) => {
-    model.authList[index].permiObj = res.data
-
-    const code = [
-    model.authList[index].permiObj.villageCode,
-    model.authList[index].permiObj.streetCode,
-    model.authList[index].permiObj.districtCode,
-    model.authList[index].permiObj.cityCode,
-    model.authList[index].permiObj.provinceCode
-    ]
-    const idx = code.findIndex(Boolean)
-    console.log("idx", idx, code[idx])
-    if (code[idx]) {
-      model.authList[index].areaCode = [code[idx] as string]
-      model.authList[index].division = useDivision(code[idx] as string).value
-    } else {
-      model.authList[index].areaCode = []
-      model.authList[index].division = []
-    }
-
-    const permissions = model.authList[index].permiObj.permissions as Unit['permissions']
-    if (permissions) {
-      model.authList[index].areaCode = permissions.map((v) => v.regionCode)
-      model.authList[index].authData = permissions.reduce(
-        (acc, cur) => {
-          acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
-          return acc
-        },
-        {} as Record<string, string[]>
-      )
-    }
-  })
-}
-
-// 查询角色
-const RoleList = ref([] as any)
-const queryRoleList = () => {
-  getRoleList({
-    page: 1,
-    size: 999,
-    obj: {}
-  }).then((res) => {
-    RoleList.value = res.rows
-  })
-}
-
-const arrChild = (arr: any) => {
-  arr.forEach((e: Tree) => {
-    e.disabled = true
-    if (e.childList?.length) {
-      arrChild(e.childList)
-    }
-  });
-  return arr
-}
-
-const changeRole = (val: number, index: number) => {
-  model.authList[index].limitsList = []
-  getRoleDetail(val).then((res) => {
-    model.authList[index].limitsList = arrChild(res.data.menuList)
-    model.authList[index].checkedKeys = res.data.menuIds
-  })
-}
-
+// 打开新增/编辑/查看
 function operateUser(type = 'add', data = {} as UserTs) {
   titleType.value = type
   queryPostList();
@@ -328,6 +202,9 @@ function operateUser(type = 'add', data = {} as UserTs) {
               {} as Record<string, string[]>
             )
           }
+
+          // 已选数据
+          changeDict(ind)
         });
       }
     }) 
@@ -337,6 +214,7 @@ function operateUser(type = 'add', data = {} as UserTs) {
   dialogRef.value?.open()
 }
 
+// 提交表单
 const handleSubmit = (val: any) => {
   const valid1 = val.ref.formRef.validate();
   const valid2 = authRef.value.validate()
@@ -374,6 +252,154 @@ const handleSubmit = (val: any) => {
       setLoading.value = false
     })
   })
+}
+
+const handleCheckChange = (data: Division2, checked: boolean, index: number) => {
+  if (checked) {
+    model.authList[index].areaCode.push(data.value)
+  } else {
+    delete model.authList[index].authData[data.value]
+    model.authList[index].choseData = model.authList[index].choseData.filter((v) => v.areaValue !== data.value)
+    model.authList[index].areaCode = model.authList[index].areaCode.filter((v: string) => v !== data.value)
+  }
+}
+
+const addAuth = () => {
+  model.authList.push({
+    unitType: "",
+  } as AuthTs)
+}
+
+const delAuth = (index: number) => {
+  model.authList.splice(index, 1)
+}
+
+// 查询岗位
+const postList = ref([] as any)
+const queryPostList = () => {
+  getDeptpostList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    postList.value = res.rows
+  })
+}
+
+// 查询单位类型
+const unitTypeList = ref([] as any)
+const queryUnitList = () => {
+  getUnitTypeList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    unitTypeList.value = res.rows
+  })
+}
+
+// 查询单位
+const unitList = ref([] as any)
+function changeUnit(val: string, index: number, type: string) {
+  if(type !== 'detail'){
+    model.authList[index].unitId = ""
+    model.authList[index].areaCode = []
+    model.authList[index].division = []
+    model.authList[index].authData = {}
+    model.authList[index].choseData = []
+  }
+  getUnitList({
+    page:1,
+    size:999,
+    obj: {
+      unitType: val
+    }
+  }).then((res) => {
+    unitList.value = res.rows
+  })
+}
+
+// 获取数据权限
+const getPermit = (val: number, index: number) => {
+  model.authList[index].choseData = []
+  getUnitDetail(val).then((res) => {
+    model.authList[index].permiObj = res.data
+
+    const code = [
+    model.authList[index].permiObj.villageCode,
+    model.authList[index].permiObj.streetCode,
+    model.authList[index].permiObj.districtCode,
+    model.authList[index].permiObj.cityCode,
+    model.authList[index].permiObj.provinceCode
+    ]
+    const idx = code.findIndex(Boolean)
+    if (code[idx]) {
+      model.authList[index].areaCode = [code[idx] as string]
+      model.authList[index].division = useDivision(code[idx] as string).value
+    } else {
+      model.authList[index].areaCode = []
+      model.authList[index].division = []
+    }
+
+    const permissions = model.authList[index].permiObj.permissions as Unit['permissions']
+    if (permissions) {
+      model.authList[index].areaCode = permissions.map((v) => v.regionCode)
+      model.authList[index].authData = permissions.reduce(
+        (acc, cur) => {
+          acc[cur.regionCode] = cur.dataPermissionPolicy?.split(',')
+          return acc
+        },
+        {} as Record<string, string[]>
+      )
+
+      changeDict(index)
+    }
+  })
+}
+
+// 查询角色
+const RoleList = ref([] as any)
+const queryRoleList = () => {
+  getRoleList({
+    page: 1,
+    size: 999,
+    obj: {}
+  }).then((res) => {
+    RoleList.value = res.rows
+  })
+}
+
+const arrChild = (arr: any) => {
+  arr.forEach((e: Tree) => {
+    e.disabled = true
+    if (e.childList?.length) {
+      arrChild(e.childList)
+    }
+  });
+  return arr
+}
+
+const changeRole = (val: number, index: number) => {
+  model.authList[index].limitsList = []
+  getRoleDetail(val).then((res) => {
+    model.authList[index].limitsList = arrChild(res.data.menuList)
+    model.authList[index].checkedKeys = res.data.menuIds
+  })
+}
+
+const changeDict = (index: number) => {
+  const arr = model.authList[index].authData
+  const arrea = model.authList[index].areaCode
+  model.authList[index].choseData = []
+  for (let item of arrea) {
+    if (arr[item]) {
+      model.authList[index].choseData.push({
+        areaValue: item,
+        areaName: useDivision(item).value[0].label,
+        authName: arr[item]
+      })
+    }
+  }
 }
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
@@ -414,7 +440,7 @@ const dialogProps = reactive<CnPage.DialogProps>({
     }
   },
   onSubmit: () => {
-    console.log({ ...dialogProps.formProps?.model })
+    // console.log({ ...dialogProps.formProps?.model })
     return new Promise((resolve) => {
       setTimeout(() => {
         resolve('')
