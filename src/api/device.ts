@@ -18,6 +18,9 @@ export const devBaseInfoStop = (ids: string): Promise<ListRes> =>
 // 注销
 export const devBaseInfoLogoff = (ids: string): Promise<ListRes> =>
   axios.get(device + `/devBaseInfo/logoff/${ids}`)
+// 导出
+export const devBaseInfoExport = (data: any): Promise<ListRes> =>
+  axios.post(device + `/devBaseInfo/export`, data, { responseType: 'blob' })
 // 获取设备基本信息详细信息
 export const getDevBaseInfo = (ids: string): Promise<ListRes> =>
   axios.get(device + `/devBaseInfo/${ids}`)
@@ -32,7 +35,10 @@ export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/listPage', data)
 // 批量修改
 export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
-  axios.post(`/devBaseInfo/editList`, data)
+  axios.post(device + `/devBaseInfo/editList`, data)
+// 修改设备基本信息
+export const devBaseInfo = (data: any): Promise<ListRes> =>
+  axios.post(device + `/devBaseInfo`, data)
 // 查询方案列表
 export const mattersProgrammeList = (data: any): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/list', data)

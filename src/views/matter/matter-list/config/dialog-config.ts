@@ -45,8 +45,11 @@ export function getLabelActionDialogConfig(params: getDialogConfigParams): CnPag
 }
 
 // 新建事项
-export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, optionsMap, visible } = params
+export function getAddActionDialogConfig(
+  params: getDialogConfigParams,
+  entryUnitValidator?: (rule: any, value: any, callback: any) => void
+): CnPage.DialogProps {
+  const { dialogSubmitSuccess, optionsMap, visible, onClose } = params
   return {
     title: '新建',
     formProps: {
@@ -64,7 +67,7 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
         {
           label: '事项进驻单位',
           prop: 'entryUnit',
-          component: 'input'
+          component: 'slot'
         },
         {
           label: '业务部门',
@@ -168,7 +171,13 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
       colSpan: 18,
       rules: {
         matterName: [{ required: true, message: '请输入事项名称' }],
-        entryUnit: [{ required: true, message: '请输入事项进驻单位' }],
+        entryUnit: [
+          { required: true, message: '请输入事项进驻单位' },
+          {
+            validator: entryUnitValidator,
+            trigger: 'blur'
+          }
+        ],
         businessUnit: [{ required: true, message: '请输入业务部门' }],
         businessSystemName: [{ required: true, message: '请输入业务系统名称' }],
         matterType: [{ required: true, message: '请选择事项类型' }],
@@ -184,13 +193,17 @@ export function getAddActionDialogConfig(params: getDialogConfigParams): CnPage.
         networdPolicy: [{ required: true, message: '请选择网络策略' }]
       }
     },
-    onSuccess: dialogSubmitSuccess
+    onSuccess: dialogSubmitSuccess,
+    onClose
   }
 }
 
 // 编辑事项
-export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, activeName, optionsMap, model, visible } = params
+export function getEditActionDialogConfig(
+  params: getDialogConfigParams,
+  entryUnitValidator?: (rule: any, value: any, callback: any) => void
+): CnPage.DialogProps {
+  const { dialogSubmitSuccess, activeName, optionsMap, model, visible, onClose } = params
   const basicInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
     {
@@ -223,7 +236,7 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
     {
       label: '事项进驻单位',
       prop: 'entryUnit',
-      component: 'input'
+      component: 'slot'
     },
     {
       label: '业务系统名称',
@@ -323,7 +336,13 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
       colSpan: 12,
       rules: {
         matterName: [{ required: true, message: '请输入事项名称' }],
-        entryUnit: [{ required: true, message: '请输入事项进驻单位' }],
+        entryUnit: [
+          { required: true, message: '请输入事项进驻单位' },
+          {
+            validator: entryUnitValidator,
+            trigger: 'blur'
+          }
+        ],
         businessUnit: [{ required: true, message: '请输入业务部门' }],
         businessSystemName: [{ required: true, message: '请输入业务系统名称' }],
         matterType: [{ required: true, message: '请选择事项类型' }],
@@ -335,13 +354,14 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
         networdPolicy: [{ required: true, message: '请选择网络策略' }]
       }
     },
-    onSuccess: dialogSubmitSuccess
+    onSuccess: dialogSubmitSuccess,
+    onClose
   }
 }
 
 // 事项详情
 export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { activeName, model, visible } = params
+  const { activeName, model, visible, onClose } = params
   const basicInfoItems: CnPage.FormItem[] = [
     { label: '', component: 'slot', prop: 'tabs', labelWidth: '0px', span: 24 },
     { label: '事项名称', prop: 'matterName' },
@@ -429,6 +449,7 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
       items: [...(activeName === 'basicInfo' ? basicInfoItems : configInfoItems)],
       labelWidth: 120,
       colSpan: 12
-    }
+    },
+    onClose
   }
 }

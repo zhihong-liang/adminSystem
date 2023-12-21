@@ -4,20 +4,23 @@
 <script lang="ts" setup>
 import { reactive, ref, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { useUserStore, useHomeStore } from "@/stores";
-
-const [store, menuList] = [useUserStore(), useHomeStore()];
 const props = defineProps({
   model: {
     type: Object,
     default: () => ({}),
   },
 });
+
+const hardwareRef = ref()
+
 const hardwareForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
   disabled: props.model.type === "edit" ? true : false,
+  rules: {
+    hardware: [{ required: true, message: "请选择硬件模块" }],
+  },
   items: [
     {
       label: "硬件模块",
@@ -38,11 +41,33 @@ const hardwareForm = reactive({
     },
   ],
 });
+
+const validateForm = () => {
+  // let flag = null;
+  // hardwareRef.value.formRef.validate((valid: boolean) => {
+  //   if (valid) {
+  //     flag = true;
+  //   } else {
+  //     flag = false;
+  //   }
+  // });
+  // return flag;
+  return hardwareRef.value.formRef.validate((valid: boolean) => {
+    if (valid) {
+      return true
+    } else {
+      return false
+    }
+  });
+};
+const getFormData = () => {
+  return hardwareForm.model
+}
+defineExpose({ validateForm, getFormData });
+
 watchEffect(() => {
   if (props.model) {
     hardwareForm.model = props.model;
-    console.log(store);
-    console.log(menuList);
   }
 });
 </script>

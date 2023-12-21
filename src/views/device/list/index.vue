@@ -1,24 +1,28 @@
 <template>
   <CnPage v-bind="props">
-    <template #proDevCode="{row}">
+    <template #proDevCode="{ row }">
       <span class="blurtext" @click="viewDetail(row)"> {{ row.proDevCode }}</span>
     </template>
   </CnPage>
   <CnDialog ref="dialogRef" v-bind="dialogProps">
     <el-tabs v-model="activeName" class="demo-tabs">
       <el-tab-pane label="基本信息" name="1">
-        <BasicInfo :model="basicInfoData"></BasicInfo>
+        <BasicInfo ref="basicInfoRef" :model="basicInfoData"></BasicInfo>
       </el-tab-pane>
       <el-tab-pane label="硬件信息" name="2">
-        <HardwareModule :model="hardwareModuleData"></HardwareModule>
+        <HardwareModule ref="hardwareModuleRef" :model="hardwareModuleData"></HardwareModule>
       </el-tab-pane>
       <el-tab-pane label="部署场所" name="3">
-        <DeploymentSite :model="deploymentSiteData"></DeploymentSite>
+        <DeploymentSite ref="deploymentSiteRef" :model="deploymentSiteData"></DeploymentSite>
       </el-tab-pane>
       <el-tab-pane label="配置信息" name="4">
-        <ConfigInfo :model="configInfoData"></ConfigInfo>
+        <ConfigInfo ref="configInfoRef" :model="configInfoData"></ConfigInfo>
       </el-tab-pane>
     </el-tabs>
+    <template #footer>
+      <el-button @click="handleCancel">取消</el-button>
+      <el-button type="primary" @click="handleSubmit">提交</el-button>
+    </template>
   </CnDialog>
   <CnDialog ref="bulkEditRef" v-bind="bulkEditProps">
     <div v-if="step1 === 1">
@@ -102,7 +106,11 @@
                         :value="option.value"
                       />
                     </el-select> -->
-                    <el-checkbox v-model="item.checked" :label="timeList[index].lable" size="large" />
+                    <el-checkbox
+                      v-model="item.checked"
+                      :label="timeList[index].lable"
+                      size="large"
+                    />
                     <span> &nbsp;&nbsp;&nbsp; </span>
                     <el-time-select
                       v-model="item.startTime"
@@ -128,7 +136,12 @@
                 </el-col>
                 <el-col :span="3">
                   <div class="time-det">
-                    <el-button type="danger" :icon="Delete" circle @click="deleteTime(index)" />
+                    <el-button
+                      type="danger"
+                      :icon="Delete"
+                      circle
+                      @click="deleteTime(index)"
+                    />
                   </div>
                 </el-col>
               </el-row>
@@ -144,7 +157,9 @@
       </CnForm>
     </div>
     <div v-if="step1 === 4">
-      <div style="text-align:center;">此次修改将影响{{propsTable.data.length}}台设备，是否确认修改？</div>
+      <div style="text-align: center">
+        此次修改将影响{{ propsTable.data.length }}台设备，是否确认修改？
+      </div>
     </div>
     <template #footer>
       <el-button type="primary" @click="BackStep" v-if="step1 !== 1">上一步</el-button>
@@ -159,8 +174,12 @@
       <el-button type="primary" @click="determine" v-if="step1 === 4">确定</el-button>
     </template>
   </CnDialog>
+  <CnDialog ref="exportRef" v-bind="exportProps">
+    <template #footer>
+      <el-button type="primary" @click="importFun">确定</el-button>
+    </template>
+  </CnDialog>
 </template>
-
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from "vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
@@ -185,6 +204,8 @@ import {
   mattersProgrammeListPage,
   devBaseInfoEditList,
   getDevBaseInfo,
+  devBaseInfoExport,
+  devBaseInfo,
 } from "@/api/device";
 const activeName = ref("1");
 const loading = ref(false);
@@ -192,6 +213,7 @@ const step1 = ref(1);
 const bulkForm: any = reactive({});
 const selectionIds = ref([]);
 const bulkEditFromRef = ref();
+const exportRef = ref();
 const supList: any = [];
 const gupList: any = [];
 const matList: any = [];
@@ -201,6 +223,11 @@ const basicInfoData = ref();
 const hardwareModuleData = ref();
 const deploymentSiteData = ref();
 const configInfoData = ref();
+const basicInfoRef = ref();
+const hardwareModuleRef = ref();
+const deploymentSiteRef = ref();
+const configInfoRef = ref();
+const dialoTitle = ref("设备详情");
 const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
 const timeList = reactive([
   { lable: "周一", value: 0 },
@@ -263,15 +290,42 @@ const mattersProgrammeListPageFun = () => {
 onMounted(async () => {
   getUnitListFun();
   devGroupListFun();
-  mattersProgrammeListPageFun(); 
+  mattersProgrammeListPageFun();
 });
 
 const dialogProps = reactive<CnPage.DialogProps>({
-  title: "设备详情",
+  title: dialoTitle.value, // "设备详情",
 });
 
 const bulkEditProps = reactive<CnPage.DialogProps>({
   title: step1.value === 4 ? "确认修改" : "批量编辑",
+});
+
+const exportProps = reactive<CnPage.DialogProps>({
+  title: "导出",
+  formProps: {
+    model: {
+      export: [
+        "proDevCode",
+        "unitDevCode",
+        "devUnitText",
+        "devManageUnitText",
+        "supportingUnitText",
+        "devModelNo",
+        "siteName",
+        "provinceCodeText,cityCodeText,countyCodeText,townCodeText,villageCodeText",
+        "detailAddress",
+        "statusText",
+        "managePersonName",
+        "managePersonContact",
+        "procedureVersion"
+      ],
+    },
+    items: [
+      { label: "请选择所需导出的字段", component: "subtitle", span: 24 },
+      { prop: "export", component: "checkbox", span: 24, dict: "DEV_EXPORT_COLUMN" },
+    ],
+  },
 });
 
 const propsTable = reactive<CnPage.TableProps>({
@@ -393,17 +447,17 @@ const stpeThreeBulkEditFrom = reactive({
   colSpan: 8,
   model: {},
   rules: {
-    supportingUnit: [{ required: true, message: '请选择设备管理单位' }],
-    devModelNo: [{ required: true, message: '请输入设备型号' }],
-    hardware: [{ required: true, message: '请选择硬件模块' }],
-    operationPersonName: [{ required: true, message: '请输入运维人员名称' }],
-    operationPersonContact: [{ required: true, message: '请输入运维人员联系方式' }],
-    groupId: [{ required: true, message: '请选择设备分组' }],
-    provinceCode: [{ required: true, message: '请选择行政区划' }],
-    detailAddress: [{ required: true, message: '请输入详细地址' }],
-    pointLatLng: [{ required: true, message: '请输入地理坐标' }],
-    siteName: [{ required: true, message: '请选择部署场所名称' }],
-    devUsage: [{ required: true, message: '请选择设备用途' }],
+    supportingUnit: [{ required: true, message: "请选择设备管理单位" }],
+    devModelNo: [{ required: true, message: "请输入设备型号" }],
+    hardware: [{ required: true, message: "请选择硬件模块" }],
+    operationPersonName: [{ required: true, message: "请输入运维人员名称" }],
+    operationPersonContact: [{ required: true, message: "请输入运维人员联系方式" }],
+    groupId: [{ required: true, message: "请选择设备分组" }],
+    provinceCode: [{ required: true, message: "请选择行政区划" }],
+    detailAddress: [{ required: true, message: "请输入详细地址" }],
+    pointLatLng: [{ required: true, message: "请输入地理坐标" }],
+    siteName: [{ required: true, message: "请选择部署场所名称" }],
+    devUsage: [{ required: true, message: "请选择设备用途" }],
   },
   items: [
     { prop: "deviceInfo", component: "slot", span: 24 },
@@ -665,7 +719,7 @@ const props = reactive<CnPage.Props>({
         label: "导出",
         type: "primary",
         onClick: () => {
-          dialogRef.value?.open();
+          exportRef.value?.open();
           // dialogProps.action = () => handleSubmit("add");
         },
       },
@@ -695,31 +749,54 @@ const props = reactive<CnPage.Props>({
       selectionIds.value = selection;
     },
   },
-  pagination: false,
+  pagination: true,
 });
 
 // 查看详情
-function viewDetail(row : any) {
+function viewDetail(row: any) {
   getDevBaseInfo(row.id).then((res: any) => {
-    if(res.code === "200") {    
-      res.data.baseInfo.type = "edit"  
-      res.data.devDeploymentSite.type = "edit"  
-      res.data.devConf.type = "edit"  
-      basicInfoData.value = res.data.baseInfo
-      hardwareModuleData.value = res.data.baseInfo
-      deploymentSiteData.value = res.data.devDeploymentSite
-      configInfoData.value = res.data.devConf
+    if (res.code === "200") {
+      res.data.baseInfo.type = "edit";
+      res.data.devDeploymentSite.type = "edit";
+      res.data.devConf.type = "edit";
+      basicInfoData.value = res.data.baseInfo;
+      hardwareModuleData.value = res.data.baseInfo;
+      deploymentSiteData.value = res.data.devDeploymentSite;
+      configInfoData.value = res.data.devConf;
+      dialoTitle.value = "设备详情"
       dialogRef.value?.open();
     }
-  })
+  });
+}
+
+// 导出
+function importFun() {
+  const params = {
+    columns: exportProps.formProps!.model.export,
+    ...props.params,
+  };
+  devBaseInfoExport(params).then((res: any) => {
+    let blob = new Blob([res.data], {
+      type: res.headers['content-type'] || 'application/vnd.ms-excel'
+    })
+    let href = window.URL.createObjectURL(blob)
+    let downloadElement = document.createElement('a')
+    downloadElement.href = href
+    downloadElement.download = '设备列表.xlsx'
+    document.body.appendChild(downloadElement)
+    downloadElement.click() //点击下载
+    document.body.removeChild(downloadElement) //下载完成移除元素
+    exportRef.value?.close()
+  });
 }
 
 // 编辑
 function handleEdit({ row }: any) {
-  basicInfoData.value = {}
-  hardwareModuleData.value = {}
-  deploymentSiteData.value = {}
-  configInfoData.value = {}
+  basicInfoData.value = {};
+  hardwareModuleData.value = {};
+  deploymentSiteData.value = {};
+  configInfoData.value = {};
+  dialoTitle.value = "编辑设备信息"
   dialogRef.value?.open();
 }
 // 筛选
@@ -751,6 +828,38 @@ const BackStep = () => {
 const submitTo = () => {
   step1.value = 4;
 };
+// 取消
+const handleCancel = () => {
+  dialogRef.value?.close()
+}
+// 提交编辑 
+const handleSubmit = () => {
+  const flagArr = [basicInfoRef.value.validateForm(), hardwareModuleRef.value.validateForm(), deploymentSiteRef.value.validateForm(), configInfoRef.value.validateForm()]
+  let isValidate = false
+  const params = {
+    baseInfo: basicInfoRef.value.getFormData(),
+    devConf: configInfoRef.value.getFormData(),
+    devDeploymentSite: deploymentSiteRef.value.getFormData(),
+    devUnitInFo: hardwareModuleRef.value.getFormData(),
+  }
+  Promise.all(flagArr).then((res: any) => {
+    for (let index = 0; index < res.length; index++) {
+      const element = res[index];
+      if (element) {
+        isValidate = true
+      } else {
+        activeName.value = String(index + 1)
+        break;
+      }
+    }
+    console.log(isValidate);
+    if (isValidate) {
+      devBaseInfo(params).then(res => {
+        console.log(res);
+      })
+    }
+  })
+}
 // 确定
 const determine = () => {
   const params = {
@@ -760,7 +869,7 @@ const determine = () => {
 
   devBaseInfoEditList(params).then((res) => {
     if (res.code === "200") {
-      bulkEditRef.value?.close()
+      bulkEditRef.value?.close();
     }
   });
 };
@@ -769,17 +878,15 @@ const addTime = () => {
   console.log("添加时间段");
   // const timeSlotList = reactive([{ checked: "", startTime: "", endTime: "" }]);
   if (timeSlotList.length < 7) {
-    timeSlotList.push(
-      { checked: "", startTime: "", endTime: "" }
-    )
+    timeSlotList.push({ checked: "", startTime: "", endTime: "" });
   } else {
-    return
+    return;
   }
 };
 // 删除时间段
 const deleteTime = (index: number) => {
-  timeSlotList.splice(index, 1)
-}
+  timeSlotList.splice(index, 1);
+};
 </script>
 <style>
 .blurtext {
@@ -792,6 +899,6 @@ const deleteTime = (index: number) => {
 }
 .time-det {
   position: relative;
-  top: 20px
+  top: 20px;
 }
 </style>

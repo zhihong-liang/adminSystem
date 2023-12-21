@@ -33,7 +33,7 @@
       <template #matterStatus="{ row }">
         <el-text v-if="row.matterStatus === '1'" type="success"> 上线 </el-text>
         <el-text v-else-if="row.matterStatus === '2'"> 下线 </el-text>
-        <el-text v-else="row.matterStatus === '2'"> 停用 </el-text>
+        <el-text v-else> 停用 </el-text>
       </template>
       <template #matterCode="{ row }">
         <el-button type="text" @click="showDialogByDetail('detail', row)">{{
@@ -42,6 +42,16 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
+      <template #entryUnit>
+        <el-autocomplete
+          v-model="dialogProps.formProps!.model.entryUnit"
+          :fetch-suggestions="querySearch"
+          value-key="label"
+          clearable
+          placeholder="请输入事项进驻单位"
+          style="width: 100%"
+        />
+      </template>
       <template #tabs>
         <el-radio-group v-model="activeName" @change="handleTabChange">
           <el-radio-button label="basicInfo">基本信息</el-radio-button>
@@ -79,6 +89,7 @@ import {
   pushDownDept
 } from '@/api/matter'
 import { getDictionary } from '@/api'
+import { getUnitList, getUnitDetail } from '@/api/admin'
 import useDictionary from '@/hooks/useDictionary'
 import { handlesysCoverageOptionsTree, stringToArray } from '../utils/index'
 
@@ -90,6 +101,8 @@ const identityAuthItemOptions = ref<any[]>()
 const payWayOptions = ref<any[]>()
 // 业务部门options
 const businessUnitOptions = ref<any[]>()
+// 当前搜索出的单位列表
+const unitListOptions = ref<any[]>()
 
 const detailAndEditorModel = ref<any>({})
 const openDialogHandle = ref<ActionType>('detail')
@@ -157,10 +170,41 @@ function authenticationTypeVisible() {
   return dialogProps.formProps?.model?.identityAuthType === '1'
 }
 
+// 单位校验
+function entryUnitValidator(rule: any, value: any, callback: any) {
+  if (!unitListOptions.value!.find((v) => v.label === value)) {
+    callback(new Error('请填写正确的单位'))
+  } else {
+    callback()
+  }
+}
+
 function handleTabChange() {
   if (openDialogHandle.value === 'edit')
     showDialogByEdit(openDialogHandle.value, detailAndEditorModel.value, false)
   else showDialogByDetail(openDialogHandle.value, detailAndEditorModel.value, false)
+}
+
+// 弹窗关闭
+function handleDialogClose() {
+  unitListOptions.value = []
+}
+
+// 搜索单位列表
+async function querySearch(queryString: string, cb: any) {
+  if (!queryString) return []
+  try {
+    const unitList = await getUnitList({
+      page: 1,
+      size: 1000,
+      obj: { fullName: queryString }
+    })
+    const results = unitList.rows.map((i: any) => ({ value: i.id, label: i.fullName }))
+    unitListOptions.value = results
+    return results
+  } catch (err) {
+    return []
+  }
 }
 
 // 新增事项
@@ -171,6 +215,7 @@ function addMatterAction() {
   model.networdPolicy = model.networdPolicy.join(',')
   model.payWay = model.payStatus === '1' ? model.payWay.join(',') : ''
   model.sysCoverage = model.sysCoverage.join(',')
+  model.entryUnit = unitListOptions.value!.find((v) => v.label === model.entryUnit).value
   return addMatter(model)
 }
 
@@ -184,9 +229,10 @@ function editMatterAction() {
     networdPolicy: model.networdPolicy.join(','),
     payWay: model.payWay.join(','),
     payStatus: model.payWay.length ? '1' : '0',
-    sysCoverage: model.sysCoverage.join(',')
+    sysCoverage: model.sysCoverage.join(','),
+    entryUnit: ''
   }
-
+  obj.entryUnit = unitListOptions.value!.find((v) => v.label === model.entryUnit).value
   return editMatter({ ...model, ...obj })
 }
 
@@ -278,16 +324,20 @@ async function showDialogByAddOrLabel(handle: ActionType) {
     }
     dialogProps.action = () => infoLabelAction()
   } else {
-    const dialogConfig = getDialogConfig(handle)({
-      dialogSubmitSuccess: dialogSubmitSuccess,
-      optionsMap: {
-        sysCoverage: computed(() => sysCoverageOptions.value),
-        identityAuthItem: computed(() => identityAuthItemOptions.value),
-        payWay: computed(() => payWayOptions.value),
-        businessUnit: computed(() => businessUnitOptions.value)
+    const dialogConfig = getDialogConfig(handle)(
+      {
+        dialogSubmitSuccess: dialogSubmitSuccess,
+        optionsMap: {
+          sysCoverage: computed(() => sysCoverageOptions.value),
+          identityAuthItem: computed(() => identityAuthItemOptions.value),
+          payWay: computed(() => payWayOptions.value),
+          businessUnit: computed(() => businessUnitOptions.value)
+        },
+        visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible },
+        onClose: handleDialogClose
       },
-      visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible }
-    })
+      entryUnitValidator
+    )
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]
     }
@@ -297,7 +347,7 @@ async function showDialogByAddOrLabel(handle: ActionType) {
 }
 
 // 显示编辑窗口
-function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = true) {
+async function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = true) {
   if (firstOpen) activeName.value = 'basicInfo'
   const model = window.structuredClone(toRaw(row))
   model.hardwareModule = stringToArray(model.hardwareModule)
@@ -305,20 +355,31 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
   model.networdPolicy = stringToArray(model.networdPolicy)
   model.payWay = stringToArray(model.payWay)
   model.sysCoverage = model.sysCoverageCode.split(',')
-  model.businessUnit = businessUnitOptions.value?.find((v) => v.label === model.businessUnit).value
+  model.businessUnit =
+    businessUnitOptions.value?.find((v) => v.label === model.businessUnit)?.value ||
+    model.businessUnit
+  if (!unitListOptions.value?.length) {
+    const unitInfo = await getUnitDetail(model.entryUnit)
+    unitListOptions.value = [{ label: unitInfo.data.fullName, value: unitInfo.data.id }]
+    model.entryUnit = unitInfo.data.fullName
+  }
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
-  const dialogConfig = getDialogConfig(handle)({
-    dialogSubmitSuccess: dialogSubmitSuccess,
-    optionsMap: {
-      sysCoverage: computed(() => sysCoverageOptions.value),
-      identityAuthItem: computed(() => identityAuthItemOptions.value),
-      payWay: computed(() => payWayOptions.value),
-      businessUnit: computed(() => businessUnitOptions.value)
+  const dialogConfig = getDialogConfig(handle)(
+    {
+      dialogSubmitSuccess: dialogSubmitSuccess,
+      optionsMap: {
+        sysCoverage: computed(() => sysCoverageOptions.value),
+        identityAuthItem: computed(() => identityAuthItemOptions.value),
+        payWay: computed(() => payWayOptions.value),
+        businessUnit: computed(() => businessUnitOptions.value)
+      },
+      activeName: activeName.value,
+      model: model,
+      onClose: handleDialogClose
     },
-    activeName: activeName.value,
-    model: model
-  })
+    entryUnitValidator
+  )
   for (const key of Object.keys(dialogConfig)) {
     dialogProps[key] = dialogConfig[key]
   }
@@ -327,7 +388,7 @@ function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean = tru
 }
 
 // 显示详情窗口
-function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = true) {
+async function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = true) {
   if (firstOpen) activeName.value = 'basicInfo'
   const model = window.structuredClone(toRaw(row))
   const obj = {
@@ -341,6 +402,14 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
     sysLevel: useDictionary('SYS_LEVEL', stringToArray(model.sysLevel)).value,
     matterStatus: useDictionary('MATTER_STATUS', stringToArray(model.matterStatus)).value
   }
+
+  // 将单位转成中文传入
+  if (!unitListOptions.value?.length) {
+    const unitInfo = await getUnitDetail(model.entryUnit)
+    unitListOptions.value = [{ label: unitInfo.data.fullName, value: unitInfo.data.id }]
+    model.entryUnit = unitInfo.data.fullName
+  }
+
   detailAndEditorModel.value = model
   openDialogHandle.value = handle
   const dialogConfig = getDialogConfig(handle)({
@@ -351,7 +420,8 @@ function showDialogByDetail(handle: ActionType, row: any, firstOpen: boolean = t
     model: {
       ...model,
       ...obj
-    }
+    },
+    onClose: handleDialogClose
   })
   for (const key of Object.keys(dialogConfig)) {
     dialogProps[key] = dialogConfig[key]

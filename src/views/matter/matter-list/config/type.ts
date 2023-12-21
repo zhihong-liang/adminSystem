@@ -24,4 +24,5 @@ export interface getDialogConfigParams {
   activeName?: tabsActivateName
   model?: Record<string, any>
   visible?: visibleMap
+  onClose?: () => void
 }

@@ -8,9 +8,10 @@ import {
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
 import Demo from './demo'
-import { useHomeStore } from '@/stores'
+import { useHomeStore, useLoginStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { getToken } from '@/utils/auth'
+
 
 import BaseLayout from '../layout/index.vue'
 
@@ -102,18 +103,29 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
+  console.log('to: ', to)
+
+  if (to.path === '/login') {
+    resetAll()
+  }
+
   if (hasToken) {
     if (refresh.value && menuList.value.length) {
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
 
-      next({ path: to.path }) // 动态添加路由后，要重新再调一次next(to.path)，不能直接next()
+      next({ path: to.path, query: to.query }) // 动态添加路由后，要重新再调一次next(to.path)，不能直接next()
     } else {
       // 发现没有菜单列表数据，先请求菜单接口，再重新跑一次守卫逻辑，下一次就不会跑进这里
       if (!menuList.value.length) {
-        await getMenuList({})
+        const loginInfo: any = useLoginStore()
+        await getMenuList({ manual: false, params: { currentRoleId: loginInfo.$state.userInfo.currentRoleId || 1 }})
+        // 要刷新一次，不然页面会空白,先这样处理，有空再改
+        setTimeout(() => {
+          location.reload();
+        }, 100);
 
-        next({ path: to.path })
+        next({ path: to.path, query: to.query })
       } else {
         if (to.path !== '/login') {
           addTabToList({
@@ -127,8 +139,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       }
     }
   } else {
-    resetAll()
-
     if (to.path !== '/login') {
       next('/login')
     } else {

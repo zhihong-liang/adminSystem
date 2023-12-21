@@ -12,83 +12,65 @@ const props = defineProps({
   },
 });
 
+const basisRef = ref()
+
 const basisForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
   disabled: props.model.type === "edit" ? true : false,
+  rules: {
+    proDevCode: [{ required: true, message: "请输入省统一设备编号" }],
+    status: [{ required: true, message: "请选择状态" }],
+    unitDevCode: [{ required: true, message: "请输入设备接入单位设备编号" }],
+    devUnit: [{ required: true, message: "请输入设备接入单位" }],
+    devType: [{ required: true, message: "请选择设备类型" }],
+    devModelNo: [{ required: true, message: "请输入设备型号" }],
+    devSource: [{ required: true, message: "请输入设备来源" }],
+    procedureVersion: [{ required: true, message: "请输入政务程序版本号" }],
+    operSystem: [{ required: true, message: "请输入操作系统" }],
+    devUsage: [{ required: true, message: "请输入设备用途" }],
+    comeTime: [{ required: true, message: "请选择到货时间" }],
+    installActivateTime: [{ required: true, message: "请选择安装激活时间" }],
+  },
   items: [
-    {
-      label: "省统一设备编号",
-      prop: "proDevCode",
-      component: "input" 
-    },
-    {
-      label: "状态",
-      prop: "status",
-      component: "select",
-      dict: "DEV_STATUS" 
-    },
-    {
-      label: "设备接入单位设备编号",
-      prop: "unitDevCode",
-      component: "input",
-    },
-    {
-      label: "设备接入单位",
-      prop: "devUnit",
-      component: "select",
-      dict: "DEV_STATUS" 
-    },
-    {
-      label: "设备类型",
-      prop: "devType",
-      component: "select",
-      dict: "DEV_TYPE" 
-    },
-    {
-      label: "设备型号",
-      prop: "devModelNo",
-      component: "input",
-    },
-    // {
-    //   label: "硬件模块",
-    //   prop: "hardware",
-    //   component: "select",
-    //   // dict: "HARDWARE_MODULE" 
-    // },
-    {
-      label: "设备来源",
-      prop: "devSource",
-      component: "input",
-    },
-    {
-      label: "政务程序版本号",
-      prop: "procedureVersion",
-      component: "input",
-    },
-    {
-      label: "操作系统",
-      prop: "operSystem",
-      component: "input",
-    },
-    {
-      label: "设备用途",
-      prop: "devUsage",
-      component: "input",
-    },
-    {
-      label: "到货时间",
-      prop: "comeTime",
-      component: "input",
-    },
-    {
-      label: "安装激活时间",
-      prop: "installActivateTime",
-      component: "input",
-    },
+    { label: "省统一设备编号", prop: "proDevCode", component: "input"  },
+    { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
+    { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input", },
+    { label: "设备接入单位", prop: "devUnit", component: "select", dict: "DEV_STATUS" },
+    { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
+    { label: "设备型号", prop: "devModelNo", component: "input" },
+    { label: "设备来源", prop: "devSource", component: "input" },
+    { label: "政务程序版本号", prop: "procedureVersion", component: "input", },
+    { label: "操作系统", prop: "operSystem", component: "input", },
+    { label: "设备用途", prop: "devUsage", component: "input", },
+    { label: "到货时间", prop: "comeTime", component: "datepicker", },
+    { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", },
   ],
 });
+const validateForm = () => {
+  // let flag = null;
+  // basisRef.value.formRef.validate((valid: boolean) => {
+  //   if (valid) {
+  //     flag = true;
+  //   } else {
+  //     flag = false;
+  //   }
+  // });
+  // return flag;
+  return basisRef.value.formRef.validate((valid: boolean) => {
+    if (valid) {
+      return true
+    } else {
+      return false
+    }
+  });
+};
+const getFormData = () => {
+  return basisForm.model
+}
+defineExpose({ validateForm, getFormData });
+
 watchEffect(() => {
   if (props.model) {
     basisForm.model = props.model
