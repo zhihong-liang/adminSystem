@@ -21,7 +21,6 @@ export const useHomeStore = defineStore('home', () => {
     }
 
     const menuList = ref<Menu[]>([])  // 菜单列表
-    const finalMenuList = computed(() => menuList.value)
     
     const flatMenuList = computed<Menu[]>(() => {  // 扁平化菜单列表
         return Tree2Flat(menuList.value, { children: 'childList'})

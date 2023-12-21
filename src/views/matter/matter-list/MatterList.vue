@@ -33,7 +33,7 @@
       <template #matterStatus="{ row }">
         <el-text v-if="row.matterStatus === '1'" type="success"> 上线 </el-text>
         <el-text v-else-if="row.matterStatus === '2'"> 下线 </el-text>
-        <el-text v-else="row.matterStatus === '2'"> 停用 </el-text>
+        <el-text v-else> 停用 </el-text>
       </template>
       <template #matterCode="{ row }">
         <el-button type="text" @click="showDialogByDetail('detail', row)">{{

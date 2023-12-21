@@ -2,6 +2,7 @@
   <CnPage v-bind="props" />
   <CnDialog ref="dialogRef" v-bind="dialogProps">
     <template #auth>
+      <GetAuth :data="choseData" v-if="choseData?.length" />
       <el-tree
         v-model="areaCode"
         :key="areaCode"
@@ -21,6 +22,7 @@
                 v-model="authData[data.value]"
                 component="checkbox"
                 dict="DATA_PERMISSION_POLICY"
+                @change="changeDict"
               />
             </div>
           </div>
@@ -38,6 +40,7 @@ import CnDict from '@/components/cn-page/CnDict.vue'
 import { getUnitList, addUnit, editUnit, getUnitDetail, type Unit, delUnit } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 import { useDelete } from '@/hooks/useConfirm'
+import GetAuth from '../user/child/getAuth.vue'
 
 const division = ref<Division2[]>([])
 
@@ -47,7 +50,29 @@ const handleCheckChange = (data: Division2, checked: boolean) => {
   if (checked) {
     areaCode.value.push(data.value)
   } else {
+    delete authData.value[data.value]
+    choseData.value = choseData.value.filter((v) => v.areaValue !== data.value)
+
     areaCode.value = areaCode.value.filter((v) => v !== data.value)
+  }
+}
+
+interface choseTs {
+  areaValue: string,
+  areaName: string,
+  authName: string[],
+}
+const choseData = ref([] as choseTs[])
+const changeDict = () => {
+  choseData.value = []
+  for (let item of areaCode.value) {
+    if (authData.value[item]) {
+      choseData.value.push({
+        areaValue: item,
+        areaName: useDivision(item).value[0].label,
+        authName: authData.value[item]
+      })
+    }
   }
 }
 
@@ -96,6 +121,7 @@ watch(
     () => dialogProps.formProps?.model.provinceCode
   ],
   (code) => {
+    choseData.value = []
     const idx = code.findIndex(Boolean)
     if (code[idx]) {
       areaCode.value = [code[idx] as string]
@@ -121,6 +147,7 @@ watch(
       },
       {} as Record<string, string[]>
     )
+    changeDict()
   },
   { deep: true }
 )
