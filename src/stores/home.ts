@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import { Tree2Flat } from '@/utils'
 import { getMenuList as queryMenuList } from '@/api'
 import type { TabItem, Menu, BreadcrumbItem } from '@/layout/type'
-import { useLoginStore } from '@/stores'
 
 export interface getMenuListPayloadOptions {
     manual?: boolean // 手动更新，默认自动更新
@@ -23,19 +22,12 @@ export const useHomeStore = defineStore('home', () => {
 
     const menuList = ref<Menu[]>([])  // 菜单列表
     const finalMenuList = computed(() => menuList.value)
-    const loginInfo: any = useLoginStore() // JSON.parse(localStorage.getItem('userInfo'))
-    let currentRoleId: number
-    
-    if (loginInfo.$state.userInfo) {
-        currentRoleId = loginInfo.$state.userInfo.currentRoleId
-    }
-    console.log("是不是每次都更新了", loginInfo.$state.userInfo);
     
     const flatMenuList = computed<Menu[]>(() => {  // 扁平化菜单列表
         return Tree2Flat(menuList.value, { children: 'childList'})
     })
     // 请求菜单列表
-    async function getMenuList({ manual = false, params = { currentRoleId: currentRoleId } }: getMenuListPayloadOptions): Promise<Menu[]> {
+    async function getMenuList({ manual = false, params }: getMenuListPayloadOptions): Promise<Menu[]> {
         // 处理menu数据
         const formatMenu = (menus: Menu[]): Menu[] => {
             const list: Menu[] = []

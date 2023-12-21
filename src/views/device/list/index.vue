@@ -749,7 +749,7 @@ const props = reactive<CnPage.Props>({
       selectionIds.value = selection;
     },
   },
-  pagination: false,
+  pagination: true,
 });
 
 // 查看详情

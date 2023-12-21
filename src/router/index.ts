@@ -8,9 +8,10 @@ import {
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
 import Demo from './demo'
-import { useHomeStore } from '@/stores'
+import { useHomeStore, useLoginStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { getToken } from '@/utils/auth'
+
 
 import BaseLayout from '../layout/index.vue'
 
@@ -111,9 +112,13 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
     } else {
       // 发现没有菜单列表数据，先请求菜单接口，再重新跑一次守卫逻辑，下一次就不会跑进这里
       if (!menuList.value.length) {
-        await getMenuList({})
-
+        const loginInfo: any = useLoginStore()
+        await getMenuList({ manual: false, params: { currentRoleId: loginInfo.$state.userInfo.currentRoleId || 1 }})
         next({ path: to.path })
+        // 要刷新一次，不然页面会空白,先这样处理，有空再改
+        setTimeout(() => {
+          location.reload();
+        }, 100);
       } else {
         if (to.path !== '/login') {
           addTabToList({

@@ -1,0 +1,311 @@
+<template>
+  <CnDialog
+    v-bind="dialogProps"
+    :loading="formLoading"
+    ref="dialogRef"
+    @success="onSuccess"
+  >
+    <template #matterHheme>
+      <h3>事项主题</h3>
+    </template>
+    <template #matterList>
+      <h3 v-if="isShowTree">事项列表</h3>
+      <el-form :model="fromData" ref="fromDataRef" style="width: 100%">
+        <el-form-item>
+          <el-radio-group v-model="fromData.labelName" @change="tabClick(fromData.labelName)" style="margin-bottom: 30px">
+            <el-radio-button
+              v-for="(item, index) in themeList"
+              :label="item.id"
+              :key="index"
+              >{{ item.labelName }}</el-radio-button
+            >
+          </el-radio-group>
+        </el-form-item>
+        <el-row>
+          <el-col :span="7">
+            <div v-if="isShowTree">
+              <el-tree
+                :props="props"
+                :load="loadNode"
+                lazy
+                @node-expand="nodeExpand"
+              ></el-tree>
+            </div>
+          </el-col>
+          <el-col :span="17">
+            <div v-if="isShowTree">
+              <div>
+                <el-button type="primary" @click="selectionItems">选择事项</el-button>
+                <el-button type="default">取消选择</el-button>
+              </div>
+              <Table v-bind="tableProps"></Table>
+            </div>
+          </el-col>
+          <el-col :span="24">
+            <div style="width: 100%; background: #fcc"></div>
+          </el-col>
+        </el-row>
+      </el-form>
+    </template>
+  </CnDialog>
+  <SelectionItems ref="selectionItemsRef"></SelectionItems>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref } from "vue";
+import CnDialog from "@/components/cn-page/CnDialog.vue";
+import CnPage from "@/components/cn-page/CnPage.vue";
+import SelectionItems from "./selectionItems.vue";
+import { FromData, ThemeList } from "../../utils/type";
+import {
+  mattersThemeLabelList,
+  mattersThemeMenuRelationList,
+  addMattersProgramme,
+  putMattersProgramme,
+} from "@/api/matter";
+import { getMattersThemeInfoList } from "../../utils/index";
+
+interface Tree {
+  name: string;
+  leaf?: boolean;
+}
+
+const isType = ref();
+const themmNameList = ref([]);
+const formLoading = ref(false);
+const isShowTree = ref(false);
+const labelId = ref();
+const selectionItemsRef = ref();
+
+const props = {
+  label: "menuName",
+  children: "children",
+  isLeaf: false,
+  key: "id",
+};
+const fromData: FromData = reactive({
+  labelName: "",
+});
+const dialogProps: CnPage.DialogProps = reactive({
+  title: "新增",
+  formProps: {
+    model: {},
+    items: [
+      {
+        label: "方案编号",
+        prop: "programmeCode",
+        component: "input",
+        props: { disabled: true },
+        visible: () => isType.value !== "add",
+      },
+      { label: "方案名称", prop: "programmeName", component: "input" },
+      {
+        label: "状态",
+        prop: "status",
+        component: "select",
+        dict: "START_STOP",
+        visible: () => isType.value !== "add",
+      },
+      { label: "备注", prop: "remark", component: "input" }, // props: { type: "textarea" }
+      {
+        label: "主题名称",
+        prop: "themeId",
+        component: "select",
+        props: {
+          options: themmNameList,
+          // onChange: () => {
+          //   if (isType.value === "select") {
+          //     formLoading.value = true;
+          //     const params = {
+          //       themeId: dialogProps.formProps.model.themeName,
+          //     };
+          //     mattersThemeLabelList(params).then((res) => {
+          //       const { code, data, message } = res;
+          //       if (code == "200" && data.length > 0) {
+          //         labelId.value = data[0].id;
+          //         fromData.labelName = data[0].id;
+          //         themeList.value = data;
+          //         isShowTree.value = true;
+          //         formLoading.value = false;
+          //         console.log("id", data[0].id);
+          //       } else {
+          //         formLoading.value = false;
+          //       }
+          //     });
+          //   }
+          // },
+        },
+      },
+      {
+        label: "关联事项数",
+        prop: "mattersCount",
+        component: "input",
+        props: { disabled: true },
+        visible: () => isType.value !== "add",
+      },
+      {
+        label: "关联设备数",
+        prop: "devCount",
+        component: "input",
+        props: { disabled: true },
+        visible: () => isType.value !== "add",
+      },
+      {
+        label: "创建人",
+        prop: "createUser",
+        component: "input",
+        props: { disabled: true },
+        visible: () => isType.value !== "add",
+      },
+      {
+        label: "创建时间",
+        prop: "createTime",
+        component: "input",
+        props: { disabled: true },
+        visible: () => isType.value !== "add",
+      },
+      {
+        label: "",
+        component: "slot",
+        prop: "matterHheme",
+        span: 24,
+        visible: () => isType.value === "select",
+      },
+      { label: "", component: "slot", prop: "matterList", span: 24 },
+    ],
+    colSpan: 24,
+    rules: {
+      programmeName: [{ required: true, message: "请输入方案名称" }],
+      themeName: [{ required: true, message: "请选择主题" }],
+    },
+  },
+});
+
+const tableProps = reactive<CnPage.Props>({
+  columns: [
+    { type: "selection" },
+    { label: "事项编号", slot: "proDevCode" },
+    { label: "事项名称", prop: "unitDevCode" },
+    { label: "事项别名", prop: "status", dict: "devModelNo" },
+    { label: "事项进驻单位", prop: "regionDetail" },
+    { label: "系统覆盖范围", prop: "detailAddress" },
+    { label: "办理类型", prop: "terminalManagePhone" },
+    { label: "事项状态", prop: "installActivateTime" },
+    {
+      prop: "action",
+      label: "操作",
+      minWidth: 120,
+      // buttons: [{ label: "编辑", type: "primary", text: true, onClick: handleEdit }],
+    },
+  ],
+  data: [],
+});
+const dialogRef = ref();
+const themeList: any = ref([]);
+const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
+  if (isShowTree) {
+    if (node.level === 0) {
+      const paramsTm = {
+        labelId: labelId.value, //data[0].id,
+      };
+      mattersThemeMenuRelationList(paramsTm).then((tree: any) => {
+        const { code, data, message } = tree;
+        return resolve(data);
+      });
+    } else {
+      const paramsTm = {
+        labelId: node.data.labelId,
+        parentId: node.data.id,
+      };
+      mattersThemeMenuRelationList(paramsTm).then((tree: any) => {
+        const { code, data, message } = tree;
+        return resolve(data);
+      });
+    }
+  }
+};
+const nodeExpand = (node: any) => {
+  const paramsTm = {
+    labelId: node.labelId,
+    parentId: node.id,
+  };
+};
+const tabClick = (labelId) => {
+  console.log('123', labelId); 
+}
+const open = async (data: any, _type: string) => {
+  dialogRef.value.open();
+  themmNameList.value = await getMattersThemeInfoList().then((res) => {
+    return res;
+  });
+  isType.value = _type;
+  dialogProps.formProps!.disabled = false;
+  if (_type == "add") {
+    // 新增
+    dialogProps.formProps!.model = {};
+    dialogProps.formProps!.colSpan = 24;
+    dialogProps.action = () => handleSubmit("add");
+    dialogProps.title = "新增";
+  } else if (_type === "edit") {
+    dialogProps.formProps!.model = data;
+    dialogProps.formProps!.colSpan = 12;
+    dialogProps.action = () => handleSubmit("edit");
+    dialogProps.title = "编辑";
+  } else if (_type === "select") {
+    dialogProps.formProps!.model = data;
+    dialogProps.formProps!.colSpan = 12;
+    dialogProps.formProps!.disabled = true;
+    dialogProps.action = () => handleSubmit("select");
+    dialogProps.title = "选择事项";
+    console.log("data::::::::::::::", data);
+
+    const params = {
+      themeId: data.themeId,
+    };
+    mattersThemeLabelList(params).then((res) => {
+      const { code, data, message } = res;
+      if (code == "200") {
+        console.log("为什么会报错", data);
+        fromData.labelName = data[0].id;
+        themeList.value = data;
+        labelId.value = data[0].id;
+        // console.log("id", data[0].id);
+        isShowTree.value = true;
+      }
+    });
+  }
+};
+
+const selectionItems = () => {
+  // console.log(data);
+  const params = {
+    id: "",
+  };
+  selectionItemsRef.value.open(params, "add");
+};
+const onSuccess = () => {};
+function handleSubmit(action: "add" | "edit" | "select") {
+  let params: any = {
+    ...dialogProps.formProps!.model,
+  };
+  if (action === "add") {
+    return addMattersProgramme(params);
+  } else if (action === "edit") {
+    return putMattersProgramme(params);
+  } else if (action === "select") {
+    console.log("select");
+  }
+  // return action === 'add' ? addMattersProgramme(params) : putMattersProgramme(params)
+}
+
+defineExpose({ open });
+</script>
+
+<style scoped lang="scss">
+.matterdrv {
+  height: 1px;
+  width: 100%;
+  margin-bottom: 15px;
+  border-top: 1px solid rgb(204, 204, 204);
+}
+</style>
