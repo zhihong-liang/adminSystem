@@ -1,8 +1,16 @@
 <template>
   <div class="Matter-Menu-Manage-add-root">
-    <CnForm style="width: 40%" v-bind="formProps">
+    <CnForm style="width: 60%" v-bind="formProps">
       <template #menuIcon>
-        <CnIcon html="ZoomIn" />
+        <CnIcon :html="formProps.model.menuIcon" size="20" />
+      </template>
+      <template #parentId>
+        <el-cascader
+          v-model="formProps!.model.parentId"
+          :props="cascaderProps"
+          :placeholder="formProps!.model.parentId ?? '无上级'"
+          :disabled="true"
+        />
       </template>
     </CnForm>
 
@@ -10,83 +18,58 @@
 
     <h2 class="mb-lg">事项列表</h2>
     <CnPage v-bind="pageProps"></CnPage>
-    <TransferFormDialog ref="transferFormDialogRef" @submit="handleDialogSubmit" />
-
-    <el-button type="primary" @click="handleAddMatterMenu">添加</el-button>
+    <TransferFormDialog
+      ref="transferFormDialogRef"
+      @onSuccess="() => (pageProps.refresh = new Date().getTime())"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, reactive, ref } from 'vue'
+import { onBeforeMount, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
-import { queryMatterMenuRelation, queryMatterMenulist_No, addMatterMenu } from '@/api/matter'
+import useConfirm from '@/hooks/useConfirm'
+import {
+  queryMatterDetail,
+  queryMatterMenulist_No,
+  queryMatterMenuRelation,
+  deleteMatterRelationList
+} from '@/api/matter'
 import { getUnitList as queryUnitList } from '@/api/admin'
+import { DEFAILT_ITEM } from './config/data'
+import useDictionary from '@/hooks/useDictionary'
 
 import CnForm from '@/components/cn-page/CnForm.vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnIcon from '@/components/cn-page/CnIcon.vue'
 import TransferFormDialog from './components/transferFormDialog.vue'
 
-import type {
-MatterMenu,
-  MatterMenuResponse,
-  MatterThemeMenuItem
-} from '@/views/matter/menu-manage/config/type'
+import type { MatterMenuRelation, MatterMenuResponse } from '@/views/matter/menu-manage/config/type'
 import type { Resolve } from 'element-plus/lib/components/cascader-panel/index.js'
 
 const route = useRoute()
 
-const model = computed(() => route.query.action)
+const selectedList = ref([])
 
 const formProps: CnPage.FormProps = reactive({
-  model: {
-    menuName: '社保测试菜单',
-    description: '这是测试的菜单',
-    remark: '这是社保测试菜单',
-    menuIcon: 'Odometer',
-    backColor: 'red'
-  },
+  model: {},
   labelPosition: 'left',
   labelWidth: '100',
-  items: [
-    {
-      label: '菜单名称',
-      prop: 'menuName',
-      component: 'input',
-      props: { maxlength: 6, showWordLimit: true }
-    },
-    { label: '补充说明', prop: 'description', component: 'input' },
-    {
-      label: '备注',
-      prop: 'remark',
-      component: 'input',
-      props: { type: 'textarea', maxlength: 200, showWordLimit: true }
-    },
-    { label: '图标', prop: 'menuIcon', component: 'slot' },
-    { label: '背景颜色', prop: 'backColor', component: 'input' },
-    {
-      label: '上级菜单',
-      prop: 'parentId',
-      component: 'cascader',
-      props: {
-        props: {
-          checkStrictly: true,
-          lazy: true,
-          lazyLoad: handleLazyLoad
-        }
-      }
-    }
-  ],
+  items: DEFAILT_ITEM,
+  readonly: true,
+  colSpan: 12,
   rules: {
     menuName: [{ required: true, message: '请输入菜单名称' }],
-    backColor: [{ required: true, message: '请输入背景颜色' }],
+    backColor: [{ required: true, message: '请输入背景颜色' }]
     // parentId: [{ required: true, message: '请选择上级菜单' }]
   }
 })
 
 const enterUnitList = ref<any>([]) // 菜单进驻单位列表
 const pageProps: CnPage.Props = reactive({
-  params: {},
+  params: {
+    menuId: route.query.id
+  },
   action: queryMatterMenuRelation,
   search: {
     items: [
@@ -113,7 +96,8 @@ const pageProps: CnPage.Props = reactive({
       {
         label: '删除',
         type: 'primary',
-        plain: true
+        plain: true,
+        onClick: () => handleDeleteMatter(selectedList.value)
       }
     ]
   },
@@ -132,55 +116,44 @@ const pageProps: CnPage.Props = reactive({
         prop: 'action',
         label: '操作',
         minWidth: 120,
-        buttons: [{ label: '删除', type: 'primary', text: true }]
+        buttons: [
+          {
+            label: '删除',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleDeleteMatter(row)
+          }
+        ]
       }
-    ]
+    ],
+    selectionChange: (list) => (selectedList.value = list)
   },
-  pagination: model.value !== 'add',
+  pagination: true,
   refresh: new Date().getTime(),
   transformRequest: (params) => ({ obj: params })
 })
-const tableData = ref<MatterThemeMenuItem[]>([])
 
 const transferFormDialogRef = ref()
 
-function handleLazyLoad(node: any, resolve: Resolve) {
-  const { value } = node
+const cascaderProps = {
+  checkStrictly: true,
+  lazy: true,
+  lazyLoad(node: any, resolve: Resolve) {
+    const params = {
+      parentId: node.value
+    }
 
-  const params = {
-    parentId: value
-  }
+    queryMatterMenulist_No(params).then((res) => {
+      let nodes: any = []
+      nodes = res.data.map((item: MatterMenuResponse) => ({
+        value: item.id,
+        label: item.menuName,
+        menuLevel: item.menuLevel,
+        leaf: !item.open
+      }))
 
-  queryMatterMenulist_No(params).then((res) => {
-    let nodes: any = []
-    nodes = res.data.map((item: MatterMenuResponse) => ({
-      value: item.id,
-      label: item.menuName,
-      leaf: !item.open
-    }))
-
-    return resolve(nodes)
-  })
-}
-
-function handleAddMatterMenu() {
-  const params: MatterMenu = {
-    ...formProps.model,
-    menuRelationList: tableData.value,
-    menuLevel: !!formProps.model.parentId ? formProps.model.parentId + 1 : 1
-  }
-
-  addMatterMenu(params).then(res => {
-    console.log('res: ', res);
-  })
-  console.log('params: ', params)
-}
-
-function handleDialogSubmit(list: MatterThemeMenuItem[]) {
-  if (model.value === 'add' && list.length) {
-    pageProps.action = () => Promise.resolve({ rows: list, total: null })
-    pageProps.refresh = new Date().getTime()
-    tableData.value = list
+      return resolve(nodes)
+    })
   }
 }
 
@@ -201,12 +174,46 @@ function getUnitList() {
   })
 }
 
-onBeforeMount(() => {
+// 删除事项
+function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]) {
+  if (Array.isArray(row) && !row.length) return
+
+  const opts = {
+    message: '确定删除事项吗?',
+    title: '删除',
+    action: () =>
+      deleteMatterRelationList({
+        ids: Array.isArray(row)
+          ? selectedList.value.map((item: any) => item.id).join(',')
+          : row.id?.toString() || ''
+      }),
+    success: () => {
+      pageProps.refresh = new Date().getTime()
+    }
+  }
+  useConfirm(opts)
+}
+
+async function init() {
+  formProps.items.forEach((item: any) => {
+    if (item.prop === 'status') {
+      item.component = ''
+    }
+  })
+
+  const id = route.query.id as any
+
   getUnitList()
 
-  if (model.value === 'add') {
-    pageProps.action = () => Promise.resolve({ rows: [], total: null })
+  const matterInfo = await queryMatterDetail(id)
+  if (matterInfo.code === '200') {
+    formProps.model = matterInfo.data
+    pageProps.params.id = matterInfo.data.id
   }
+}
+
+onBeforeMount(() => {
+  init()
 })
 </script>
 
