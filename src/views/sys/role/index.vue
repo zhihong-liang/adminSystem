@@ -40,8 +40,6 @@
         </div>
       </div>
     </div>
-
-    <i></i><i></i><i></i><i></i><i></i>
   </div>
 
   <Deal
@@ -140,11 +138,13 @@ onUnmounted(() => {
   margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
-  gap: 5px;
+
+  gap: 20px;
   .box-card {
     width: 200px;
     height: 160px;
+    box-sizing: border-box;
+    overflow: hidden;
     .card-content {
       height: 100px;
     }
@@ -152,9 +152,10 @@ onUnmounted(() => {
 }
 .add-card {
   width: 222px;
-  height: 156px;
+  height: 160px;
+  box-sizing: border-box;
   background: #ffffff;
-  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  box-shadow: 0px 2px 6px 0px #dfe1e3;
   border-radius: 6px;
   overflow: hidden;
   color: #303133;
@@ -172,11 +173,12 @@ onUnmounted(() => {
   }
 }
 .role-card {
+  box-sizing: border-box;
   margin-bottom: 15px;
   width: 226px;
   height: 156px;
   background: #ffffff;
-  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  box-shadow: 0px 2px 6px 0px #dfe1e3;
   border-radius: 6px;
   overflow: hidden;
   color: #303133;
@@ -243,8 +245,5 @@ onUnmounted(() => {
       }
     }
   }
-}
-i {
-  width: 222px;
 }
 </style>
