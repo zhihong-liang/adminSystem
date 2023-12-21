@@ -287,6 +287,7 @@ const hanldeAddMenu = () => {
 }
 // 菜单选中返回
 const hanldeGetMenuFromSel = () => {
+  tableData.value = []
   getMenuFromLabel()
 }
 

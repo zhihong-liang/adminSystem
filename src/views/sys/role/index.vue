@@ -226,7 +226,6 @@ onUnmounted(() => {
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-
       border-radius: 6px;
       &:last-child {
         border: none;
