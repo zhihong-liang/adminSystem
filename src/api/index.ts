@@ -195,3 +195,4 @@ export const queryUserInfo = (id: number): Promise<Res<UserInfo>> =>
 
 export * from './sys'
 export * from './device'
+export * from "./front"

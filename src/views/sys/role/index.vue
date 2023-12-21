@@ -40,6 +40,7 @@
         </div>
       </div>
     </div>
+
     <i></i><i></i><i></i><i></i><i></i>
   </div>
 
@@ -140,6 +141,7 @@ onUnmounted(() => {
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
+  gap: 5px;
   .box-card {
     width: 200px;
     height: 160px;
