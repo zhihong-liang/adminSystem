@@ -28,7 +28,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, nextTick, watch, onMounted } from 'vue'
+import { reactive, ref, nextTick, watch, onMounted, computed } from 'vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { useHomeStore } from '@/stores/home'
 import CnPage from '@/components/cn-page/CnPage.vue'
