@@ -65,7 +65,7 @@ const props: CnPage.Props = reactive({
     items: [
       { label: '主题编号', prop: 'themeCode', component: 'input' },
       { label: '主题名称', prop: 'themeName', component: 'input' },
-      { label: '状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS' }
+      { label: '状态', prop: 'status', component: 'select', dict: 'START_STOP' }
     ]
   },
   toolbar: {
@@ -87,9 +87,9 @@ const props: CnPage.Props = reactive({
       { prop: 'themeCode', label: '主题编号' },
       { prop: 'themeName', label: '主题名称' },
       { prop: 'themeName', label: '备注' },
-      { prop: 'menuCount', label: '包含菜单数' },
-      { prop: 'devCount', label: '使用设备数' },
-      { prop: 'status', label: '状态', dict: 'ROLE_STATUS' },
+      { prop: 'menuCount', label: '包含菜单数', width: '120px' },
+      { prop: 'devCount', label: '使用设备数', width: '120px' },
+      { prop: 'status', label: '状态', dict: 'START_STOP', width: '120px' },
       {
         prop: 'action',
         label: '操作',
@@ -131,4 +131,11 @@ const props: CnPage.Props = reactive({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+::v-deep .启用 {
+  color: #67c23a;
+}
+::v-deep .停用 {
+  color: #f56c6c;
+}
+</style>
