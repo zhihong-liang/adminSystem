@@ -114,7 +114,7 @@ const props: CnPage.Props = reactive({
           { label: '删除', type: 'danger', text: true, onClick: handleRemove },
           {
             label: '复制',
-            type: 'success',
+            type: 'info',
             text: true,
             onClick: ({ row }) => {
               dealRef.value.open(row, 'copy')

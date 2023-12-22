@@ -17,6 +17,7 @@
       <div class="role-main">
         <div class="role-name">
           {{ item.name }}
+          <span class="forbidden" v-if="item.status == 0">（停用）</span>
         </div>
         <div class="role-desc">{{ item.description }}</div>
       </div>
@@ -244,5 +245,10 @@ onUnmounted(() => {
       }
     }
   }
+}
+
+.forbidden {
+  color: #ec3535;
+  font-weight: 500;
 }
 </style>
