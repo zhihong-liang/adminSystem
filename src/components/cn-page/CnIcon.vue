@@ -6,9 +6,13 @@ export default {
   props: ['html', 'size', 'color'],
   setup(props) {
     return () => {
-      return h(ElIcon, { size: props.size, color: props.color }, () =>
-        h(resolveComponent(props.html))
-      )
+      return h(ElIcon, { size: props.size, color: props.color }, () => {
+        if (props.html) {
+          return h(resolveComponent(props.html))
+        } else {
+          return null
+        }
+      })
     }
   }
 }

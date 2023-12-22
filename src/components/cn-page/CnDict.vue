@@ -27,7 +27,7 @@ watchEffect(() => {
 
 const value = computed({
   get() {
-    return props.modelValue
+    return String(props.modelValue || '')
   },
   set(val) {
     emits('update:model-value', val)

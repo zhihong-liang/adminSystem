@@ -1,5 +1,12 @@
 <template>
   <CnDialog v-bind="dialogProps" ref="dialogRef" @success="handleSuccess">
+    <template #menuIcon>
+      <el-input v-model="dialogProps.formProps!.model.menuIcon" disabled>
+        <template #append>
+          <el-button @click="() => IconDialogRef?.open()">选择</el-button>
+        </template>
+      </el-input>
+    </template>
     <template #parentId>
       <el-cascader
         v-model="dialogProps.formProps!.model.parentId"
@@ -8,91 +15,24 @@
         ref="cascaderRef"
       />
     </template>
-    <!-- <template #footer>
-      <span>{{ dialogProps.formProps?.model.parentId }}</span>
-    </template> -->
   </CnDialog>
+  <IconDialog v-model:value="dialogProps.formProps!.model.menuIcon" ref="IconDialogRef" />
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
-import { queryMatterMenuRelation, queryMatterMenulist_No, addMatterMenu } from '@/api/matter'
+import { queryMatterMenulist_No, addMatterMenu, editMatterMenu } from '@/api/matter'
+import { DEFAILT_ITEM } from '../config/data'
+
+import IconDialog from '@/components/cn-page/CnIconsDialog.vue'
 
 import type { Resolve } from 'element-plus'
 import type { MatterMenuResponse } from '../config/type'
 
-const DEFAILT_ITEM = [
-  {
-    label: '菜单编号',
-    prop: 'menuCode',
-    component: '',
-    model: ['edit']
-  },
-  {
-    label: '菜单等级',
-    prop: 'menuLevel',
-    component: '',
-    dict: 'MATTERS_MENU_LEVEL',
-    model: ['edit']
-  },
-  {
-    label: '使用主题数',
-    prop: 'themeCount',
-    component: '',
-    model: ['edit']
-  },
-  {
-    label: '创建时间',
-    prop: 'createTime',
-    component: '',
-    model: ['edit']
-  },
-  {
-    label: '包含事项数',
-    prop: 'mattersCount',
-    component: '',
-    model: ['edit']
-  },
-  {
-    label: '创建人',
-    prop: 'createUser',
-    component: '',
-    model: ['edit']
-  },
-  {
-    label: '状态',
-    prop: 'status',
-    component: 'select',
-    dict: 'START_STOP',
-    model: ['edit']
-  },
-  {
-    label: '菜单名称',
-    prop: 'menuName',
-    component: 'input',
-    props: { maxlength: 6, showWordLimit: true },
-    model: ['add', 'edit']
-  },
-  { label: '补充说明', prop: 'description', component: 'input', model: ['add', 'edit'] },
-  {
-    label: '备注',
-    prop: 'remark',
-    component: 'input',
-    props: { type: 'textarea', maxlength: 200, showWordLimit: true },
-    model: ['add', 'edit']
-  },
-  { label: '图标', prop: 'menuIcon', component: 'slot', model: ['add', 'edit'] },
-  { label: '背景颜色', prop: 'backColor', component: 'input', model: ['add', 'edit'] },
-  {
-    label: '上级菜单',
-    prop: 'parentId',
-    component: 'slot',
-    model: ['add', 'edit']
-  }
-]
-
 const emits = defineEmits(['success'])
 
+const model = ref('') // add(新增)、edit(编辑)、copy(复制)模式
+const IconDialogRef = ref()
 const dialogProps: CnPage.DialogProps = reactive({
   title: '',
   formProps: {
@@ -111,12 +51,21 @@ const dialogProps: CnPage.DialogProps = reactive({
 })
 
 function DialogAction() {
-  const params = {
+  const params: any = {
     ...dialogProps?.formProps!.model,
     menuLevel: _menuLevel.value === 1 ? 1 : _menuLevel.value
   }
 
-  return addMatterMenu(params)
+  if (params.parentId && Array.isArray(params.parentId)) {
+    params.parentId = params.parentId[params.parentId.length - 1]
+  }
+
+  if (model.value === 'copy') {
+    params.copyId = params.id
+    params.id = null
+  }
+
+  return model.value === 'edit' ? editMatterMenu(params) : addMatterMenu(params)
 }
 
 function handleSuccess() {
@@ -127,14 +76,11 @@ function handleSuccess() {
 const _menuLevel = ref<number>(1)
 // 上级菜单懒加载
 const cascaderProps = {
-  emitPath: false,
   checkStrictly: true,
   lazy: true,
   lazyLoad(node: any, resolve: Resolve) {
-    const { value } = node
-
     const params = {
-      parentId: value
+      parentId: node.value
     }
 
     queryMatterMenulist_No(params).then((res) => {
@@ -172,21 +118,26 @@ function close() {
 
 function resetAll() {
   _menuLevel.value = 1
-  //   dialogProps.formProps.model = {}
+  dialogProps.formProps!.model = {}
 }
 
 function init(params: any) {
+  model.value = params.model
   dialogProps.formProps!.items = DEFAILT_ITEM.filter((item) =>
     item.model.includes(params.model)
-  ) as any
-  dialogProps.formProps!.model = params.data
+  ) as CnPage.FormItem[]
+  dialogProps.formProps!.model = { ...params.data }
+
+  if (params.data.parentId) {
+    dialogProps.formProps!.model.parentId = [params.data.parentId, params.data.id]
+  }
 
   if (params.model === 'add') {
     dialogProps.formProps!.colSpan = 24
     dialogProps.title = '新增事项菜单'
   } else {
     dialogProps.formProps!.colSpan = 12
-    dialogProps.title = '编辑'
+    dialogProps.title = params.model === 'edit' ? '编辑' : '复制'
   }
 }
 

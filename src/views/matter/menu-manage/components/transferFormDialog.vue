@@ -35,14 +35,16 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onBeforeMount, reactive, ref } from 'vue'
-import { queryMatterRelationListThemeMenu } from '@/api/matter'
+import { computed, reactive, ref, watchEffect } from 'vue'
+import { useRoute } from 'vue-router'
+import { queryMatterRelationListThemeMenu, queryAddMatterRelationList } from '@/api/matter'
 
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import CnTable from '@/components/cn-page/CnTable.vue'
+import type { MatterMenuRelation } from '../config/type'
 
-
-const emits = defineEmits(['submit'])
+const route = useRoute()
+const emits = defineEmits(['onSuccess'])
 
 const DEFAULT_TABLE_COLUMNS = [
   { type: 'selection' },
@@ -106,13 +108,21 @@ function reset() {
 }
 
 function handleSubmit() {
-  emits('submit', rightTableProps.data)
-  reset()
-  close()
+  const params = rightTableProps.data.map((matter: MatterMenuRelation) => ({
+    ...matter,
+    menuId: route.query.id,
+  }))
+
+  queryAddMatterRelationList(params).then((res) => {
+    if (res.code === '200') {
+      emits('onSuccess')
+      close()
+    }
+  })
 }
 
 function getMatterMenuList() {
-  queryMatterRelationListThemeMenu({}).then((res) => {
+  queryMatterRelationListThemeMenu({ menuId: route.query.id } as any).then((res) => {
     if (res.code === '200') {
       leftTableProps.data = res.data
     }
@@ -122,14 +132,11 @@ function getMatterMenuList() {
 const dialogRef = ref()
 function open() {
   dialogRef.value!.open()
+  getMatterMenuList()
 }
 function close() {
   dialogRef.value!.close()
 }
-
-onBeforeMount(() => {
-  getMatterMenuList()
-})
 
 defineExpose({ open })
 </script>

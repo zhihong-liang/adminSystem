@@ -17,6 +17,7 @@
       <div class="role-main">
         <div class="role-name">
           {{ item.name }}
+          <span class="forbidden" v-if="item.status == 0">（停用）</span>
         </div>
         <div class="role-desc">{{ item.description }}</div>
       </div>
@@ -40,7 +41,6 @@
         </div>
       </div>
     </div>
-    <i></i><i></i><i></i><i></i><i></i>
   </div>
 
   <Deal
@@ -139,10 +139,13 @@ onUnmounted(() => {
   margin-top: 16px;
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+
+  gap: 20px;
   .box-card {
     width: 200px;
     height: 160px;
+    box-sizing: border-box;
+    overflow: hidden;
     .card-content {
       height: 100px;
     }
@@ -150,9 +153,10 @@ onUnmounted(() => {
 }
 .add-card {
   width: 222px;
-  height: 156px;
+  height: 160px;
+  box-sizing: border-box;
   background: #ffffff;
-  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  box-shadow: 0px 2px 6px 0px #dfe1e3;
   border-radius: 6px;
   overflow: hidden;
   color: #303133;
@@ -170,11 +174,12 @@ onUnmounted(() => {
   }
 }
 .role-card {
+  box-sizing: border-box;
   margin-bottom: 15px;
   width: 226px;
   height: 156px;
   background: #ffffff;
-  box-shadow: 0px 2px 6px 0px #f0f2f7;
+  box-shadow: 0px 2px 6px 0px #dfe1e3;
   border-radius: 6px;
   overflow: hidden;
   color: #303133;
@@ -222,7 +227,6 @@ onUnmounted(() => {
       justify-content: center;
       align-items: center;
       box-sizing: border-box;
-
       border-radius: 6px;
       &:last-child {
         border: none;
@@ -242,7 +246,9 @@ onUnmounted(() => {
     }
   }
 }
-i {
-  width: 222px;
+
+.forbidden {
+  color: #ec3535;
+  font-weight: 500;
 }
 </style>
