@@ -31,11 +31,11 @@
         }}</el-button>
       </template>
     </CnPage>
-    <TransferFormDialog
-      ref="transferFormDialogRef"
-      @onSuccess="() => (pageProps.refresh = new Date().getTime())"
-    />
   </div>
+  <TransferFormDialog
+    ref="transferFormDialogRef"
+    @onSuccess="() => (pageProps.refresh = new Date().getTime())"
+  />
 </template>
 
 <script setup lang="ts">
@@ -71,7 +71,10 @@ const formProps: CnPage.FormProps = reactive({
   model: {},
   labelPosition: 'left',
   labelWidth: '100',
-  items: DEFAILT_ITEM,
+  items: DEFAILT_ITEM.map((i) => {
+    i.prop === 'status' && (i.component = '') // 设置为readOnly
+    return i
+  }),
   readonly: true,
   colSpan: 12,
   rules: {
@@ -171,7 +174,7 @@ const cascaderProps = {
   }
 }
 
-function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelTop') {
+function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelTop'): void {
   const { id, sortTop } = row
 
   if (actionName === 'up' && sortTop === 1) return
@@ -192,25 +195,8 @@ function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelT
   })
 }
 
-// 获取事项进驻单位
-function getUnitList() {
-  const params = {
-    obj: {},
-    size: 10000
-  }
-
-  queryUnitList(params).then((res) => {
-    if (res.code === '200') {
-      enterUnitList.value = res.rows.map((item) => ({
-        label: item.fullName,
-        value: item.id
-      }))
-    }
-  })
-}
-
 // 删除事项
-function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]) {
+function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]): void {
   if (Array.isArray(row) && !row.length) return
 
   const opts = {
@@ -229,21 +215,28 @@ function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]) {
   useConfirm(opts)
 }
 
-async function init() {
-  formProps.items.forEach((item: any) => {
-    if (item.prop === 'status') {
-      item.component = ''
+function init(): void {
+  // 获取事项进驻单位
+  queryUnitList({ obj: {}, size: 10000 }).then((res) => {
+    if (res.code === '200') {
+      enterUnitList.value = res.rows.map((item) => ({
+        label: item.fullName,
+        value: item.id
+      }))
     }
   })
 
-  const id = route.query.id as any
-
-  getUnitList()
-
-  const matterInfo = await queryMatterDetail(id)
-  if (matterInfo.code === '200') {
-    formProps.model = matterInfo.data
-  }
+  // 请求菜单详情
+  queryMatterDetail(route.query.id as any).then((res) => {
+    if (res.code === '200') {
+      formProps.model = res.data
+    } else {
+      formProps.model = {
+        menuLevel: '',
+        status: ''
+      }
+    }
+  })
 }
 
 onBeforeMount(() => {
