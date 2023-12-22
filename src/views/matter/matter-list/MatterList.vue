@@ -263,7 +263,7 @@ async function exportMatterListAction() {
     'matterStatus'
   ]
   const filedNameList = [
-    '粤智助事项编码',
+    '事项编码',
     '事项别名',
     '事项名称',
     '业务部门',
