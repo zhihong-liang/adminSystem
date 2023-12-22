@@ -6,7 +6,7 @@ import { useHomeStore } from '@/stores'
 import zhCn from 'element-plus/dist/locale/zh-cn.mjs'
 import { queryAreaAll } from '@/hooks/useDivision'
 
-const { updateModules} = useHomeStore()
+const { updateModules } = useHomeStore()
 const local = computed(() => zhCn)
 
 const modules = import.meta.glob('./views/**/*.vue')

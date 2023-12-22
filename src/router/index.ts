@@ -12,7 +12,6 @@ import { useHomeStore, useLoginStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { getToken } from '@/utils/auth'
 
-
 import BaseLayout from '../layout/index.vue'
 
 import type { BreadcrumbItem, Menu } from '@/layout/type'
@@ -34,11 +33,13 @@ const formatMenus = (menus: Menu[], modules: any) => {
       menu.children = formatMenus(childList, modules)
     }
 
+    // console.log('component: ', modules)
+
     if (type === 'dirt') {
-      menu.component = modules[component!]
+      menu.component = modules[component as string]
     }
 
-    menu = Object.assign(menu, {
+    menu = Object.assign({}, menu, {
       path,
       name: code,
       meta: {
@@ -47,6 +48,8 @@ const formatMenus = (menus: Menu[], modules: any) => {
         parentId
       }
     })
+
+    // console.log('menu: ', menu)
 
     return menu
   })
@@ -60,6 +63,8 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
     ...formatMenus(menuList, modules)
     // TODO 添加404
   ]
+
+  // console.log('_children: ', _children)
 
   const baseRoute: any = {
     path: '/',
@@ -103,14 +108,15 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
-
   if (to.path === '/login') {
     resetAll()
-    return next()
+    next()
+    return
   }
 
   if (hasToken) {
     if (refresh.value && menuList.value.length) {
+
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
 
@@ -119,11 +125,10 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       // 发现没有菜单列表数据，先请求菜单接口，再重新跑一次守卫逻辑，下一次就不会跑进这里
       if (!menuList.value.length) {
         const loginInfo: any = useLoginStore()
-        await getMenuList({ manual: false, params: { currentRoleId: loginInfo.$state.userInfo.currentRoleId || 1 }})
-        // 要刷新一次，不然页面会空白,先这样处理，有空再改
-        setTimeout(() => {
-          location.reload();
-        }, 100);
+        await getMenuList({
+          manual: false,
+          params: { currentRoleId: loginInfo.$state.userInfo.currentRoleId || 1 }
+        })
 
         next({ path: to.path, query: to.query })
       } else {
