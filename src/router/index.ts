@@ -103,7 +103,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const hasToken = !!getToken()
 
-  console.log('to: ', to)
 
   if (to.path === '/login') {
     resetAll()
