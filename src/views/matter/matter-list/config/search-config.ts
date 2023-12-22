@@ -6,7 +6,7 @@ export function getSearchConfig(
     model: {},
     labelPosition: 'left',
     items: [
-      { label: '粤智助事项编码', prop: 'matterCode', component: 'input' },
+      { label: '事项编码', prop: 'matterCode', component: 'input' },
       { label: '事项名称', prop: 'matterName', component: 'input' },
       {
         label: '事项别名',

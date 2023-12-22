@@ -34,7 +34,7 @@
       <!-- 删除多个标签 -->
       <template #deleteTitle v-if="handleType === 'manyDelete'">
         <div class="deleteTitle">
-          确定删除 "<span class="labelName"> {{ (labelName as any).join('，') }} </span>" 标签
+          确定删除 "<span class="labelName"> {{ (labelName as any[]).join('，') }} </span>" 标签
         </div>
       </template>
       <template #footer v-if="handleType === 'manyDelete'">

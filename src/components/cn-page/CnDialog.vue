@@ -93,5 +93,5 @@ function open() {
 function close() {
   visible.value = false
 }
-defineExpose({ open, close })
+defineExpose({ open, close, handleSubmit })
 </script>

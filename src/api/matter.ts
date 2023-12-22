@@ -229,5 +229,33 @@ export interface HandleNotice {
   matterName?: string
   mattersHandleNoticeStatus?: string
 }
+// 查询办理需知管理列表
 export const getHandleNoticeList = (data: ListReq<ServiceNotice>): Promise<ListRes> =>
   axios.post('/api/matters/handleNotice/list', data)
+// 上线-下线办理需知管理
+export const pushDownNotice = (data: any): Promise<Res> =>
+  axios.put('/api/matters/handleNotice/pushDown', data)
+// 查询办理材料库列表
+export const getFileList = (data: any): Promise<any> => axios.post('/api/matters/files/list', data)
+// 新增办理需知管理
+export const addNotice = (data: any): Promise<any> =>
+  axios.post('/api/matters/handleNotice/add', data)
+// 删除办理需知管理
+export const deleteNotice = (ids: string): Promise<any> =>
+  axios.delete(`/api/matters/handleNotice/remove/${ids}`)
+// 获取办理需知管理详细信息
+export const getNoticeDetail = (id: string): Promise<any> =>
+  axios.get(`/api/matters/handleNotice/get/${id}`)
+// 修改办理需知管理
+export const editNotice = (data: any): Promise<any> =>
+  axios.put('/api/matters/handleNotice/edit', data)
+
+/*
+ * 文件上传
+ */
+export const uploadFile = (data: any): Promise<any> =>
+  axios.post('/api/file/infra/file/upload', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
