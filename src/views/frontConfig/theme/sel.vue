@@ -138,7 +138,7 @@ const dialogProps = reactive({
       { label: '创建时间', prop: 'createTime', span: 12 },
       { label: '主题编号', prop: 'themeCode', span: 12 },
       { label: '主题名称', prop: 'themeName', span: 12 },
-      { label: '状态', prop: 'status', dict: 'ROLE_STATUS', span: 12 },
+      { label: '状态', prop: 'status', dict: 'START_STOP', span: 12 },
       { label: '备注', prop: 'remark', span: 12 },
       { label: '', component: 'slot', prop: 'tabs' },
       { label: '', component: 'slot', prop: 'addmenu' }
@@ -159,6 +159,7 @@ const open = (row: any) => {
 defineExpose({ open })
 
 const initDia = () => {
+  tableData.value = []
   getTabList(() => {
     tabIndex.value = 0
     getMenuFromLabel()

@@ -65,7 +65,7 @@ const props: CnPage.Props = reactive({
     items: [
       { label: '主题编号', prop: 'themeCode', component: 'input' },
       { label: '主题名称', prop: 'themeName', component: 'input' },
-      { label: '状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS' }
+      { label: '状态', prop: 'status', component: 'select', dict: 'START_STOP' }
     ]
   },
   toolbar: {
@@ -89,7 +89,7 @@ const props: CnPage.Props = reactive({
       { prop: 'themeName', label: '备注' },
       { prop: 'menuCount', label: '包含菜单数' },
       { prop: 'devCount', label: '使用设备数' },
-      { prop: 'status', label: '状态', dict: 'ROLE_STATUS' },
+      { prop: 'status', label: '状态', dict: 'START_STOP' },
       {
         prop: 'action',
         label: '操作',
