@@ -131,27 +131,33 @@ const dialogProps = reactive({
   }
 })
 
-function handleCopy({ row }: any) {
+function handleCopy({ row }: any): void {
   dialogProps.model = 'copy'
   dialogProps.data = row
   menuDialogRef.value.open(dialogProps)
 }
 
-function handleEdit({ row }: any) {
+function handleEdit({ row }: any): void {
   dialogProps.model = 'edit'
   dialogProps.data = row
   menuDialogRef.value.open(dialogProps)
 }
 
-function handleDelete(row: MatterMenu | Array<MatterMenuResponse>) {
+function handleDelete(row: MatterMenu | Array<MatterMenuResponse>): void {
   if (Array.isArray(row) && !row.length) return
 
   const opts = {
     message: '确定删除菜单吗?',
     title: '删除',
     action: () =>
-      delMatterMenu({
-        ids: Array.isArray(row) ? row.map((m) => m.id).join(',') : row.id || ''
+      new Promise((resolve, reject) => {
+        delMatterMenu({
+          ids: Array.isArray(row) ? row.map((m) => m.id).join(',') : row.id || ''
+        })
+          .then((res) => {
+            resolve(res)
+          })
+          .catch(() => reject({}))
       }),
     success: () => {
       props.refresh = new Date().getTime()
@@ -160,17 +166,17 @@ function handleDelete(row: MatterMenu | Array<MatterMenuResponse>) {
   useConfirm(opts)
 }
 
-function handleQueryMatterMenuList(pid: number | undefined, callback: Function) {
+function handleQueryMatterMenuList(pid: number | undefined, callback: Function): void {
   queryMatterMenulist_No({ parentId: pid } as MatterMenu).then((res) => {
     callback(res.data.map((item) => ({ ...item, menuLevel: item.menuLevel?.toString() })))
   })
 }
 
 // 排序操作
-function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelTop') {
+function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelTop'): void {
   const { id, parentId, sortTop } = row
 
-  if (actionName === 'up' && sortTop === 1) return
+  if (actionName === 'up' && sortTop === 1) return // 置顶状态的数据，上升操作无效
 
   const map = {
     up: { api: upperMatterMenu, params: id },
@@ -194,7 +200,7 @@ function TableLoad(
   row: MatterMenuResponse,
   treeNode: unknown,
   resolve: (date: MatterMenuResponse[]) => void
-) {
+): void {
   _resolve.value = resolve
   // 局部更新
   handleQueryMatterMenuList(row.id, resolve)
