@@ -1,6 +1,5 @@
 <template>
   <CnPage v-bind="props"></CnPage>
-  <div class="cell">启用</div>
   <Deal
     ref="dealRef"
     @success="
@@ -133,10 +132,10 @@ const props: CnPage.Props = reactive({
 </script>
 
 <style scoped lang="scss">
-:deep(.启用) {
+::v-deep .启用 {
   color: #67c23a;
 }
-:deep(.停用) {
+::v-deep .停用 {
   color: #f56c6c;
 }
 </style>
