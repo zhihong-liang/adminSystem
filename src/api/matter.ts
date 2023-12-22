@@ -139,6 +139,14 @@ export const addMattersProgramme = (data: any): Promise<Res> =>
 export const putMattersProgramme = (data: any): Promise<Res> =>
   axios.put( matters + `/mattersProgramme`, data)
 
+// 修改方案管理表 
+export const mattersProgrammeRelationListProgrammeMatters = (data: any): Promise<Res> =>
+  axios.post( matters + `/mattersProgrammeRelation/listProgrammeMatters`, data)
+
+// 新增方案-事项关联表(list,列表)
+export const mattersProgrammeRelationAddList = (data: any): Promise<Res> =>
+  axios.post( matters + `/mattersProgrammeRelation/addList`, data)
+
 /**
   * 菜单管理
  */

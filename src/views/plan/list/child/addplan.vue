@@ -28,17 +28,17 @@
                 :props="props"
                 :load="loadNode"
                 lazy
-                @node-expand="nodeExpand"
+                @node-click="nodeClick"
               ></el-tree>
             </div>
           </el-col>
           <el-col :span="17">
             <div v-if="isShowTree">
               <div>
-                <el-button type="primary" @click="selectionItems">选择事项</el-button>
+                <el-button type="primary" @click="selectionItems" :disabled="selectTm">选择事项</el-button>
                 <el-button type="default">取消选择</el-button>
               </div>
-              <Table v-bind="tableProps"></Table>
+              <CnTable v-bind="tableProps"></CnTable>
             </div>
           </el-col>
           <el-col :span="24">
@@ -48,7 +48,7 @@
       </el-form>
     </template>
   </CnDialog>
-  <SelectionItems ref="selectionItemsRef"></SelectionItems>
+  <SelectionItems ref="selectionItemsRef" @onHandleSubmit="onHandleSubmit"></SelectionItems>
 </template>
 
 <script setup lang="ts">
@@ -75,6 +75,8 @@ const themmNameList = ref([]);
 const formLoading = ref(false);
 const isShowTree = ref(false);
 const labelId = ref();
+const selectTm = ref(true);
+const mattersMenuId = ref();
 const selectionItemsRef = ref();
 
 const props = {
@@ -113,27 +115,6 @@ const dialogProps: CnPage.DialogProps = reactive({
         component: "select",
         props: {
           options: themmNameList,
-          // onChange: () => {
-          //   if (isType.value === "select") {
-          //     formLoading.value = true;
-          //     const params = {
-          //       themeId: dialogProps.formProps.model.themeName,
-          //     };
-          //     mattersThemeLabelList(params).then((res) => {
-          //       const { code, data, message } = res;
-          //       if (code == "200" && data.length > 0) {
-          //         labelId.value = data[0].id;
-          //         fromData.labelName = data[0].id;
-          //         themeList.value = data;
-          //         isShowTree.value = true;
-          //         formLoading.value = false;
-          //         console.log("id", data[0].id);
-          //       } else {
-          //         formLoading.value = false;
-          //       }
-          //     });
-          //   }
-          // },
         },
       },
       {
@@ -181,22 +162,17 @@ const dialogProps: CnPage.DialogProps = reactive({
   },
 });
 
+
+
 const tableProps = reactive<CnPage.Props>({
   columns: [
     { type: "selection" },
-    { label: "事项编号", slot: "proDevCode" },
-    { label: "事项名称", prop: "unitDevCode" },
-    { label: "事项别名", prop: "status", dict: "devModelNo" },
-    { label: "事项进驻单位", prop: "regionDetail" },
-    { label: "系统覆盖范围", prop: "detailAddress" },
-    { label: "办理类型", prop: "terminalManagePhone" },
-    { label: "事项状态", prop: "installActivateTime" },
-    {
-      prop: "action",
-      label: "操作",
-      minWidth: 120,
-      // buttons: [{ label: "编辑", type: "primary", text: true, onClick: handleEdit }],
-    },
+    { label: "事项编号", slot: "matterCode" },
+    { label: "事项名称", prop: "matterName" },
+    { label: "事项别名", prop: "matterAlias" },
+    { label: "事项进驻单位", prop: "entryUnitText" },
+    { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE" },
+    { label: "事项状态", prop: "matterStatus", dict: "HANDLE_TYPE" },
   ],
   data: [],
 });
@@ -224,14 +200,15 @@ const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
     }
   }
 };
-const nodeExpand = (node: any) => {
-  const paramsTm = {
-    labelId: node.labelId,
-    parentId: node.id,
-  };
+const nodeClick = (node: any) => {
+  console.log("fdfffffffffffff", node);
+  
+  selectTm.value = false
+  mattersMenuId.value = node.mattersMenuId
 };
 const tabClick = (labelId) => {
   console.log('123', labelId); 
+  fromData.labelName = labelId
 }
 const open = async (data: any, _type: string) => {
   dialogRef.value.open();
@@ -257,8 +234,6 @@ const open = async (data: any, _type: string) => {
     dialogProps.formProps!.disabled = true;
     dialogProps.action = () => handleSubmit("select");
     dialogProps.title = "选择事项";
-    console.log("data::::::::::::::", data);
-
     const params = {
       themeId: data.themeId,
     };
@@ -279,9 +254,12 @@ const open = async (data: any, _type: string) => {
 const selectionItems = () => {
   // console.log(data);
   const params = {
-    id: "",
+    programmeId: dialogProps.formProps!.model.id,
+    labelId: fromData.labelName,
+    mattersMenuId: mattersMenuId.value,
+    themeId: dialogProps.formProps!.model.themeId
   };
-  selectionItemsRef.value.open(params, "add");
+  selectionItemsRef.value.open(params);
 };
 const onSuccess = () => {};
 function handleSubmit(action: "add" | "edit" | "select") {
@@ -297,7 +275,9 @@ function handleSubmit(action: "add" | "edit" | "select") {
   }
   // return action === 'add' ? addMattersProgramme(params) : putMattersProgramme(params)
 }
-
+const onHandleSubmit = (data) => {
+  tableProps.data = data
+}
 defineExpose({ open });
 </script>
 
