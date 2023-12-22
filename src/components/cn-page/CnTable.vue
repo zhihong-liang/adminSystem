@@ -33,7 +33,12 @@ export default {
                       if (row[column.prop] === undefined || row[column.prop] === null) {
                         return ''
                       }
-                      return useDictionary(dict, row[column.prop]).value
+                      let label = useDictionary(dict, row[column.prop]).value
+                      return h(
+                        'span',
+                        { class: label + ' ' + column.prop + row[column.prop] },
+                        label
+                      )
                     }
                     delete column.dict
                   } else if (column.buttons) {

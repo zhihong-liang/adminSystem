@@ -1,5 +1,6 @@
 <template>
   <CnPage v-bind="props"></CnPage>
+  <div class="cell">启用</div>
   <Deal
     ref="dealRef"
     @success="
@@ -87,9 +88,9 @@ const props: CnPage.Props = reactive({
       { prop: 'themeCode', label: '主题编号' },
       { prop: 'themeName', label: '主题名称' },
       { prop: 'themeName', label: '备注' },
-      { prop: 'menuCount', label: '包含菜单数' },
-      { prop: 'devCount', label: '使用设备数' },
-      { prop: 'status', label: '状态', dict: 'START_STOP' },
+      { prop: 'menuCount', label: '包含菜单数', width: '120px' },
+      { prop: 'devCount', label: '使用设备数', width: '120px' },
+      { prop: 'status', label: '状态', dict: 'START_STOP', width: '120px' },
       {
         prop: 'action',
         label: '操作',
@@ -131,4 +132,11 @@ const props: CnPage.Props = reactive({
 })
 </script>
 
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+:deep(.启用) {
+  color: #67c23a;
+}
+:deep(.停用) {
+  color: #f56c6c;
+}
+</style>
