@@ -210,7 +210,7 @@ function handleSubmit(action: 'add' | 'edit') {
   if (action === 'add') {
     params = Object.assign({}, params, {
       createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-      createUser: 'ceshi'
+      // createUser: 'ceshi'
     })
 
     if (params.parentId) {
@@ -221,7 +221,7 @@ function handleSubmit(action: 'add' | 'edit') {
   } else {
     params = Object.assign({}, params, {
       updateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-      updateUser: 'ceshi'
+      // updateUser: 'ceshi'
     })
   }
 

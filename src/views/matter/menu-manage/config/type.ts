@@ -63,6 +63,7 @@ export interface MatterMenuResponse {
   themeCount?: number
   updateTime?: string
   updateUser?: string
+  isTop?: boolean // 判断每一层中的数据是否排第一条
 }
 
 export interface MatterMenuRelation {
