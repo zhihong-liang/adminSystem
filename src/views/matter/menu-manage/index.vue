@@ -1,10 +1,19 @@
 <template>
-  <CnPage v-bind="props"></CnPage>
+  <CnPage v-bind="props">
+    <template #sort="{ $index, row }">
+      <template v-if="row.menuLevel !== 1">
+        <el-button type="primary" icon="Top" text></el-button>
+        <el-button type="primary" icon="Bottom" text></el-button>
+        <el-button text>{{ $index ? '置顶' : '取消置顶' }}</el-button>
+      </template>
+    </template>
+  </CnPage>
   <MenuDialog ref="menuDialogRef" @success="() => (props.refresh = new Date().getTime())" />
 </template>
 
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import useConfirm from '@/hooks/useConfirm'
 import { queryMatterMenulist_No, delMatterMenu } from '@/api/matter'
 
@@ -12,6 +21,8 @@ import CnPage from '@/components/cn-page/CnPage.vue'
 import MenuDialog from './components/menuDialog.vue'
 
 import type { MatterMenu, MatterMenuResponse } from '@/views/matter/menu-manage/config/type'
+
+const router = useRouter()
 
 const menuDialogRef = ref()
 const selectedList = ref<MatterMenuResponse[]>([]) // table选中的数据
@@ -56,16 +67,32 @@ const props: CnPage.Props = reactive({
       { prop: 'mattersCount', label: '包含事项数' },
       { prop: 'themeCount', label: '使用主题数' },
       { prop: 'status', label: '状态', dict: 'START_STOP' },
-      { prop: 'sort', label: '排序' },
+      {
+        prop: 'sort',
+        label: '排序',
+        minWidth: 130,
+        slot: 'sort'
+        // buttons: [
+        //   { label: '', type: 'primary', icon: 'Top', text: true, onClick: handleEdit },
+        //   { label: '', type: 'primary', icon: 'Bottom', text: true, onClick: handleEdit },
+        //   { label: '置顶', text: true, onClick: handleEdit }
+        // ]
+      },
       {
         prop: 'action',
         label: '操作',
         minWidth: 150,
         buttons: [
           { label: '编辑', type: 'primary', text: true, onClick: handleEdit },
-          { label: '选择事项', type: 'primary', text: true },
+          {
+            label: '选择事项',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }: any) =>
+              router.push({ path: '/matter/menuManage/chooseMatter', query: { id: row.id } })
+          },
           { label: '删除', type: 'primary', text: true, onClick: ({ row }) => handleDelete(row) },
-          { label: '复制', type: 'primary', text: true }
+          { label: '复制', type: 'primary', text: true, onClick: handleCopy }
         ]
       }
     ],
@@ -91,6 +118,12 @@ const dialogProps = reactive({
   }
 })
 
+function handleCopy({ row }: any) {
+  dialogProps.model = 'copy'
+  dialogProps.data = row
+  menuDialogRef.value.open(dialogProps)
+}
+
 function handleEdit({ row }: any) {
   dialogProps.model = 'edit'
   dialogProps.data = row
@@ -98,6 +131,8 @@ function handleEdit({ row }: any) {
 }
 
 function handleDelete(row: MatterMenu | Array<MatterMenuResponse>) {
+  if (Array.isArray(row) && !row.length) return
+
   const opts = {
     message: '确定删除菜单吗?',
     title: '删除',

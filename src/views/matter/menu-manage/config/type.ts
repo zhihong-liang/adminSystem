@@ -75,7 +75,7 @@ export interface MatterMenuRelation {
   matterName?: string
   matterStatus?: string
   mattersId?: number
-  menuId?: number
+  menuId?: number | string
   sort?: number
   sortTop?: number
   status?: string

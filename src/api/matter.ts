@@ -156,8 +156,9 @@ export const queryMatterMenulist_No = (data: MatterMenu): Promise<Res<MatterMenu
   axios.post('/api/matters/mattersMenu/list', data)
 
 // 查询事项菜单列表(分页)
-export const queryMatterMenulist = (data: MatterMenuRes<MatterMenu>): Promise<ListRes<MatterMenuResponse>> =>
-  axios.post('/api/matters/mattersMenu/listPage', data)
+export const queryMatterMenulist = (
+  data: MatterMenuRes<MatterMenu>
+): Promise<ListRes<MatterMenuResponse>> => axios.post('/api/matters/mattersMenu/listPage', data)
 
 // 新增/复制 事项菜单
 export const addMatterMenu = (data: MatterMenu): Promise<Res> =>
@@ -167,9 +168,13 @@ export const addMatterMenu = (data: MatterMenu): Promise<Res> =>
 export const delMatterMenu = (data: any): Promise<Res> =>
   axios.delete(`/api/matters/mattersMenu/${data.ids}`)
 
+// 编辑 事项菜单
+export const editMatterMenu = (data: MatterMenu): Promise<Res> =>
+  axios.put('/api/matters/mattersMenu', data)
+
 // 查询菜单-事项关联表列表(不分页)
 export const queryMatterMenuRelation_No = (data: MatterMenu): Promise<Res> =>
-  axios.post('/api/matters/mattersMenuRelation/listPage', data)
+  axios.post('/api/matters/mattersMenuRelation/list', data)
 
 // 查询菜单-事项关联表列表(分页)
 export const queryMatterMenuRelation = (
@@ -182,6 +187,22 @@ export const queryMatterRelationListThemeMenu = (
   data: MatterThemeMenuItem
 ): Promise<Res<MatterThemeMenuItem[]>> =>
   axios.post('/api/matters/mattersMenuRelation/listMenuMatters', data)
+
+// 获取菜单-事项关联表详细信息
+export const queryMatterDetail = (id: number): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenu/${id}`)
+
+// 获取菜单-事项关联表详细信息
+export const queryMatterRelationDetail = (id: number): Promise<Res<MatterThemeMenuItem[]>> =>
+  axios.get(`/api/matters/mattersMenuRelation/${id}`)
+
+// 新增菜单-事项关联表-批量
+export const queryAddMatterRelationList = (data: MatterMenuRelation[]): Promise<Res> =>
+  axios.post('/api/matters/mattersMenuRelation/addList', data)
+
+// 删除菜单-事项关联表
+export const deleteMatterRelationList = (data: Record<'ids', string>): Promise<Res> =>
+  axios.delete(`/api/matters/mattersMenuRelation/${data.ids}`)
 
 /*
  * 办理须知管理
