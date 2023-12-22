@@ -13,7 +13,6 @@
           >
             <el-table-column type="selection" width="40" :reserve-selection="true" />
             <el-table-column prop="menuName" label="菜单名称" width="250" />
-            <el-table-column prop="menuCode" label="菜单编号" width="160" />
             <el-table-column prop="mattersCount" label="包含事项数" width="100" />
             <el-table-column prop="remark" label="备注" />
           </el-table>
@@ -32,7 +31,6 @@
             row-key="mattersMenuId"
           >
             <el-table-column prop="menuName" label="菜单名称" width="250" />
-            <el-table-column prop="menuCode" label="菜单编号" width="160" />
             <el-table-column prop="mattersCount" label="包含事项数" width="100" />
             <el-table-column prop="remark" label="备注" />
             <el-table-column label="操作" fixed="right" width="90">

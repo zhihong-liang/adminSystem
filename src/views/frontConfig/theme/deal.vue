@@ -21,10 +21,19 @@ const checkThemeName = (rule: any, value: any, callback: any) => {
     themeName: dialogProps.formProps?.model?.themeName,
     id: dialogProps.formProps!.model?.id || ''
   }).then((res) => {
-    if (res.data) {
+    if (!res.data) {
       callback()
     } else {
-      callback(new Error('主题名称重复'))
+      if (type.value == 'edit') {
+        console.log('value: ', value)
+        if (oldThemeName == value) {
+          callback()
+        } else {
+          callback(new Error('主题名称重复'))
+        }
+      } else {
+        callback(new Error('主题名称重复'))
+      }
     }
   })
 }
@@ -38,8 +47,13 @@ const dialogProps = reactive({
       return EditRequest(params)
     } else if (type.value === 'copy') {
       params.copyId = params.id
-      delete params.id
-      return CopyRequest(params)
+      let _params = {
+        copyId: params.id,
+        remark: params.remark,
+        themeName: params.themeName,
+        status: params.status
+      }
+      return CopyRequest(_params)
     }
   },
   formProps: {
@@ -60,7 +74,8 @@ const dialogProps = reactive({
 
 const dialogRef = ref()
 const type = ref<string>('add')
-const open = (data: ThemeType, _type: string) => {
+let oldThemeName = ''
+const open = (data: any, _type: string) => {
   type.value = _type || 'add'
   if (_type == 'edit') {
     dialogProps.title = '修改'
@@ -72,9 +87,10 @@ const open = (data: ThemeType, _type: string) => {
       { label: '创建时间', prop: 'createTime', span: 12 },
       { label: '主题编号', prop: 'themeCode', component: 'input', span: 12 },
       { label: '主题名称', prop: 'themeName', component: 'input', span: 12 },
-      { label: '状态', prop: 'status', component: 'select', dict: 'ROLE_STATUS', span: 12 },
+      { label: '状态', prop: 'status', component: 'select', dict: 'START_STOP', span: 12 },
       { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' }, span: 24 }
     ]
+    oldThemeName = data.themeName
   }
   if (_type == 'add') {
     dialogProps.formProps!.model = {}

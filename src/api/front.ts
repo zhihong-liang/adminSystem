@@ -30,7 +30,7 @@ export const delMattersThemeInfo = (ids: string | number): Promise<Res> => axios
 export const isExistThemeName = (params: ThemeType): Promise<Res> => axios.get(`/api/matters/mattersThemeInfo/isExistThemeName`, { params })
 
 // 复制事项主题
-export const copyThemeInfo = (data: ThemeType): Promise<Res> => axios.post('/api/matters/copytheme', data)
+export const copyThemeInfo = (data: ThemeType): Promise<Res> => axios.post('/api/matters/mattersThemeInfo', data)
 
 /**
  * 主题标签
