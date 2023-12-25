@@ -144,7 +144,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       }
     }
   } else {
-    if (to.path !== '/login') {
+    if (to.path !== '/login' && to.path !== "/noauth") {
       next('/login')
     } else {
       next()

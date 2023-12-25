@@ -109,23 +109,27 @@ const handleLogin = async () => {
         userName: form.username,
         password: password
       }).then(async (res) => {
-        setToken(res.data.accessToken)
-        updateUserInfo(res.data)
-        getLoginInfo(res.data)
-        // localStorage.setItem('userInfo', JSON.stringify(res.data))
-        if (form.remember) {
-          localStorage.setItem('userName', form.username)
-          localStorage.setItem('password', form.password)
-          localStorage.setItem('remember', form.remember ? '1' : '0')
-        } else {
-          localStorage.removeItem('username')
-          localStorage.removeItem('password')
-          localStorage.removeItem('remember')
-        }
-        Message.success('登录成功')
-        queryAreaAll()
+        if (res.data.status == 1) {
+          setToken(res.data.accessToken)
+          updateUserInfo(res.data)
+          getLoginInfo(res.data)
+          // localStorage.setItem('userInfo', JSON.stringify(res.data))
+          if (form.remember) {
+            localStorage.setItem('userName', form.username)
+            localStorage.setItem('password', form.password)
+            localStorage.setItem('remember', form.remember ? '1' : '0')
+          } else {
+            localStorage.removeItem('username')
+            localStorage.removeItem('password')
+            localStorage.removeItem('remember')
+          }
+          Message.success('登录成功')
+          queryAreaAll()
 
-        router.push('/system/usercenter') // 默认跳到个人中心
+          router.push('/system/usercenter') // 默认跳到个人中心
+        } else {
+          router.push('/noauth')
+        }
       })
     }
   })

@@ -136,24 +136,18 @@ onUnmounted(() => {
   border-radius: 6px;
 }
 .role-list {
+  box-sizing: border-box;
+  width: 100%;
   margin-top: 16px;
-  display: flex;
-  flex-wrap: wrap;
-
-  gap: 20px;
-  .box-card {
-    width: 200px;
-    height: 160px;
-    box-sizing: border-box;
-    overflow: hidden;
-    .card-content {
-      height: 100px;
-    }
-  }
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 220px);
+  grid-template-rows: repeat(auto-fill, 160px);
+  justify-content: space-between;
+  grid-gap: 10px;
 }
 .add-card {
-  width: 222px;
-  height: 160px;
+  width: 100%;
+  height: 100%;
   box-sizing: border-box;
   background: #ffffff;
   box-shadow: 0px 2px 6px 0px #dfe1e3;
@@ -176,8 +170,8 @@ onUnmounted(() => {
 .role-card {
   box-sizing: border-box;
   margin-bottom: 15px;
-  width: 226px;
-  height: 156px;
+  width: 100%;
+  height: 100%;
   background: #ffffff;
   box-shadow: 0px 2px 6px 0px #dfe1e3;
   border-radius: 6px;

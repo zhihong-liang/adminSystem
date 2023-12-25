@@ -11,7 +11,11 @@ const props = reactive<CnPage.Props>({
   params: { parentId: 0 },
   action: areaList,
   transformRequest: (params) => {
-    console.log('params: ', params)
+    if (params.areaName || params.areaCode) {
+      delete params.parentId
+    } else {
+      params.parentId = 0
+    }
     return params
   },
   transformResponse: (data) => {
