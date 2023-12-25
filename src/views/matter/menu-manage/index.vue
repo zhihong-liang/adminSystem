@@ -4,6 +4,7 @@
       <template v-if="parseInt(row.menuLevel) > 1">
         <el-button type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
         <el-button
+          v-permission="'down'"
           type="primary"
           icon="Bottom"
           text
@@ -67,6 +68,7 @@ const props: CnPage.Props = reactive({
         label: '删除',
         type: 'primary',
         plain: true,
+        directives: [{ label: 'permission', value: 'delete' }],
         onClick: () => handleDelete(selectedList.value)
       }
     ]
@@ -101,7 +103,13 @@ const props: CnPage.Props = reactive({
             onClick: ({ row }: any) =>
               router.push({ path: '/matter/menuManage/chooseMatter', query: { id: row.id } })
           },
-          { label: '删除', type: 'primary', text: true, onClick: ({ row }) => handleDelete(row) },
+          {
+            label: '删除',
+            type: 'primary',
+            text: true,
+            directives: [{ label: 'permission', value: 'delete' }],
+            onClick: ({ row }) => handleDelete(row)
+          },
           { label: '复制', type: 'primary', text: true, onClick: handleCopy }
         ]
       }
@@ -122,13 +130,7 @@ const props: CnPage.Props = reactive({
 
 const dialogProps = reactive({
   model: 'add',
-  data: {
-    menuName: '社保测试菜单',
-    description: '这是测试的菜单',
-    remark: '这是社保测试菜单',
-    menuIcon: 'Odometer',
-    backColor: 'red'
-  }
+  data: {}
 })
 
 function handleCopy({ row }: any): void {
@@ -150,14 +152,8 @@ function handleDelete(row: MatterMenu | Array<MatterMenuResponse>): void {
     message: '确定删除菜单吗?',
     title: '删除',
     action: () =>
-      new Promise((resolve, reject) => {
-        delMatterMenu({
-          ids: Array.isArray(row) ? row.map((m) => m.id).join(',') : row.id || ''
-        })
-          .then((res) => {
-            resolve(res)
-          })
-          .catch(() => reject({}))
+      delMatterMenu({
+        ids: Array.isArray(row) ? row.map((m) => m.id).join(',') : row.id || ''
       }),
     success: () => {
       props.refresh = new Date().getTime()

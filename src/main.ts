@@ -6,6 +6,7 @@ import * as ElIcons from '@element-plus/icons-vue'
 import App from './App.vue'
 import router from './router'
 import moment from 'moment'
+import directives from '@/directives'
 // import './api/mock'
 
 import 'normalize.css/normalize.css' // 初始化样式
@@ -27,5 +28,6 @@ pinia.use(piniaPluginPersistedstate)
 
 app.use(pinia)
 app.use(router)
+app.use(directives)
 
 app.mount('#app')

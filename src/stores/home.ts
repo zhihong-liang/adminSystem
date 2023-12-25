@@ -34,31 +34,14 @@ export const useHomeStore = defineStore(
       manual = false,
       params
     }: getMenuListPayloadOptions): Promise<Menu[]> {
-      // 处理menu数据
-      const formatMenu = (menus: Menu[]): Menu[] => {
-        const list: Menu[] = []
-
-        menus.forEach((menu) => {
-          const { childList = [], status } = menu || {}
-
-          if (status === '1') {
-            if (childList.length) {
-              menu.childList = formatMenu(childList)
-            }
-            return list.push(menu)
-          }
-        })
-        return list
-      }
       const _res = await queryMenuList(params ?? {}) // TODO 接口失败也要做对应的处理
-      console.log('_res: ', _res)
 
       const { data = [], code } = _res || {}
 
       return new Promise((resolve, reject) => {
         if (manual) {
           if (code === '200') {
-            resolve(formatMenu(data))
+            resolve(data)
           }
         } else {
           if (code === '200') {

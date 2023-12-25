@@ -1,4 +1,4 @@
-import type { ExtractPropTypes, MaybeRef } from 'vue'
+import type { ExtractPropTypes, MaybeRef, DirectiveArguments } from 'vue'
 import type {
   FormInstance as ElFormInstance,
   TableProps as ElTableProps,
@@ -77,6 +77,7 @@ declare namespace CnPage {
     -readonly [K in keyof ElButtonProps]?: ElButtonProps[K]
   } & {
     label: string
+    directives?: Recode<string, DirectiveArguments>
     onClick?: (data: ElRenderRowData<Row>, evt?: MouseEvent) => any
   }
 

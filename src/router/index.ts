@@ -8,7 +8,7 @@ import {
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
 import Demo from './demo'
-import { useHomeStore, useLoginStore } from '@/stores'
+import { useHomeStore, useLoginStore, useUserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { getToken } from '@/utils/auth'
 
@@ -28,15 +28,25 @@ const formatMenus = (menus: Menu[], modules: any) => {
   list = menus.map((m: Menu) => {
     const { name, id, parentId, path, childList, component, code, type } = m
     let menu: any = {}
+    let buttons: any[] = []
 
     if (type === 'menu' && childList && childList.length) {
       menu.children = formatMenus(childList, modules)
     }
 
-    // console.log('component: ', modules)
-
     if (type === 'dirt') {
       menu.component = modules[component as string]
+
+      if (childList?.length) {
+        buttons = childList
+          .filter((b) => b.type === 'action')
+          .map((buttons) => ({
+            status: buttons.status,
+            code: buttons.code,
+            id: buttons.id,
+            parentId: buttons.parentId
+          }))
+      }
     }
 
     menu = Object.assign({}, menu, {
@@ -45,11 +55,10 @@ const formatMenus = (menus: Menu[], modules: any) => {
       meta: {
         name,
         id,
-        parentId
+        parentId,
+        authButtons: buttons
       }
     })
-
-    // console.log('menu: ', menu)
 
     return menu
   })
@@ -63,8 +72,6 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
     ...formatMenus(menuList, modules)
     // TODO 添加404
   ]
-
-  // console.log('_children: ', _children)
 
   const baseRoute: any = {
     path: '/',
@@ -103,9 +110,12 @@ function searchParentNode(id?: number): BreadcrumbItem[] {
 const refresh = ref(true)
 
 const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
-  const home = useHomeStore()
+  const [home, userStore] = [useHomeStore(), useUserStore()]
+
   const { menuList, modules } = storeToRefs(home)
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
+  const { updateAuthButtions } = userStore
+
   const hasToken = !!getToken()
 
   if (to.path === '/login') {
@@ -116,7 +126,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
   if (hasToken) {
     if (refresh.value && menuList.value.length) {
-
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
 
@@ -138,7 +147,9 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
             name: to.meta.name as string,
             path: to.path
           })
+          to.meta?.authButtons && updateAuthButtions(to.meta.authButtons as Menu[])
         }
+
         updateBreadcrumb(searchParentNode(to.meta.id as number))
         next()
       }

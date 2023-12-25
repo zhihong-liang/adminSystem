@@ -1,5 +1,5 @@
 <script lang="ts">
-import { h, renderSlot, resolveComponent } from 'vue'
+import { h, renderSlot, resolveComponent, resolveDirective, withDirectives } from 'vue'
 import { ElButton, ElTable, ElTableColumn, ElIcon } from 'element-plus'
 import 'element-plus/es/components/button/style/css'
 import 'element-plus/es/components/table/style/css'
@@ -42,17 +42,27 @@ export default {
                     }
                     delete column.dict
                   } else if (column.buttons) {
-                    return column.buttons.map((button) =>
-                      h(
+                    return column.buttons.map((button) => {
+                      const elButton = h(
                         ElButton,
                         {
                           ...button,
                           size: 'small',
+                          directives: null,
                           onClick: (evt) => button.onClick && button.onClick(params, evt)
                         },
                         () => button.label
                       )
-                    )
+                      if (button.directives && button.directives.length) {
+                        button.directives.forEach((d: any) => {
+                          const directive = resolveDirective(d.label)
+                          if (!!directive) {
+                            withDirectives(elButton, [[directive, d.value || '']]) // 需要 argument、modifiers 时再加上
+                          }
+                        })
+                      }
+                      return elButton
+                    })
                   } else if (column.icons) {
                     return column.icons.map((icon) => {
                       if (params.row.icon) {
