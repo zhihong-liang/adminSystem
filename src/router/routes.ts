@@ -7,6 +7,11 @@ export default [
     name: '登录',
     component: Login
   },
+  {
+    path: '/noauth',
+    name: '无权登录',
+    component: () => import('../views/login/noauth.vue')
+  },
   // {
   //   path: '/',
   //   name: 'layout',

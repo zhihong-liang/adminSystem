@@ -78,6 +78,9 @@ interface Login {
 }
 export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/logon', data)
 
+export const getLogonStatus = (data: { userName: string }): Promise<Res> => axios.post('/api/auth/jwt/logonStatus', data)
+
+
 /**
  * 获取字典接口
  */
