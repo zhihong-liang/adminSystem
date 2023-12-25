@@ -4,7 +4,6 @@
       <template v-if="parseInt(row.menuLevel) > 1">
         <el-button type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
         <el-button
-          v-permission="'down'"
           type="primary"
           icon="Bottom"
           text
