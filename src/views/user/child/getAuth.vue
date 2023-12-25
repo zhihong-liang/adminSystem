@@ -4,7 +4,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, defineProps, PropType, watch } from 'vue'
+import { reactive, ref, defineProps, type PropType, watch } from 'vue'
 import CnTable from '@/components/cn-page/CnTable.vue'
 
 const props = defineProps({
@@ -14,7 +14,7 @@ const props = defineProps({
   }
 })
 
-const tableProp = reactive<CnPage.TableProps<User>>({
+const tableProp = reactive<CnPage.TableProps>({
   columns: [
     { type: 'index', label: '序号', width: 60 },
     { label: '区域', prop: 'areaName' },
