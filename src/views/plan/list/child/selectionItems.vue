@@ -1,13 +1,19 @@
 <template>
   <CnDialog v-bind="dialogProps" ref="dialogRef">
-    <el-row :gutter="20">
-      <el-col :span="12">
-        <CnTable v-bind="tableProps"></CnTable>
-      </el-col>
-      <el-col :span="12">
-        <CnTable v-bind="selectTableProps"></CnTable>
-      </el-col>
-    </el-row>
+    <div class="wrap" v-loading="loading">
+      <div class="table-left">
+        <CnTable max-height="700px" v-bind="tableProps"></CnTable>
+      </div>
+      <div class="table-icon">
+        <el-icon>
+          <DArrowRight />
+        </el-icon>
+      </div>
+      <div class="table-right">
+        <CnTable max-height="700px" v-bind="selectTableProps"></CnTable>
+      </div>
+    </div>
+
     <template #footer>
       <el-button type="primary" @click="handleSubmit">确定</el-button>
     </template>
@@ -25,6 +31,7 @@ import {
 import { ElMessage } from "element-plus";
 const emits = defineEmits(["onHandleSubmit"]);
 const dialogRef = ref();
+const loading = ref(false);
 
 const dialogProps: CnPage.DialogProps = reactive({
   title: "选择事项",
@@ -43,7 +50,6 @@ const tableProps = reactive<CnPage.Props>({
   ],
   data: [],
   onSelect: (selection: any) => {
-    console.log(selection);
     selectTableProps.data = selection;
   },
 });
@@ -65,9 +71,11 @@ const selectTableProps = reactive<CnPage.Props>({
           type: "primary",
           text: true,
           onClick: ({ row }) => {
-            selectTableProps.data = selectTableProps.data.filter(
-              (item) => item.mattersId !== row.mattersId
-            );
+            console.log(tableProps);
+            
+            // selectTableProps.data = selectTableProps.data.filter(
+            //   (item) => item.mattersId !== row.mattersId
+            // );
           },
         },
       ],
@@ -76,16 +84,20 @@ const selectTableProps = reactive<CnPage.Props>({
   data: [],
 });
 
-const open = async (data: any) => {
-  console.log(data);
+const open = (data: any) => {
+  loading.value = true;
   dialogRef.value.open();
-  mattersProgrammeRelationListProgrammeMatters(data).then((res) => {
-    console.log(res);
-    const { code, data } = res;
-    if (code === "200") {
-      tableProps.data = data;
-    }
-  });
+  mattersProgrammeRelationListProgrammeMatters(data)
+    .then((res) => {
+      console.log(res);
+      const { code, data } = res;
+      if (code === "200") {
+        tableProps.data = data;
+      }
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 
 const handleSubmit = () => {
@@ -112,4 +124,25 @@ const handleSubmit = () => {
 defineExpose({ open });
 </script>
 
-<style scoped lang="scss"></style>
+<style lang="scss" scoped>
+.wrap {
+  display: flex;
+  width: 100%;
+
+  .table-left {
+    width: calc(50% - 20px);
+    // border: 1px solid #ebeef5;
+  }
+  .table-icon {
+    flex: 1;
+    height: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .table-right {
+    width: calc(50% - 20px);
+    // border: 1px solid #ebeef5;
+  }
+}
+</style>

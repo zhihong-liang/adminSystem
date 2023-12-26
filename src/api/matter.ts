@@ -147,6 +147,10 @@ export const mattersProgrammeRelationListProgrammeMatters = (data: any): Promise
 export const mattersProgrammeRelationAddList = (data: any): Promise<Res> =>
   axios.post( matters + `/mattersProgrammeRelation/addList`, data)
 
+// 查询方案-事项关联表列表(不分页)
+export const mattersProgrammeRelationList = (data: any): Promise<Res> =>
+  axios.post( matters + `/mattersProgrammeRelation/list`, data)
+
 /**
   * 菜单管理
  */

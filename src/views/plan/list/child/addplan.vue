@@ -3,7 +3,6 @@
     v-bind="dialogProps"
     :loading="formLoading"
     ref="dialogRef"
-    @success="onSuccess"
   >
     <template #matterHheme>
       <h3>事项主题</h3>
@@ -62,6 +61,7 @@ import {
   mattersThemeMenuRelationList,
   addMattersProgramme,
   putMattersProgramme,
+  mattersProgrammeRelationList
 } from "@/api/matter";
 import { getMattersThemeInfoList } from "../../utils/index";
 
@@ -78,6 +78,7 @@ const labelId = ref();
 const selectTm = ref(true);
 const mattersMenuId = ref();
 const selectionItemsRef = ref();
+const emits = defineEmits(["onSubmit"]);
 
 const props = {
   label: "menuName",
@@ -145,13 +146,13 @@ const dialogProps: CnPage.DialogProps = reactive({
         props: { disabled: true },
         visible: () => isType.value !== "add",
       },
-      {
-        label: "",
-        component: "slot",
-        prop: "matterHheme",
-        span: 24,
-        visible: () => isType.value === "select",
-      },
+      // {
+      //   label: "",
+      //   component: "slot",
+      //   prop: "matterHheme",
+      //   span: 24,
+      //   visible: () => isType.value === "select",
+      // },
       { label: "", component: "slot", prop: "matterList", span: 24 },
     ],
     colSpan: 24,
@@ -201,13 +202,24 @@ const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
   }
 };
 const nodeClick = (node: any) => {
-  console.log("fdfffffffffffff", node);
-  
   selectTm.value = false
   mattersMenuId.value = node.mattersMenuId
+  const params = {
+    programmeId: dialogProps.formProps!.model.id,
+    labelId: node.labelId,
+    themeId: node.themeId,
+    mattersMenuId: node.mattersMenuId,
+  };
+  
+  tableProps.data = []
+  mattersProgrammeRelationList(params).then(res => {
+    const {code, data} = res
+    if (code === '200') {
+      tableProps.data = data
+    }
+  })
 };
 const tabClick = (labelId) => {
-  console.log('123', labelId); 
   fromData.labelName = labelId
 }
 const open = async (data: any, _type: string) => {
@@ -224,23 +236,24 @@ const open = async (data: any, _type: string) => {
     dialogProps.action = () => handleSubmit("add");
     dialogProps.title = "新增";
   } else if (_type === "edit") {
-    dialogProps.formProps!.model = data;
+    const newData = JSON.parse(data)
+    dialogProps.formProps!.model = newData;
     dialogProps.formProps!.colSpan = 12;
     dialogProps.action = () => handleSubmit("edit");
     dialogProps.title = "编辑";
   } else if (_type === "select") {
-    dialogProps.formProps!.model = data;
+    const newData = JSON.parse(data)
+    dialogProps.formProps!.model = newData;
     dialogProps.formProps!.colSpan = 12;
     dialogProps.formProps!.disabled = true;
     dialogProps.action = () => handleSubmit("select");
     dialogProps.title = "选择事项";
     const params = {
-      themeId: data.themeId,
+      themeId: newData.themeId,
     };
     mattersThemeLabelList(params).then((res) => {
       const { code, data, message } = res;
       if (code == "200") {
-        console.log("为什么会报错", data);
         fromData.labelName = data[0].id;
         themeList.value = data;
         labelId.value = data[0].id;
@@ -261,17 +274,15 @@ const selectionItems = () => {
   };
   selectionItemsRef.value.open(params);
 };
-const onSuccess = () => {};
 function handleSubmit(action: "add" | "edit" | "select") {
   let params: any = {
     ...dialogProps.formProps!.model,
   };
+  emits("onSubmit");
   if (action === "add") {
     return addMattersProgramme(params);
   } else if (action === "edit") {
     return putMattersProgramme(params);
-  } else if (action === "select") {
-    console.log("select");
   }
   // return action === 'add' ? addMattersProgramme(params) : putMattersProgramme(params)
 }

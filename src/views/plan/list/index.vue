@@ -1,13 +1,6 @@
 <template>
-  <CnPage
-    v-bind="props"
-    @success="
-      () => {
-        props.refresh = new Date().getTime();
-      }
-    "
-  ></CnPage>
-  <Addplan ref="addplayRef"></Addplan>
+  <CnPage v-bind="props"></CnPage>
+  <Addplan ref="addplayRef" @onSubmit="onSubmit"></Addplan>
 </template>
 
 <script setup lang="ts">
@@ -15,7 +8,6 @@ import { reactive, ref, computed } from "vue";
 import { mattersProgrammeListPage, delMattersProgramme } from "@/api/matter";
 import Addplan from "./child/addplan.vue";
 import { ElMessageBox, ElMessage } from "element-plus";
-import { log } from "console";
 
 const addplayRef = ref();
 
@@ -90,7 +82,8 @@ const props: CnPage.Props = reactive({
             type: "primary",
             text: true,
             onClick: ({ row }) => {
-              addplayRef.value?.open(row, "edit");
+              const newRow = JSON.stringify(row);
+              addplayRef.value?.open(newRow, "edit");
               // addplayRef.value?.open(row, 'edit')
             },
           },
@@ -99,7 +92,8 @@ const props: CnPage.Props = reactive({
             type: "info",
             text: true,
             onClick: ({ row }) => {
-              addplayRef.value?.open(row, "select");
+              const newRow = JSON.stringify(row);
+              addplayRef.value?.open(newRow, "select");
             },
           },
           { label: "删除", type: "danger", text: true, onClick: handleRemove },
@@ -111,6 +105,11 @@ const props: CnPage.Props = reactive({
   refresh: new Date().getTime(),
   // transformResponse: () => {}
 });
+const onSubmit = () => {
+    console.log(122312);
+    
+    props.refresh = new Date().getTime();
+}
 </script>
 
 <style scoped lang="scss"></style>
