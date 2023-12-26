@@ -42,9 +42,16 @@ import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { getRoleList, userRoleSwitch, getSysMenuTree } from '@/api/admin'
 import { ElMessage } from 'element-plus'
 
-const roleList: any = ref([]);
-const [router, store, menuList, loginInfo] = [useRouter(), useUserStore(), useHomeStore(), useLoginStore()]
+const roleList: any = ref([])
+const [router, store, menuList, loginInfo] = [
+  useRouter(),
+  useUserStore(),
+  useHomeStore(),
+  useLoginStore()
+]
 const roleIdList = loginInfo.$state.userInfo?.roleIdList || []
+const useRoleIdList = loginInfo.$state.userInfo?.useRoleIdList || []
+
 const currentRoleId = loginInfo.$state.userInfo?.currentRoleId
 const userId = loginInfo.$state.userInfo?.userId
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
@@ -71,10 +78,10 @@ const dialogProps = reactive<CnPage.DialogProps>({
 })
 
 function handleLogOut() {
-  clearToken();
-  store.updateUserInfo({});
-  loginInfo.getLoginInfo({});
-  router.push("/login");
+  clearToken()
+  store.updateUserInfo({})
+  loginInfo.getLoginInfo({})
+  router.push('/login')
 }
 function switchRoles() {
   const params = {
@@ -83,15 +90,19 @@ function switchRoles() {
     size: 999
   }
   getRoleList(params).then((res: any) => {
-    if (res.code === "200") {
-      roleList.value = [];
+    if (res.code === '200') {
+      roleList.value = []
       res.rows.map((item: any) => {
         item.label = item.name
         item.value = item.id
+        if (!useRoleIdList.includes(item.id)) {
+          item.disabled = true
+        }
+
         for (let index = 0; index < roleIdList.length; index++) {
           const element = roleIdList[index]
           if (item.id === element) {
-            roleList.value.push(item);
+            roleList.value.push(item)
           }
         }
       })
@@ -100,7 +111,6 @@ function switchRoles() {
   })
 }
 function handleScreen() {
-  
   if (currentRoleId === dialogProps.formProps!.model.currentRoleId) {
     ElMessage({
       type: 'error',
@@ -109,28 +119,28 @@ function handleScreen() {
   } else {
     const params = {
       id: userId,
-      currentRoleId: dialogProps.formProps!.model.currentRoleId,
-    };
+      currentRoleId: dialogProps.formProps!.model.currentRoleId
+    }
     userRoleSwitch(params).then((res: any) => {
-      if (res.code === "200") {
+      if (res.code === '200') {
         ElMessage({
-          type: "error",
-          message: res.message,
-        });
+          type: 'error',
+          message: res.message
+        })
 
         getSysMenuTree({
-          currentRoleId: dialogProps.formProps!.model.currentRoleId,
+          currentRoleId: dialogProps.formProps!.model.currentRoleId
         }).then((tree) => {
           menuList.updateMenuList(tree.data)
-        });     
+        })
         loginInfo.getLoginInfo(res.data)
-        router.push("/system/usercenter");
-        dialogRef.value?.close();
+        router.push('/system/usercenter')
+        dialogRef.value?.close()
         setTimeout(() => {
-          location.reload();
-        }, 100);
+          location.reload()
+        }, 100)
       }
-    });
+    })
   }
 }
 </script>

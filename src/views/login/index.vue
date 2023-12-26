@@ -109,7 +109,7 @@ const handleLogin = async () => {
         userName: form.username,
         password: password
       }).then(async (res) => {
-        if (res.data.status == 1) {
+        if (res.data.isAuth === '1') {
           setToken(res.data.accessToken)
           updateUserInfo(res.data)
           getLoginInfo(res.data)
@@ -127,7 +127,7 @@ const handleLogin = async () => {
           queryAreaAll()
 
           router.push('/system/usercenter') // 默认跳到个人中心
-        } else {
+        } else if (res.data.isAuth === '0') {
           router.push('/noauth')
         }
       })
