@@ -202,11 +202,10 @@ const props = reactive<CnPage.Props>({
     columns: [
       { type: 'index', label: '序号', width: 60 },
       { label: '单位名称', prop: 'fullName' },
-      { label: '用户数', prop: 'unitCount' },
+      { label: '用户数', prop: 'userCount' },
       { label: '单位性质', prop: 'unitNature', dict: 'UNIT_NATURE' },
       { label: '单位类', prop: 'orgType', dict: 'ORG_TYPE' },
       { label: '单位类型', prop: 'unitType', dict: 'UNIT_TYPE' },
-      { label: '上级单位', prop: 'parentName' },
       { label: '创建时间', prop: 'createTime' },
       {
         label: '操作',

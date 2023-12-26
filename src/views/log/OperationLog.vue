@@ -10,11 +10,15 @@ import { getOperationLog } from '@/api/admin'
 const props: CnPage.Props = reactive({
   params: {},
   action: getOperationLog,
+  transformRequest: (params, page, size) => {
+    const [startTime, endTime] = params.createTime || []
+    return { obj: { ...params, startTime, endTime, createTime: undefined }, page, size }
+  },
   search: {
     items: [
       { label: '用户姓名', prop: 'operatorUsername', component: 'input' },
       { label: '状态', prop: 'status', component: 'select', dict: 'RESULT_TYPE' },
-      { label: '操作日期', prop: 'createTime', component: 'datepicker', props: { valueFormat: 'YYYY-MM-DD HH:mm:ss' } },
+      { label: '操作日期', prop: 'createTime', component: 'datepicker', props: { type: 'datetimerange' } },
     ]
   },
   table: {

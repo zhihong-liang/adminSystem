@@ -17,6 +17,7 @@ import {
   delUnitType,
   type UnitType
 } from '@/api/admin'
+import { removeDictionary } from '@/hooks/useDictionary'
 
 type UnitTypeReq = Partial<Omit<UnitType, 'dataPermissionPolicy'>> & {
   dataPermissionPolicy?: string[]
@@ -53,7 +54,7 @@ const saveUnitType = (type = 'add', model: UnitTypeReq = { status: '1' }) => {
       dataPermissionPolicy: model.dataPermissionPolicy.join()
     })
   }
-  dialogProps.onSuccess = () => (props.refresh = Date.now())
+  dialogProps.onSuccess = saveUnitTypeSuccess
   dialogRef.value?.open()
 }
 
@@ -119,7 +120,7 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
             onClick: ({ row }) => {
               useDelete({
                 action: () => delUnitType(row.id!.toString()),
-                success: () => (props.refresh = Date.now())
+                success: saveUnitTypeSuccess
               })
             }
           }
@@ -128,4 +129,9 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
     ]
   }
 })
+
+function saveUnitTypeSuccess() {
+  props.refresh = Date.now()
+  removeDictionary('UNIT_TYPE')
+}
 </script>

@@ -76,3 +76,11 @@ function getUnitTypeDict() {
     }))
   })
 }
+
+// 移除指定字典类型的数据
+// TODO 如有使用场景，可以支持移除全部
+export function removeDictionary(type?: string) {
+  if (type && dict[type]) {
+    delete dict[type]
+  }
+}
