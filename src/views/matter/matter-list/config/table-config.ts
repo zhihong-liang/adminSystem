@@ -6,7 +6,7 @@ export default function getTableConfig(
     selectionChange,
     columns: [
       { type: 'selection' },
-      { label: '粤智助事项编码', slot: 'matterCode' },
+      { label: '事项编码', slot: 'matterCode' },
       { label: '事项别名', prop: 'matterAlias' },
       { label: '事项名称', prop: 'matterName' },
       { label: '业务部门', prop: 'businessUnit' },

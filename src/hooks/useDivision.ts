@@ -1,5 +1,6 @@
 import { ref } from 'vue'
 import { getDivisionList, type Division } from '@/api/admin'
+import { getToken } from '@/utils/auth'
 
 export interface Division2 {
   label: string
@@ -11,6 +12,7 @@ const division = ref<Division2[]>([])
 let divisionFlat: Division2[] = []
 
 export function queryAreaAll () {
+  if (!getToken()) return
   division.value = []
   divisionFlat = []
   getDivisionList().then((res) => {

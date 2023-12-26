@@ -1,26 +1,36 @@
 import type { ActionType } from './type'
-export default function getTollbarConifg(): CnPage.ToolbarProps {
+export default function getTollbarConifg(
+  clickCb: (handle: ActionType) => void
+): CnPage.ToolbarProps {
   return {
     items: [
       {
         label: '新建',
         type: 'primary',
-        onClick: () => {}
+        onClick: () => {
+          clickCb('add')
+        }
       },
       {
         label: '上线',
         type: '',
-        onClick: () => {}
+        onClick: () => {
+          clickCb('online')
+        }
       },
       {
         label: '下线',
         type: '',
-        onClick: () => {}
+        onClick: () => {
+          clickCb('Offline')
+        }
       },
       {
         label: '删除',
         type: '',
-        onClick: () => {}
+        onClick: () => {
+          clickCb('manyDelete')
+        }
       }
     ]
   }

@@ -1,6 +1,7 @@
 import type { ActionType } from './type'
 
 export default function getTableConfig(
+  tableClickCb: (handleType: ActionType, params: any) => void,
   selectionChange?: (selection: any) => void
 ): CnPage.TableProps {
   return {
@@ -21,15 +22,40 @@ export default function getTableConfig(
           {
             label: '编辑',
             type: 'text',
-            onClick: (params: any) => {}
+            onClick: (params: any) => {
+              tableClickCb('edit', params.row)
+            }
           },
           {
             label: '删除',
             type: 'text',
-            onClick: (params: any) => {}
+            onClick: (params: any) => {
+              tableClickCb('delete', params.row)
+            }
           }
         ]
       }
+    ]
+  }
+}
+
+export function getMatterListTableConfig() {
+  return {
+    data: [],
+    columns: [
+      {
+        label: '事项编号',
+        prop: 'matterCode',
+        slot: 'matterCode',
+        width: 240
+      },
+      {
+        label: '事项名称',
+        prop: 'matterName'
+      },
+      { label: '事项别名', prop: 'matterAlias' },
+      { label: '事项覆盖范围', prop: 'sysCoverage' },
+      { label: '事项状态', prop: 'matterStatus', slot: 'matterStatus' }
     ]
   }
 }

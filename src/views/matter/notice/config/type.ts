@@ -1,4 +1,4 @@
-export type ActionType = 'add' | 'delete' | 'edit' | 'detail' | 'manyDelete'
+export type ActionType = 'add' | 'delete' | 'edit' | 'detail' | 'manyDelete' | 'online' | 'Offline'
 
 export interface getDialogConfigParams {
   dialogSubmitSuccess?: () => void

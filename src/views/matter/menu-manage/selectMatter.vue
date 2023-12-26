@@ -17,12 +17,25 @@
     <el-divider />
 
     <h2 class="mb-lg">事项列表</h2>
-    <CnPage v-bind="pageProps"></CnPage>
-    <TransferFormDialog
-      ref="transferFormDialogRef"
-      @onSuccess="() => (pageProps.refresh = new Date().getTime())"
-    />
+    <CnPage v-bind="pageProps">
+      <template #sort="{ row }">
+        <el-button type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
+        <el-button
+          type="primary"
+          icon="Bottom"
+          text
+          @click="handleSortAction(row, 'down')"
+        ></el-button>
+        <el-button text @click="handleSortAction(row, row.sortTop === 1 ? 'cancelTop' : 'top')">{{
+          row.sortTop === 1 ? '取消置顶' : '置顶'
+        }}</el-button>
+      </template>
+    </CnPage>
   </div>
+  <TransferFormDialog
+    ref="transferFormDialogRef"
+    @onSuccess="() => (pageProps.refresh = new Date().getTime())"
+  />
 </template>
 
 <script setup lang="ts">
@@ -33,11 +46,14 @@ import {
   queryMatterDetail,
   queryMatterMenulist_No,
   queryMatterMenuRelation,
-  deleteMatterRelationList
+  deleteMatterRelationList,
+  upperMatterMenuRelation,
+  lowwerMatterMenuRelation,
+  isTopMatterMenuRelation
 } from '@/api/matter'
 import { getUnitList as queryUnitList } from '@/api/admin'
 import { DEFAILT_ITEM } from './config/data'
-import useDictionary from '@/hooks/useDictionary'
+import { ElMessage } from 'element-plus'
 
 import CnForm from '@/components/cn-page/CnForm.vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
@@ -55,7 +71,10 @@ const formProps: CnPage.FormProps = reactive({
   model: {},
   labelPosition: 'left',
   labelWidth: '100',
-  items: DEFAILT_ITEM,
+  items: DEFAILT_ITEM.map((i) => {
+    i.prop === 'status' && (i.component = '') // 设置为readOnly
+    return i
+  }),
   readonly: true,
   colSpan: 12,
   rules: {
@@ -67,9 +86,7 @@ const formProps: CnPage.FormProps = reactive({
 
 const enterUnitList = ref<any>([]) // 菜单进驻单位列表
 const pageProps: CnPage.Props = reactive({
-  params: {
-    menuId: route.query.id
-  },
+  params: {},
   action: queryMatterMenuRelation,
   search: {
     items: [
@@ -111,7 +128,7 @@ const pageProps: CnPage.Props = reactive({
       { prop: 'entryUnitText', label: '事项进驻单位', dict: 'MENU_STATUS' },
       { prop: 'handleType', label: '办理类型', dict: 'HANDLE_TYPE' },
       { prop: 'matterStatus', label: '事项状态', dict: 'START_STOP' },
-      { prop: 'sort', label: '排序' },
+      { prop: 'sort', label: '排序', minWidth: 130, slot: 'sort' },
       {
         prop: 'action',
         label: '操作',
@@ -130,7 +147,7 @@ const pageProps: CnPage.Props = reactive({
   },
   pagination: true,
   refresh: new Date().getTime(),
-  transformRequest: (params) => ({ obj: params })
+  transformRequest: (params) => ({ obj: { menuId: route.query.id, ...params } })
 })
 
 const transferFormDialogRef = ref()
@@ -157,25 +174,29 @@ const cascaderProps = {
   }
 }
 
-// 获取事项进驻单位
-function getUnitList() {
-  const params = {
-    obj: {},
-    size: 10000
+function handleSortAction(row: any, actionName: 'up' | 'down' | 'top' | 'cancelTop'): void {
+  const { id, sortTop } = row
+
+  if (actionName === 'up' && sortTop === 1) return
+
+  const map = {
+    up: { api: upperMatterMenuRelation, params: id },
+    down: { api: lowwerMatterMenuRelation, params: id },
+    top: { api: isTopMatterMenuRelation, params: { id, isTop: true } },
+    cancelTop: { api: isTopMatterMenuRelation, params: { id, isTop: false } }
   }
 
-  queryUnitList(params).then((res) => {
+  const target = map[actionName]
+  target.api(target.params).then((res) => {
     if (res.code === '200') {
-      enterUnitList.value = res.rows.map((item) => ({
-        label: item.fullName,
-        value: item.id
-      }))
+      ElMessage({ message: '操作成功', type: 'success' })
+      pageProps.refresh = new Date().getTime()
     }
   })
 }
 
 // 删除事项
-function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]) {
+function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]): void {
   if (Array.isArray(row) && !row.length) return
 
   const opts = {
@@ -194,22 +215,28 @@ function handleDeleteMatter(row: MatterMenuRelation | MatterMenuRelation[]) {
   useConfirm(opts)
 }
 
-async function init() {
-  formProps.items.forEach((item: any) => {
-    if (item.prop === 'status') {
-      item.component = ''
+function init(): void {
+  // 获取事项进驻单位
+  queryUnitList({ obj: {}, size: 10000 }).then((res) => {
+    if (res.code === '200') {
+      enterUnitList.value = res.rows.map((item) => ({
+        label: item.fullName,
+        value: item.id
+      }))
     }
   })
 
-  const id = route.query.id as any
-
-  getUnitList()
-
-  const matterInfo = await queryMatterDetail(id)
-  if (matterInfo.code === '200') {
-    formProps.model = matterInfo.data
-    pageProps.params.id = matterInfo.data.id
-  }
+  // 请求菜单详情
+  queryMatterDetail(route.query.id as any).then((res) => {
+    if (res.code === '200') {
+      formProps.model = { ...res.data, menuLevel: res.data.menuLevel.toString() }
+    } else {
+      formProps.model = {
+        menuLevel: '',
+        status: ''
+      }
+    }
+  })
 }
 
 onBeforeMount(() => {

@@ -111,7 +111,7 @@ const IconDialogRef = ref<InstanceType<typeof CnDialog>>()
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: Action,
+  action: queryMenuTree, //Action,
   search: {
     items: [
       { label: '标题', prop: 'name', component: 'input' },
@@ -172,20 +172,6 @@ const props: CnPage.Props = reactive({
 
 const step = ref('') // 有两个状态：add 或 delete
 
-function Action(params: any) {
-  return new Promise((resolve, reject) => {
-    queryMenuTree(params)
-      .then((res) => {
-        if (res.code === '200') {
-          resolve(res)
-        } else {
-          reject(res)
-        }
-      })
-      .catch((err) => reject(err))
-  })
-}
-
 function handleTransformResp(res: Res) {
   const { code, data } = res
 
@@ -210,7 +196,7 @@ function handleSubmit(action: 'add' | 'edit') {
   if (action === 'add') {
     params = Object.assign({}, params, {
       createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-      createUser: 'ceshi'
+      // createUser: 'ceshi'
     })
 
     if (params.parentId) {
@@ -221,7 +207,7 @@ function handleSubmit(action: 'add' | 'edit') {
   } else {
     params = Object.assign({}, params, {
       updateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-      updateUser: 'ceshi'
+      // updateUser: 'ceshi'
     })
   }
 

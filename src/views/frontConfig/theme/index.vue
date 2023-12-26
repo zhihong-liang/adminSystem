@@ -114,7 +114,7 @@ const props: CnPage.Props = reactive({
           { label: '删除', type: 'danger', text: true, onClick: handleRemove },
           {
             label: '复制',
-            type: 'success',
+            type: 'info',
             text: true,
             onClick: ({ row }) => {
               dealRef.value.open(row, 'copy')
@@ -132,10 +132,10 @@ const props: CnPage.Props = reactive({
 </script>
 
 <style scoped lang="scss">
-::v-deep .启用 {
+:deep(.启用) {
   color: #67c23a;
 }
-::v-deep .停用 {
+:deep(.停用) {
   color: #f56c6c;
 }
 </style>

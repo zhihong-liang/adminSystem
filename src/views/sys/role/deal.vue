@@ -46,12 +46,18 @@ const treeData = ref([])
 const elTreeRef = ref()
 
 const checkMemuIds = (rule: any, value: any, callback: any) => {
-  console.log('treeData.value: ', treeData.value)
-  if (!treeData.value.includes(45)) {
-    callback(new Error('个人中心必选'))
-  } else {
-    callback()
-  }
+  console.log('value: ', treeData.value)
+  nextTick(() => {
+    if (!treeData.value.includes(45)) {
+      if (allCheck.value) {
+        callback()
+      } else {
+        callback(new Error('个人中心必选'))
+      }
+    } else {
+      callback()
+    }
+  })
 }
 
 const dialogProps: CnPage.DialogProps = reactive({
@@ -70,7 +76,7 @@ const dialogProps: CnPage.DialogProps = reactive({
     rules: {
       name: [{ required: true, message: '请输入角色名称' }],
       status: [{ required: true, message: '请选中状态', trigger: 'change' }],
-      menuIds: [{ validator: checkMemuIds, trigger: 'change' }]
+      menuIds: [{ validator: checkMemuIds }]
     }
   }
 })
@@ -134,6 +140,7 @@ function handleSubmit(action: 'add' | 'edit') {
 
 const handleCheckChange = (data: any, checked: boolean) => {
   treeData.value = elTreeRef.value.getCheckedKeys()
+  // todo: 触发校验
 }
 
 defineExpose({ open })

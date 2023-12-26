@@ -8,7 +8,7 @@ import type {
   MatterThemeMenuItem
 } from '@/views/matter/menu-manage/config/type'
 
-const matters = "/api/matters"
+const matters = '/api/matters'
 
 /**
  * 事项列表管理
@@ -108,36 +108,36 @@ export const pushDownServiceNotice = (data: any): Promise<Res> =>
   axios.put('/api/matters/serviceNotice/pushDown', data, {})
 
 /**
-* 方案管理表
-*/
+ * 方案管理表
+ */
 
 // 查询方案管理表列表 (分页)
 export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
-  axios.post( matters + '/mattersProgramme/listPage', data)
+  axios.post(matters + '/mattersProgramme/listPage', data)
 
 // 查询事项-主题标签表列表(不分页)
 export const mattersThemeLabelList = (data: ListReq): Promise<Res> =>
-  axios.post( matters + '/mattersThemeLabel/list', data)
+  axios.post(matters + '/mattersThemeLabel/list', data)
 
 // 查询事项主题菜单列表关联表列表(不分页)
 export const mattersThemeMenuRelationList = (data: ListReq): Promise<Res> =>
-  axios.post( matters + '/mattersThemeMenuRelation/list', data)
+  axios.post(matters + '/mattersThemeMenuRelation/list', data)
 
 // 查询事项主题列表（不分页）
 export const mattersThemeInfoList = (data: any): Promise<Res> =>
-  axios.post( matters + '/mattersThemeInfo/list', data)
+  axios.post(matters + '/mattersThemeInfo/list', data)
 
-// 删除方案管理表 
+// 删除方案管理表
 export const delMattersProgramme = (id: string): Promise<Res> =>
-  axios.delete( matters + `/mattersProgramme/${id}`)
+  axios.delete(matters + `/mattersProgramme/${id}`)
 
-// 新增方案管理表 
+// 新增方案管理表
 export const addMattersProgramme = (data: any): Promise<Res> =>
-  axios.post( matters + `/mattersProgramme`, data)
+  axios.post(matters + `/mattersProgramme`, data)
 
-// 修改方案管理表 
+// 修改方案管理表
 export const putMattersProgramme = (data: any): Promise<Res> =>
-  axios.put( matters + `/mattersProgramme`, data)
+  axios.put(matters + `/mattersProgramme`, data)
 
 // 修改方案管理表 
 export const mattersProgrammeRelationListProgrammeMatters = (data: any): Promise<Res> =>
@@ -152,7 +152,7 @@ export const mattersProgrammeRelationList = (data: any): Promise<Res> =>
   axios.post( matters + `/mattersProgrammeRelation/list`, data)
 
 /**
-  * 菜单管理
+ * 菜单管理
  */
 
 // 查询事项菜单列表(不分页)
@@ -175,6 +175,18 @@ export const delMatterMenu = (data: any): Promise<Res> =>
 // 编辑 事项菜单
 export const editMatterMenu = (data: MatterMenu): Promise<Res> =>
   axios.put('/api/matters/mattersMenu', data)
+
+// 排序上升
+export const upperMatterMenu = (id: number): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenu/upper/${id}`)
+
+// 排序下移
+export const lowwerMatterMenu = (id: number): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenu/below/${id}`)
+
+// 是否置顶
+export const isTopMatterMenu = (data: Pick<MatterMenuResponse, 'id' | 'isTop'>): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenu/top/${data.id}`, { params: { isTop: data.isTop } })
 
 // 查询菜单-事项关联表列表(不分页)
 export const queryMatterMenuRelation_No = (data: MatterMenu): Promise<Res> =>
@@ -208,6 +220,18 @@ export const queryAddMatterRelationList = (data: MatterMenuRelation[]): Promise<
 export const deleteMatterRelationList = (data: Record<'ids', string>): Promise<Res> =>
   axios.delete(`/api/matters/mattersMenuRelation/${data.ids}`)
 
+// 排序上升-事项关联表
+export const upperMatterMenuRelation = (id: number): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenuRelation/upper/${id}`)
+
+// 排序下移-事项关联表
+export const lowwerMatterMenuRelation = (id: number): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenuRelation/below/${id}`)
+
+// 是否置顶-事项关联表
+export const isTopMatterMenuRelation = (data: Pick<MatterMenuResponse, 'id' | 'isTop'>): Promise<Res> =>
+  axios.get(`/api/matters/mattersMenuRelation/top/${data.id}`, { params: { isTop: data.isTop } })
+
 /*
  * 办理须知管理
  */
@@ -217,5 +241,33 @@ export interface HandleNotice {
   matterName?: string
   mattersHandleNoticeStatus?: string
 }
+// 查询办理需知管理列表
 export const getHandleNoticeList = (data: ListReq<ServiceNotice>): Promise<ListRes> =>
   axios.post('/api/matters/handleNotice/list', data)
+// 上线-下线办理需知管理
+export const pushDownNotice = (data: any): Promise<Res> =>
+  axios.put('/api/matters/handleNotice/pushDown', data)
+// 查询办理材料库列表
+export const getFileList = (data: any): Promise<any> => axios.post('/api/matters/files/list', data)
+// 新增办理需知管理
+export const addNotice = (data: any): Promise<any> =>
+  axios.post('/api/matters/handleNotice/add', data)
+// 删除办理需知管理
+export const deleteNotice = (ids: string): Promise<any> =>
+  axios.delete(`/api/matters/handleNotice/remove/${ids}`)
+// 获取办理需知管理详细信息
+export const getNoticeDetail = (id: string): Promise<any> =>
+  axios.get(`/api/matters/handleNotice/get/${id}`)
+// 修改办理需知管理
+export const editNotice = (data: any): Promise<any> =>
+  axios.put('/api/matters/handleNotice/edit', data)
+
+/*
+ * 文件上传
+ */
+export const uploadFile = (data: any): Promise<any> =>
+  axios.post('/api/file/infra/file/upload', data, {
+    headers: {
+      'Content-Type': 'multipart/form-data'
+    }
+  })
