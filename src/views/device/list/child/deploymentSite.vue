@@ -89,7 +89,7 @@ const basisForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "edit" ? true : false,
+  disabled: props.model.type === "view" ? true : false,
   rules: {
     regionDetail: [{ required: true, message: "请选择行政区域" }],
     detailAddress: [{ required: true, message: "请输入详细地址" }],
@@ -130,13 +130,13 @@ const basisForm: any = reactive({
       prop: "coordinate",
       component: "slot",
       span: 24,
-      visible: () => props.model.type === "edit",
+      visible: () => props.model.type === "view",
     },
     {
       label: "地理坐标",
       prop: "coordinate",
       component: "input",
-      visible: () => props.model.type !== "edit",
+      visible: () => props.model.type !== "view",
     },
     {
       label: "部署场所名称",
@@ -153,6 +153,7 @@ const basisForm: any = reactive({
       label: "网络策略",
       prop: "networkPolicy",
       component: "select",
+      props: { multiple: true },
       dict: "NETWORD_POLICY",
     },
     {

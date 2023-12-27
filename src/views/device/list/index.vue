@@ -10,10 +10,16 @@
         <BasicInfo ref="basicInfoRef" :model="basicInfoData"></BasicInfo>
       </el-tab-pane>
       <el-tab-pane label="硬件信息" name="2">
-        <HardwareModule ref="hardwareModuleRef" :model="hardwareModuleData"></HardwareModule>
+        <HardwareModule
+          ref="hardwareModuleRef"
+          :model="hardwareModuleData"
+        ></HardwareModule>
       </el-tab-pane>
       <el-tab-pane label="部署场所" name="3">
-        <DeploymentSite ref="deploymentSiteRef" :model="deploymentSiteData"></DeploymentSite>
+        <DeploymentSite
+          ref="deploymentSiteRef"
+          :model="deploymentSiteData"
+        ></DeploymentSite>
       </el-tab-pane>
       <el-tab-pane label="配置信息" name="4">
         <ConfigInfo ref="configInfoRef" :model="configInfoData"></ConfigInfo>
@@ -318,7 +324,7 @@ const exportProps = reactive<CnPage.DialogProps>({
         "statusText",
         "managePersonName",
         "managePersonContact",
-        "procedureVersion"
+        "procedureVersion",
       ],
     },
     items: [
@@ -742,7 +748,28 @@ const props = reactive<CnPage.Props>({
         prop: "action",
         label: "操作",
         minWidth: 120,
-        buttons: [{ label: "编辑", type: "primary", text: true, onClick: handleEdit }],
+        buttons: [
+          {
+            label: "编辑",
+            type: "primary",
+            text: true,
+            onClick: ({ row }) => {
+              getDevBaseInfo(row.id).then((res: any) => {
+                if (res.code === "200") {
+                  res.data.baseInfo.type = "edit";
+                  res.data.devDeploymentSite.type = "edit";
+                  res.data.devConf.type = "edit";
+                  basicInfoData.value = res.data.baseInfo;
+                  hardwareModuleData.value = res.data.baseInfo;
+                  deploymentSiteData.value = res.data.devDeploymentSite;
+                  configInfoData.value = res.data.devConf;
+                  dialoTitle.value = "编辑设备信息";
+                  dialogRef.value?.open();
+                }
+              });
+            },
+          },
+        ],
       },
     ],
     onSelect: (selection: any) => {
@@ -756,14 +783,14 @@ const props = reactive<CnPage.Props>({
 function viewDetail(row: any) {
   getDevBaseInfo(row.id).then((res: any) => {
     if (res.code === "200") {
-      res.data.baseInfo.type = "edit";
-      res.data.devDeploymentSite.type = "edit";
-      res.data.devConf.type = "edit";
+      res.data.baseInfo.type = "view";
+      res.data.devDeploymentSite.type = "view";
+      res.data.devConf.type = "view";
       basicInfoData.value = res.data.baseInfo;
       hardwareModuleData.value = res.data.baseInfo;
       deploymentSiteData.value = res.data.devDeploymentSite;
       configInfoData.value = res.data.devConf;
-      dialoTitle.value = "设备详情"
+      dialoTitle.value = "设备详情";
       dialogRef.value?.open();
     }
   });
@@ -777,16 +804,16 @@ function importFun() {
   };
   devBaseInfoExport(params).then((res: any) => {
     let blob = new Blob([res.data], {
-      type: res.headers['content-type'] || 'application/vnd.ms-excel'
-    })
-    let href = window.URL.createObjectURL(blob)
-    let downloadElement = document.createElement('a')
-    downloadElement.href = href
-    downloadElement.download = '设备列表.xlsx'
-    document.body.appendChild(downloadElement)
-    downloadElement.click() //点击下载
-    document.body.removeChild(downloadElement) //下载完成移除元素
-    exportRef.value?.close()
+      type: res.headers["content-type"] || "application/vnd.ms-excel",
+    });
+    let href = window.URL.createObjectURL(blob);
+    let downloadElement = document.createElement("a");
+    downloadElement.href = href;
+    downloadElement.download = "设备列表.xlsx";
+    document.body.appendChild(downloadElement);
+    downloadElement.click(); //点击下载
+    document.body.removeChild(downloadElement); //下载完成移除元素
+    exportRef.value?.close();
   });
 }
 
@@ -796,7 +823,7 @@ function handleEdit({ row }: any) {
   hardwareModuleData.value = {};
   deploymentSiteData.value = {};
   configInfoData.value = {};
-  dialoTitle.value = "编辑设备信息"
+  dialoTitle.value = "编辑设备信息";
   dialogRef.value?.open();
 }
 // 筛选
@@ -830,36 +857,41 @@ const submitTo = () => {
 };
 // 取消
 const handleCancel = () => {
-  dialogRef.value?.close()
-}
-// 提交编辑 
+  dialogRef.value?.close();
+};
+// 提交编辑
 const handleSubmit = () => {
-  const flagArr = [basicInfoRef.value.validateForm(), hardwareModuleRef.value.validateForm(), deploymentSiteRef.value.validateForm(), configInfoRef.value.validateForm()]
-  let isValidate = false
+  const flagArr = [
+    basicInfoRef.value.validateForm(),
+    hardwareModuleRef.value.validateForm(),
+    deploymentSiteRef.value.validateForm(),
+    configInfoRef.value.validateForm(),
+  ];
+  let isValidate = false;
   const params = {
     baseInfo: basicInfoRef.value.getFormData(),
     devConf: configInfoRef.value.getFormData(),
     devDeploymentSite: deploymentSiteRef.value.getFormData(),
     devUnitInFo: hardwareModuleRef.value.getFormData(),
-  }
+  };
   Promise.all(flagArr).then((res: any) => {
     for (let index = 0; index < res.length; index++) {
       const element = res[index];
       if (element) {
-        isValidate = true
+        isValidate = true;
       } else {
-        activeName.value = String(index + 1)
+        activeName.value = String(index + 1);
         break;
       }
     }
     console.log(isValidate);
     if (isValidate) {
-      devBaseInfo(params).then(res => {
+      devBaseInfo(params).then((res) => {
         console.log(res);
-      })
+      });
     }
-  })
-}
+  });
+};
 // 确定
 const determine = () => {
   const params = {

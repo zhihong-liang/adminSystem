@@ -47,8 +47,8 @@ const props: CnPage.Props = reactive({
     items: [
       { label: "方案编号", prop: "programmeCode", component: "input" },
       { label: "方案名称", prop: "programmeName", component: "input" },
-      { label: "主题名称", prop: "themeId", component: "input" },
-      { label: "状态", prop: "devType", component: "select", dict: "START_STOP" },
+      { label: "主题名称", prop: "themeName", component: "input" },
+      { label: "状态", prop: "status", component: "select", dict: "START_STOP" },
     ],
   },
   toolbar: {
@@ -107,7 +107,6 @@ const props: CnPage.Props = reactive({
 });
 const onSubmit = () => {
     console.log(122312);
-    
     props.refresh = new Date().getTime();
 }
 </script>

@@ -35,7 +35,7 @@
             <div v-if="isShowTree">
               <div>
                 <el-button type="primary" @click="selectionItems" :disabled="selectTm">选择事项</el-button>
-                <el-button type="default">取消选择</el-button>
+                <el-button type="default" @click="deselect">取消选择</el-button>
               </div>
               <CnTable v-bind="tableProps"></CnTable>
             </div>
@@ -45,6 +45,9 @@
           </el-col>
         </el-row>
       </el-form>
+    </template>
+    <template #footer v-if="isType === 'select'">
+      <el-button type="primary" @click="handleSubmit('select')">确定</el-button>
     </template>
   </CnDialog>
   <SelectionItems ref="selectionItemsRef" @onHandleSubmit="onHandleSubmit"></SelectionItems>
@@ -61,10 +64,12 @@ import {
   mattersThemeMenuRelationList,
   addMattersProgramme,
   putMattersProgramme,
-  mattersProgrammeRelationList
+  mattersProgrammeRelationList,
+  detMattersProgrammeRelation
 } from "@/api/matter";
 import { getMattersThemeInfoList } from "../../utils/index";
 
+import { ElMessage, ElMessageBox } from "element-plus";
 interface Tree {
   name: string;
   leaf?: boolean;
@@ -78,6 +83,7 @@ const labelId = ref();
 const selectTm = ref(true);
 const mattersMenuId = ref();
 const selectionItemsRef = ref();
+const selectData = ref()
 const emits = defineEmits(["onSubmit"]);
 
 const props = {
@@ -163,8 +169,6 @@ const dialogProps: CnPage.DialogProps = reactive({
   },
 });
 
-
-
 const tableProps = reactive<CnPage.Props>({
   columns: [
     { type: "selection" },
@@ -173,16 +177,20 @@ const tableProps = reactive<CnPage.Props>({
     { label: "事项别名", prop: "matterAlias" },
     { label: "事项进驻单位", prop: "entryUnitText" },
     { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE" },
-    { label: "事项状态", prop: "matterStatus", dict: "HANDLE_TYPE" },
+    { label: "事项状态", prop: "matterStatus", dict: "MATTER_STATUS" },
   ],
   data: [],
+  onSelect: (selection: any) => {
+    selectData.value = selection
+    // tableProps.data = selection;
+  },
 });
 const dialogRef = ref();
 const themeList: any = ref([]);
 const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
   if (isShowTree) {
     if (node.level === 0) {
-      const paramsTm = {
+      const paramsTm: any = {
         labelId: labelId.value, //data[0].id,
       };
       mattersThemeMenuRelationList(paramsTm).then((tree: any) => {
@@ -190,7 +198,7 @@ const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
         return resolve(data);
       });
     } else {
-      const paramsTm = {
+      const paramsTm: any = {
         labelId: node.data.labelId,
         parentId: node.data.id,
       };
@@ -210,7 +218,7 @@ const nodeClick = (node: any) => {
     themeId: node.themeId,
     mattersMenuId: node.mattersMenuId,
   };
-  
+  console.log(",,,", params);
   tableProps.data = []
   mattersProgrammeRelationList(params).then(res => {
     const {code, data} = res
@@ -219,7 +227,7 @@ const nodeClick = (node: any) => {
     }
   })
 };
-const tabClick = (labelId) => {
+const tabClick = (labelId: string) => {
   fromData.labelName = labelId
 }
 const open = async (data: any, _type: string) => {
@@ -233,12 +241,14 @@ const open = async (data: any, _type: string) => {
     // 新增
     dialogProps.formProps!.model = {};
     dialogProps.formProps!.colSpan = 24;
+    isShowTree.value = false;
     dialogProps.action = () => handleSubmit("add");
     dialogProps.title = "新增";
   } else if (_type === "edit") {
     const newData = JSON.parse(data)
     dialogProps.formProps!.model = newData;
     dialogProps.formProps!.colSpan = 12;
+    isShowTree.value = false;
     dialogProps.action = () => handleSubmit("edit");
     dialogProps.title = "编辑";
   } else if (_type === "select") {
@@ -246,9 +256,9 @@ const open = async (data: any, _type: string) => {
     dialogProps.formProps!.model = newData;
     dialogProps.formProps!.colSpan = 12;
     dialogProps.formProps!.disabled = true;
-    dialogProps.action = () => handleSubmit("select");
+    // dialogProps.action = () => handleSubmit("select");
     dialogProps.title = "选择事项";
-    const params = {
+    const params: any = {
       themeId: newData.themeId,
     };
     mattersThemeLabelList(params).then((res) => {
@@ -264,6 +274,39 @@ const open = async (data: any, _type: string) => {
   }
 };
 
+const deselect = () => {
+  console.log(selectData.value);
+  if(selectData.value && selectData.value.length > 0) {
+    const ids: any = []
+    selectData.value.map((item: any) => {
+      ids.push(item.id)
+    })
+    const params = {
+      ids: ids.join(',')
+    }
+    ElMessageBox.confirm("确定要取消选择吗？", "提示", {
+      type: "warning",
+      closeOnClickModal: false,
+      confirmButtonText: "确定",
+    }).then(() => {
+      detMattersProgrammeRelation(params.ids).then(res => {
+        const { data, code } = res
+        if (code === "200") {
+          ids.map((i: any) => {
+            tableProps.data = tableProps.data.filter((v: any) => v.id !== i)
+          })
+        }
+      })
+    });
+  } else {
+    ElMessage({
+      type: "error",
+      message: "请选择事项",
+    });
+    return
+  }
+  
+}
 const selectionItems = () => {
   // console.log(data);
   const params = {
@@ -283,12 +326,15 @@ function handleSubmit(action: "add" | "edit" | "select") {
     return addMattersProgramme(params);
   } else if (action === "edit") {
     return putMattersProgramme(params);
+  } else if (action === "select") {
+    dialogRef.value.close()
   }
   // return action === 'add' ? addMattersProgramme(params) : putMattersProgramme(params)
 }
-const onHandleSubmit = (data) => {
+const onHandleSubmit = (data: any) => {
   tableProps.data = data
 }
+
 defineExpose({ open });
 </script>
 

@@ -17,7 +17,7 @@ const hardwareForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "edit" ? true : false,
+  disabled: props.model.type === "view" ? true : false,
   rules: {
     hardware: [{ required: true, message: "请选择硬件模块" }],
   },
@@ -28,7 +28,7 @@ const hardwareForm = reactive({
       component: "select",
       dict: "HARDWARE_MODULE",
       span: 24,
-      visible: () => props.model.type === "edit"
+      visible: () => props.model.type === "view"
     },
     {
       label: "硬件模块",
@@ -37,7 +37,7 @@ const hardwareForm = reactive({
       props: { multiple: true },
       dict: "HARDWARE_MODULE",
       span: 24,
-      visible: () => props.model.type !== "edit"
+      visible: () => props.model.type !== "view"
     },
   ],
 });

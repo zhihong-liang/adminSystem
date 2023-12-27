@@ -46,7 +46,7 @@ const tableProps = reactive<CnPage.Props>({
     { label: "事项别名", prop: "matterAlias" },
     { label: "事项进驻单位", prop: "entryUnitText" },
     { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE" },
-    { label: "事项状态", prop: "matterStatus", dict: "HANDLE_TYPE" },
+    { label: "事项状态", prop: "matterStatus", dict: "MATTER_STATUS" },
   ],
   data: [],
   onSelect: (selection: any) => {
@@ -60,7 +60,7 @@ const selectTableProps = reactive<CnPage.Props>({
     { label: "事项别名", prop: "matterAlias" },
     { label: "事项进驻单位", prop: "entryUnitText" },
     { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE" },
-    { label: "事项状态", prop: "matterStatus", dict: "HANDLE_TYPE" },
+    { label: "事项状态", prop: "matterStatus", dict: "MATTER_STATUS" },
     {
       prop: "action",
       label: "操作",

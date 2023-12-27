@@ -151,6 +151,10 @@ export const mattersProgrammeRelationAddList = (data: any): Promise<Res> =>
 export const mattersProgrammeRelationList = (data: any): Promise<Res> =>
   axios.post( matters + `/mattersProgrammeRelation/list`, data)
 
+// 删除事项主题菜单列表关联表
+export const detMattersProgrammeRelation = (ids: any): Promise<Res> =>
+  axios.delete( matters + `/mattersProgrammeRelation/${ids}`,)
+
 /**
  * 菜单管理
  */

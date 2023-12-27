@@ -25,7 +25,7 @@ const configForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "edit" ? true : false,
+  disabled: props.model.type === "view" ? true : false,
   rules: {
     groupId: [{ required: true, message: "请选择设备分组" }],
     programmeId: [{ required: true, message: "请选择方案名称" }],

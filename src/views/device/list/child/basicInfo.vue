@@ -18,7 +18,7 @@ const basisForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "edit" ? true : false,
+  disabled: props.model.type === "view" ? true : false,
   rules: {
     proDevCode: [{ required: true, message: "请输入省统一设备编号" }],
     status: [{ required: true, message: "请选择状态" }],
