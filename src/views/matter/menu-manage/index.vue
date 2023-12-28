@@ -2,14 +2,15 @@
   <CnPage v-bind="props">
     <template #sort="{ row }">
       <template v-if="parseInt(row.menuLevel) > 1">
-        <el-button type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
+        <el-button v-permission="'button:up'" type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
         <el-button
+          v-permission="'button:down'"
           type="primary"
           icon="Bottom"
           text
           @click="handleSortAction(row, 'down')"
         ></el-button>
-        <el-button text @click="handleSortAction(row, row.sortTop === 1 ? 'cancelTop' : 'top')">{{
+        <el-button v-permission="'button:top'" text @click="handleSortAction(row, row.sortTop === 1 ? 'cancelTop' : 'top')">{{
           row.sortTop === 1 ? '取消置顶' : '置顶'
         }}</el-button>
       </template>
@@ -57,6 +58,7 @@ const props: CnPage.Props = reactive({
       {
         label: '新增',
         type: 'primary',
+        directives: [{ label: 'permission', value: 'button:add' }],
         onClick: () => {
           dialogProps.model = 'add'
           dialogProps.data = {} as any
@@ -67,7 +69,7 @@ const props: CnPage.Props = reactive({
         label: '删除',
         type: 'primary',
         plain: true,
-        directives: [{ label: 'permission', value: 'delete' }],
+        directives: [{ label: 'permission', value: 'button:delete' }],
         onClick: () => handleDelete(selectedList.value)
       }
     ]
@@ -94,11 +96,12 @@ const props: CnPage.Props = reactive({
         label: '操作',
         minWidth: 150,
         buttons: [
-          { label: '编辑', type: 'primary', text: true, onClick: handleEdit },
+          { label: '编辑', type: 'primary', text: true, directives: [{ label: 'permission', value: 'button:edit' }], onClick: handleEdit },
           {
             label: '选择事项',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'button:chooseMatter' }],
             onClick: ({ row }: any) =>
               router.push({ path: '/matter/menuManage/chooseMatter', query: { id: row.id } })
           },
@@ -106,10 +109,10 @@ const props: CnPage.Props = reactive({
             label: '删除',
             type: 'primary',
             text: true,
-            directives: [{ label: 'permission', value: 'delete' }],
+            directives: [{ label: 'permission', value: 'button:delete' }],
             onClick: ({ row }) => handleDelete(row)
           },
-          { label: '复制', type: 'primary', text: true, onClick: handleCopy }
+          { label: '复制', type: 'primary', text: true, directives: [{ label: 'permission', value: 'button:copy' }], onClick: handleCopy }
         ]
       }
     ],

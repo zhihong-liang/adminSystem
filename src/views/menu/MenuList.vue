@@ -111,7 +111,7 @@ const IconDialogRef = ref<InstanceType<typeof CnDialog>>()
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: queryMenuTree, //Action,
+  action: queryMenuTree,
   search: {
     items: [
       { label: '标题', prop: 'name', component: 'input' },

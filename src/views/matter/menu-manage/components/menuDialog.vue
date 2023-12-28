@@ -1,11 +1,7 @@
 <template>
   <CnDialog v-bind="dialogProps" ref="dialogRef" @success="handleSuccess">
     <template #menuIcon>
-      <el-input v-model="dialogProps.formProps!.model.menuIcon" disabled>
-        <template #append>
-          <el-button @click="() => IconDialogRef?.open()">选择</el-button>
-        </template>
-      </el-input>
+      <UploadPic v-model:value="dialogProps.formProps!.model.menuIcon" />
     </template>
     <template #parentId>
       <el-cascader
@@ -25,6 +21,7 @@ import { queryMatterMenulist_No, addMatterMenu, editMatterMenu } from '@/api/mat
 import { DEFAILT_ITEM } from '../config/data'
 
 import IconDialog from '@/components/cn-page/CnIconsDialog.vue'
+import UploadPic from './uploadPic.vue'
 
 import type { Resolve } from 'element-plus'
 import type { MatterMenuResponse } from '../config/type'
