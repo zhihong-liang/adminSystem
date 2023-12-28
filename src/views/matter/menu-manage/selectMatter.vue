@@ -234,7 +234,7 @@ function init(): void {
   // 请求菜单详情
   queryMatterDetail(route.query.id as any).then((res) => {
     if (res.code === '200') {
-      formProps.model = { ...res.data, menuLevel: res.data.menuLevel.toString() }
+      formProps.model = res.data
     } else {
       formProps.model = {
         menuLevel: '',

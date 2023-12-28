@@ -6,7 +6,7 @@
     class="avatar-uploader"
     v-model:file-list="fileList"
     :headers="{ Authorization: getToken() }"
-    accept="image/png, image/jpeg, image/svg"
+    accept=".png,.jpeg,.svg"
     action="/selfHelp/api/file/infra/file/upload"
     :data="(rawFile: any) => ({ path: rawFile.name })"
     :on-remove="handleUploadRemove"
@@ -53,7 +53,7 @@ async function handleBeforeUpload(rawFile: any) {
     ElMessage.warning('文件大小不能超过5MB')
     return false
   }
-  if (type === 'image/jpeg' || type === 'image/png' || type === 'image/svg') {
+  if (type === 'image/jpeg' || type === 'image/png' || type === 'image/svg+xml') {
     return true
   } else {
     ElMessage.warning('材料需JPG/PNG/SVG格式')
