@@ -4,6 +4,7 @@
 <script lang="ts" setup>
 import { reactive, ref, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
+import { devGroupListUtils, getUnitListUtils, mattersProgrammeListPageUtils } from "../../utils/index";
 
 const props = defineProps({
   model: {
@@ -11,7 +12,7 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-
+const supList: any = ref([]);
 const basisRef = ref()
 
 const basisForm = reactive({
@@ -34,18 +35,18 @@ const basisForm = reactive({
     installActivateTime: [{ required: true, message: "请选择安装激活时间" }],
   },
   items: [
-    { label: "省统一设备编号", prop: "proDevCode", component: "input"  },
-    { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
+    { label: "省统一设备编号", prop: "proDevCode", component: "input", props: {disabled: true}  },
+    { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS", props: {disabled: true}  },
     { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input", },
-    { label: "设备接入单位", prop: "devUnit", component: "select", dict: "DEV_STATUS" },
+    { label: "设备接入单位", prop: "devUnit", component: "select", props: { options: supList }},
     { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
     { label: "设备型号", prop: "devModelNo", component: "input" },
     { label: "设备来源", prop: "devSource", component: "input" },
     { label: "政务程序版本号", prop: "procedureVersion", component: "input", },
     { label: "操作系统", prop: "operSystem", component: "input", },
-    { label: "设备用途", prop: "devUsage", component: "input", },
+    { label: "设备用途", prop: "devUsage", component: "select", dict: "DEV_USAGE"  },
     { label: "到货时间", prop: "comeTime", component: "datepicker", },
-    { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", },
+    { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { disabled: true }  },
   ],
 });
 const validateForm = () => {
@@ -71,9 +72,10 @@ const getFormData = () => {
 }
 defineExpose({ validateForm, getFormData });
 
-watchEffect(() => {
+watchEffect(async() => {
   if (props.model) {
     basisForm.model = props.model
+    supList.value = await getUnitListUtils().then(res => { return res})
   }
 })
 </script>
