@@ -61,9 +61,8 @@ const dialogProps = reactive({
   },
   action: () => {
     setData(tableData2.value)
-    function setData(tree) {
-      console.log('tree: ', tree)
-      tree.forEach((item) => {
+    function setData(tree: any) {
+      tree.forEach((item: any) => {
         if (item.children && item.children.length) {
           item.relationList = item.children
           setData(item.children)
@@ -75,8 +74,8 @@ const dialogProps = reactive({
 })
 
 const dialogRef = ref()
-let menuParams = {}
-const open = (val) => {
+let menuParams: any = {}
+const open = (val: any) => {
   menuParams = val
   dialogRef.value.open()
   tableData2.value = []
@@ -87,7 +86,7 @@ defineExpose({ open })
 // table1
 const loading = ref(false)
 const tableRef = ref()
-const tableData1 = ref([])
+const tableData1 = ref<any>([])
 let tableDataClone: any = []
 const pagination = ref({
   page: 1,
@@ -105,7 +104,6 @@ const getTable1List = () => {
     }
   })
     .then((res) => {
-      console.log('res: ', res)
       tableData1.value = res.rows
       tableDataClone = JSON.parse(JSON.stringify(res.rows))
       total.value = res.total
@@ -121,8 +119,31 @@ const getTable1List = () => {
 // }
 
 let ids: string[] = [] // 保存选中的id
+let pids: string[] = []
+const findParents = (id: string) => {
+  let val = treeFind(tableData1.value, (data: any) => {
+    return data.mattersMenuId == id
+  })
+  if (val) {
+    pids.push(val.mattersMenuId)
+  }
+  if (val.parentId) {
+    findParents(val.parentId)
+  }
+}
+
 const handleSelectionChange = (val: any) => {
-  ids = val.map((item: any) => item.mattersMenuId)
+  // 获取所有项的parentId,并去重
+  let _pIds = Array.from(new Set(val.map((item: any) => item.parentId).filter((a: any) => a)))
+
+  // 找出所有父项
+  pids = []
+  _pIds.forEach((pId: any) => {
+    findParents(pId)
+  })
+
+  // 父项 mattersMenuId 纳入 ids
+  ids = [...val.map((item: any) => item.mattersMenuId), ...pids]
   setTabledata2()
 }
 
@@ -139,7 +160,7 @@ const setCloneData = (data: any) => {
   })
 }
 
-const filterData = (data) => {
+const filterData = (data: any) => {
   for (let i = 0; i < data.length; i++) {
     if (!data[i].checked) {
       data.splice(i, 1)
@@ -153,12 +174,12 @@ const filterData = (data) => {
 }
 
 // 回显
-const resetRow = (id) => {
+const resetRow = (id: string, isSel = false) => {
   // 在tabledata1里找row
   let row = treeFind(tableData1.value, (data: any) => {
     return data.mattersMenuId == id
   })
-  tableRef.value.toggleRowSelection(row)
+  tableRef.value.toggleRowSelection(row, isSel)
 }
 
 const treeFind = (tree: any, func: any) => {

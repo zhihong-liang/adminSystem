@@ -1,5 +1,5 @@
 <template>
-  <CnDialog title="增加事项" width="75%" ref="dialogRef">
+  <CnDialog :style="{width: 'fit-content'}" title="增加事项" ref="dialogRef">
     <div class="transfer-form-dialog-root flex flex-around">
       <div>
         <h3>选择事项（共{{ leftTableProps.data.length }}项）</h3>
@@ -7,12 +7,6 @@
       </div>
 
       <div class="flex flex-center ml-lg mr-lg">
-        <!-- <el-button
-          type="primary"
-          icon="Back"
-          :disabled="buttons.left.disable"
-          @click="buttons.left.onClick"
-        /> -->
         <el-button
           type="primary"
           icon="Right"

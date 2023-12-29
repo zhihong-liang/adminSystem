@@ -2,7 +2,13 @@
   <CnPage v-bind="props">
     <template #sort="{ row }">
       <template v-if="parseInt(row.menuLevel) > 1">
-        <el-button v-permission="'button:up'" type="primary" icon="Top" text @click="handleSortAction(row, 'up')"></el-button>
+        <el-button
+          v-permission="'button:up'"
+          type="primary"
+          icon="Top"
+          text
+          @click="handleSortAction(row, 'up')"
+        ></el-button>
         <el-button
           v-permission="'button:down'"
           type="primary"
@@ -10,9 +16,12 @@
           text
           @click="handleSortAction(row, 'down')"
         ></el-button>
-        <el-button v-permission="'button:top'" text @click="handleSortAction(row, row.sortTop === 1 ? 'cancelTop' : 'top')">{{
-          row.sortTop === 1 ? '取消置顶' : '置顶'
-        }}</el-button>
+        <el-button
+          v-permission="'button:top'"
+          text
+          @click="handleSortAction(row, row.sortTop === 1 ? 'cancelTop' : 'top')"
+          >{{ row.sortTop === 1 ? '取消置顶' : '置顶' }}</el-button
+        >
       </template>
     </template>
   </CnPage>
@@ -96,7 +105,13 @@ const props: CnPage.Props = reactive({
         label: '操作',
         minWidth: 150,
         buttons: [
-          { label: '编辑', type: 'primary', text: true, directives: [{ label: 'permission', value: 'button:edit' }], onClick: handleEdit },
+          {
+            label: '编辑',
+            type: 'primary',
+            text: true,
+            directives: [{ label: 'permission', value: 'button:edit' }],
+            onClick: handleEdit
+          },
           {
             label: '选择事项',
             type: 'primary',
@@ -112,7 +127,13 @@ const props: CnPage.Props = reactive({
             directives: [{ label: 'permission', value: 'button:delete' }],
             onClick: ({ row }) => handleDelete(row)
           },
-          { label: '复制', type: 'primary', text: true, directives: [{ label: 'permission', value: 'button:copy' }], onClick: handleCopy }
+          {
+            label: '复制',
+            type: 'primary',
+            text: true,
+            directives: [{ label: 'permission', value: 'button:copy' }],
+            onClick: handleCopy
+          }
         ]
       }
     ],
@@ -125,7 +146,7 @@ const props: CnPage.Props = reactive({
   refresh: new Date().getTime(),
   transformRequest: (params) => params,
   transformResponse: (params) => ({
-    rows: params.data.map((m: any) => ({ ...m, menuLevel: m.menuLevel.toString() })),
+    rows: params.data,
     total: 0
   })
 })
@@ -166,7 +187,7 @@ function handleDelete(row: MatterMenu | Array<MatterMenuResponse>): void {
 
 function handleQueryMatterMenuList(pid: number | undefined, callback: Function): void {
   queryMatterMenulist_No({ parentId: pid } as MatterMenu).then((res) => {
-    callback(res.data.map((item) => ({ ...item, menuLevel: item.menuLevel?.toString() })))
+    callback(res.data)
   })
 }
 
