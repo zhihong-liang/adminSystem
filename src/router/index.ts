@@ -26,7 +26,7 @@ const formatMenus = (menus: Menu[], modules: any) => {
   let list = []
 
   list = menus.map((m: Menu) => {
-    const { name, id, parentId, path, childList, component, code, type } = m
+    const { name, id, parentId, path, childList, component, code, type, status } = m
     let menu: any = {}
     let buttons: any[] = []
 
@@ -56,6 +56,7 @@ const formatMenus = (menus: Menu[], modules: any) => {
         name,
         id,
         parentId,
+        status: parseInt(status!),
         authButtons: buttons
       }
     })
@@ -141,7 +142,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
         next({ path: to.path, query: to.query })
       } else {
-        if (to.path !== '/login') {
+        if (to.path !== '/login' && to.meta.status === 1) {
           addTabToList({
             id: to.meta.id as number,
             name: to.meta.name as string,
@@ -152,6 +153,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
         }
 
         updateBreadcrumb(searchParentNode(to.meta.id as number))
+
         next()
       }
     }
@@ -166,6 +168,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
 router.beforeEach((to, from, next) => {
   start()
+  console.log('to: ', to)
 
   handleRouterBeforeEach(to, next)
 })
