@@ -297,6 +297,8 @@ const props = reactive<CnPage.Props>({
                   hardwareModuleData.value = res.data.baseInfo;
                   deploymentSiteData.value = res.data.devDeploymentSite;
                   configInfoData.value = res.data.devConf;
+                  deploymentSiteData.value.ip = res.data.baseInfo.ip
+                  deploymentSiteData.value.mac = res.data.baseInfo.mac
                   dialoTitle.value = "编辑设备信息";
                   dialogRef.value?.open();
                 }
