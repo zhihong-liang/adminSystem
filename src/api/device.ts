@@ -35,7 +35,7 @@ export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/listPage', data)
 // 批量修改
 export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
-  axios.post(device + `/devBaseInfo/editList`, data)
+  axios.put(device + `/devBaseInfo/editList`, data)
 // 修改设备基本信息
 export const devBaseInfo = (data: any): Promise<ListRes> =>
   axios.post(device + `/devBaseInfo`, data)

@@ -2,7 +2,7 @@
   <CnForm ref="hardwareRef" v-bind="hardwareForm" :value="hardwareForm.model"></CnForm>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, defineProps, watchEffect } from "vue";
+import { reactive, ref, defineProps, watchEffect, onMounted } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 const props = defineProps({
   model: {
@@ -11,9 +11,17 @@ const props = defineProps({
   },
 });
 
-const hardwareRef = ref()
+onMounted(() => {
+  setTimeout(() => {
+    if (props.model.hardware && props.model.hardware.length > 0) {
+      hardwareForm.model.hardware = hardwareForm.model.hardware.split(",");
+    }
+  }, 30);
+});
 
-const hardwareForm = reactive({
+const hardwareRef = ref();
+
+const hardwareForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
@@ -28,7 +36,7 @@ const hardwareForm = reactive({
       component: "select",
       dict: "HARDWARE_MODULE",
       span: 24,
-      visible: () => props.model.type === "view"
+      visible: () => props.model.type === "view",
     },
     {
       label: "硬件模块",
@@ -37,32 +45,23 @@ const hardwareForm = reactive({
       props: { multiple: true },
       dict: "HARDWARE_MODULE",
       span: 24,
-      visible: () => props.model.type !== "view"
+      visible: () => props.model.type !== "view",
     },
   ],
 });
 
 const validateForm = () => {
-  // let flag = null;
-  // hardwareRef.value.formRef.validate((valid: boolean) => {
-  //   if (valid) {
-  //     flag = true;
-  //   } else {
-  //     flag = false;
-  //   }
-  // });
-  // return flag;
   return hardwareRef.value.formRef.validate((valid: boolean) => {
     if (valid) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   });
 };
 const getFormData = () => {
-  return hardwareForm.model
-}
+  return hardwareForm.model;
+};
 defineExpose({ validateForm, getFormData });
 
 watchEffect(() => {
