@@ -1,30 +1,41 @@
 <template>
   <el-upload
+    :class="{ disabled: uploadDisabled }"
     :limit="1"
-    ref="uploadRef"
-    :disabled="disabled"
-    class="avatar-uploader"
-    v-model:file-list="fileList"
-    :headers="{ Authorization: getToken() }"
-    accept="image/png, image/jpeg, image/svg"
+    list-type="picture-card"
+    accept=".png,.jpeg,.svg"
     action="/selfHelp/api/file/infra/file/upload"
+    :headers="{ Authorization: getToken() }"
     :data="(rawFile: any) => ({ path: rawFile.name })"
-    :on-remove="handleUploadRemove"
+    :file-list="fileList"
+    :disabled="disabled"
     :on-success="handleUploadSuccess"
     :before-upload="handleBeforeUpload"
+    :on-remove="handleUploadRemove"
+    :on-preview="handleUploadPreView"
   >
-    <img v-if="!!imageUrl" :src="imageUrl" class="avatar" />
-    <el-icon v-else class="avatar-uploader-icon"><Plus /></el-icon>
+    <el-icon><Plus /></el-icon>
   </el-upload>
+
+  <CnDialog ref="dialogRef">
+    <div class="flex flex-center">
+      <el-image style="width: 400px; height: 400px;" :src="dialogImageUrl" alt="" />
+    </div>
+
+    <template #footer>
+      <el-button @click="() => dialogRef.close()">关闭</el-button>
+    </template>
+  </CnDialog>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, onBeforeMount, ref } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
 
-import { ElMessage, type UploadProps } from 'element-plus'
+import { ElMessage, type UploadFile, type UploadProps } from 'element-plus'
 
+const emits = defineEmits(['update:value'])
 const props = defineProps({
   value: {
     type: String,
@@ -35,16 +46,13 @@ const props = defineProps({
     default: false
   }
 })
-const emits = defineEmits(['update:value'])
 
-const uploadRef = ref()
-const imageUrl = ref(props.value)
+const dialogRef = ref()
+const dialogImageUrl = ref()
 
-const fileList = computed(() => {
-  if (props.value && props.value.includes('http')) {
-    return [{ name: '图片1', url: props.value }]
-  }
-})
+const fileList = ref([]) as any
+
+const uploadDisabled = computed(() => fileList.value.length >= 1)
 
 // 上传文件
 async function handleBeforeUpload(rawFile: any) {
@@ -53,7 +61,7 @@ async function handleBeforeUpload(rawFile: any) {
     ElMessage.warning('文件大小不能超过5MB')
     return false
   }
-  if (type === 'image/jpeg' || type === 'image/png' || type === 'image/svg') {
+  if (type === 'image/jpeg' || type === 'image/png' || type === 'image/svg+xml') {
     return true
   } else {
     ElMessage.warning('材料需JPG/PNG/SVG格式')
@@ -62,49 +70,36 @@ async function handleBeforeUpload(rawFile: any) {
 }
 
 // 上传成功
-const handleUploadSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+const handleUploadSuccess: UploadProps['onSuccess'] = (response, uploadFiles) => {
   if (response.code === '200') {
     emits('update:value', response.data)
-    imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+    fileList.value.push({ url: response.data })
   } else {
-    uploadRef.value?.clearFiles()
     ElMessage.error(response.message)
   }
 }
 
 function handleUploadRemove() {
-  imageUrl.value = ''
   emits('update:value', '')
+  fileList.value = []
 }
+
+function handleUploadPreView(uploadFile: UploadFile) {
+  dialogImageUrl.value = uploadFile.url
+  dialogRef.value.open()
+}
+
+onBeforeMount(() => {
+  if (props.value) {
+    fileList.value = [{ url: props.value }]
+  }
+})
 </script>
 
 <style lang="scss" scoped>
-.avatar-uploader .avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
-</style>
-
-<style>
-.avatar-uploader .el-upload {
-  border: 1px dashed var(--el-border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-  transition: var(--el-transition-duration-fast);
-}
-
-.avatar-uploader .el-upload:hover {
-  border-color: var(--el-color-primary);
-}
-
-.el-icon.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  text-align: center;
+.disabled {
+  :deep(.el-upload--picture-card) {
+    display: none;
+  }
 }
 </style>

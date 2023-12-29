@@ -58,7 +58,10 @@ function useDictionary(
     if (value === undefined || value === null) return ''
     const values = Array.isArray(value) ? value : [value]
     const items = values.map(
-      (value) => options.value.find((v) => v.value === value) || { label: value }
+      (value) => {
+        if (typeof value === 'number') value = value.toString()
+        return options.value.find((v) => v.value === value) || { label: value }
+      }
     )
     return items.map((v) => v.label).join(separator)
   })
