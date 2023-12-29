@@ -55,7 +55,7 @@
 <script lang="ts" setup>
 import { reactive, ref, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { devGroupListUtils } from "../../utils/index";
+import { getUnitListUtils } from "../../utils/index";
 
 const timeSlotList = reactive([
   { checked: true, startTime: "09:00", endTime: "17:00" },
@@ -125,18 +125,21 @@ const basisForm: any = reactive({
       prop: "detailAddress",
       component: "input",
     },
-    {
-      label: "地理坐标",
-      prop: "coordinate",
-      component: "slot",
-      span: 24,
-      visible: () => props.model.type === "view",
-    },
+    // {
+    //   label: "地理坐标",
+    //   prop: "coordinate",
+    //   component: "slot",
+    //   span: 24,
+    //   visible: () => props.model.type === "view",
+    // },
     {
       label: "地理坐标",
       prop: "coordinate",
       component: "input",
-      visible: () => props.model.type !== "view",
+      props: {
+        disabled: props.model.type === "view"
+      }
+      // visible: () => props.model.type !== "view",
     },
     {
       label: "部署场所名称",
@@ -220,7 +223,8 @@ const basisForm: any = reactive({
     {
       label: "设备技术支撑单位",
       prop: "supportingUnit",
-      component: "input",
+      component: "select",
+      props: { options: groupList },
     },
     {
       label: "运维人员",
@@ -261,7 +265,7 @@ defineExpose({ validateForm, getFormData });
 watchEffect(async () => {
   if (props.model) {
     basisForm.model = props.model;
-    groupList.value = await devGroupListUtils().then(res => { return res})
+    groupList.value = await getUnitListUtils().then(res => { return res})
     console.log("设备", groupList);
   }
 });
