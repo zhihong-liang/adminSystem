@@ -67,8 +67,8 @@ const leftTableProps = reactive<any>({
   rowKey: 'id',
   reserveSelection: true,
   maxHeight: '500px',
-  selectionChange: handleSelectionChange,
-  selectedList: []
+  selectedList: [],
+  selectionChange: (selection: any) => leftTableProps.selectedList = selection
 })
 
 const rightTableProps = reactive<any>({
@@ -80,17 +80,9 @@ const rightTableProps = reactive<any>({
 const buttons = reactive({
   right: {
     disable: computed(() => !leftTableProps.selectedList.length),
-    onClick: transferData4LeftForm
+    onClick: () => rightTableProps.data = leftTableProps.selectedList
   }
 })
-
-function handleSelectionChange(selection: any) {
-  leftTableProps.selectedList = selection
-}
-
-function transferData4LeftForm() {
-  rightTableProps.data = leftTableProps.selectedList
-}
 
 function handleActionClick(params: any) {
   const { row } = params

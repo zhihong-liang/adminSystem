@@ -2,7 +2,11 @@
   <div class="Matter-Menu-Manage-add-root">
     <CnForm style="width: 60%" v-bind="formProps">
       <template #menuIcon>
-        <CnIcon :html="formProps.model.menuIcon" size="20" />
+        <UploadPic
+          v-if="formProps.model.menuIcon"
+          v-model:value="formProps.model.menuIcon"
+          :disabled="true"
+        />
       </template>
       <template #parentId>
         <el-cascader
@@ -55,6 +59,7 @@ import { getUnitList as queryUnitList } from '@/api/admin'
 import { DEFAILT_ITEM } from './config/data'
 import { ElMessage } from 'element-plus'
 
+import UploadPic from './components/uploadPic.vue'
 import CnForm from '@/components/cn-page/CnForm.vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnIcon from '@/components/cn-page/CnIcon.vue'

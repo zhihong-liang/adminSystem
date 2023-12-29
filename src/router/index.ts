@@ -147,6 +147,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
             name: to.meta.name as string,
             path: to.path
           })
+          // 更新权限按钮组
           to.meta?.authButtons && updateAuthButtions(to.meta.authButtons as Menu[])
         }
 
@@ -155,7 +156,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
       }
     }
   } else {
-    if (to.path !== '/login' && to.path !== "/noauth") {
+    if (to.path !== '/login' && to.path !== '/noauth') {
       next('/login')
     } else {
       next()
