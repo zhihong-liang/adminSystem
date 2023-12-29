@@ -3,40 +3,103 @@
     <template #add>
       <div class="sqtitle">
         <span>授权信息</span>
-        <el-button size="small" :icon="Plus" type="primary" @click="addAuth" class="sqtitle-but">增加授权</el-button> 
+        <el-button size="small" :icon="Plus" type="primary" @click="addAuth" class="sqtitle-but"
+          >增加授权</el-button
+        >
       </div>
     </template>
 
     <template #authSlot>
-      <el-form :model="model" ref="authRef" :disabled="titleType ==='look'">
+      <el-form :model="model" ref="authRef" :disabled="titleType === 'look'">
         <div v-for="(item, index) in model.authList" :key="index">
-          <div>授权{{index + 1}}<span v-if="index !== 0 && titleType !=='look'" style="float: right;color:red;cursor:pointer;" @click="delAuth(index)">删除</span></div>
+          <div>
+            授权{{ index + 1
+            }}<span
+              v-if="index !== 0 && titleType !== 'look'"
+              style="float: right; color: red; cursor: pointer"
+              @click="delAuth(index)"
+              >删除</span
+            >
+          </div>
           <el-row :gutter="20" class="aublock">
             <el-col :span="12">
-              <el-form-item label="单位类型" :prop="'authList.' + index + '.unitType'" :rules="{ required: true, message: '请选择单位类型', trigger: 'change'}" style="margin-bottom: 18px">
-                <el-select clearable filterable placeholder="请选择" v-model="item.unitType" @change="(val: string) => changeUnit(val, index, 'change')">
-                  <el-option v-for="option in unitTypeList" :key="option.id" :label="option.unitTypeName" :value="option.id" />
+              <el-form-item
+                label="单位类型"
+                :prop="'authList.' + index + '.unitType'"
+                :rules="{ required: true, message: '请选择单位类型', trigger: 'change' }"
+                style="margin-bottom: 18px"
+              >
+                <el-select
+                  clearable
+                  filterable
+                  placeholder="请选择"
+                  v-model="item.unitType"
+                  @change="(val: string) => changeUnit(val, index, 'change')"
+                >
+                  <el-option
+                    v-for="option in unitTypeList"
+                    :key="option.id"
+                    :label="option.unitTypeName"
+                    :value="option.id"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="单位" :prop="'authList.' + index + '.unitId'" :rules="{ required: true, message: '请选择单位', trigger: 'change'}" style="margin-bottom: 18px">
-                <el-select clearable filterable placeholder="请选择" v-model="item.unitId" @change="getPermit($event, index)">
-                  <el-option v-for="option in unitList" :key="option.id" :label="option.fullName" :value="option.id" />
+              <el-form-item
+                label="单位"
+                :prop="'authList.' + index + '.unitId'"
+                :rules="{ required: true, message: '请选择单位', trigger: 'change' }"
+                style="margin-bottom: 18px"
+              >
+                <el-select
+                  clearable
+                  filterable
+                  placeholder="请选择"
+                  v-model="item.unitId"
+                  @change="getPermit($event, index)"
+                >
+                  <el-option
+                    v-for="option in unitList"
+                    :key="option.id"
+                    :label="option.fullName"
+                    :value="option.id"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
-              <el-form-item label="角色" :prop="'authList.' + index + '.roleId'" :rules="{ required: true, message: '请选择角色', trigger: 'change'}" style="margin-bottom: 18px">
-                <el-select clearable filterable placeholder="请选择" v-model="item.roleId" @change="(val: number) => changeRole(val, index)">
-                  <el-option v-for="option in RoleList" :key="option.id" :label="option.name" :value="option.id" />
+              <el-form-item
+                label="角色"
+                :prop="'authList.' + index + '.roleId'"
+                :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
+                style="margin-bottom: 18px"
+              >
+                <el-select
+                  clearable
+                  filterable
+                  placeholder="请选择"
+                  v-model="item.roleId"
+                  @change="(val: number) => changeRole(val, index)"
+                >
+                  <el-option
+                    v-for="option in RoleList"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
             <el-col :span="12">
               <el-form-item label="岗位" style="margin-bottom: 18px">
                 <el-select clearable filterable placeholder="请选择" v-model="item.postId">
-                  <el-option v-for="option in postList" :key="option.id" :label="option.name" :value="option.id" />
+                  <el-option
+                    v-for="option in postList"
+                    :key="option.id"
+                    :label="option.name"
+                    :value="option.id"
+                  />
                 </el-select>
               </el-form-item>
             </el-col>
@@ -63,7 +126,9 @@
                 show-checkbox
                 check-strictly
                 style="width: 100%"
-                @check-change="(data: Division2, checked: boolean)=>handleCheckChange(data,checked, index)"
+                @check-change="
+                  (data: Division2, checked: boolean) => handleCheckChange(data, checked, index)
+                "
               >
                 <template #default="{ node, data }">
                   <div class="tree_label">
@@ -83,11 +148,18 @@
           </el-row>
         </div>
       </el-form>
-
     </template>
     <template v-slot:footer="slotProp">
-      <el-button @click="dialogRef?.close()">{{titleType === "look" ? "关闭" : "取消"}}</el-button>
-      <el-button v-if="titleType !== 'look'" type="primary" :loading="setLoading" @click="handleSubmit(slotProp)">提交</el-button>
+      <el-button @click="dialogRef?.close()">{{
+        titleType === 'look' ? '关闭' : '取消'
+      }}</el-button>
+      <el-button
+        v-if="titleType !== 'look'"
+        type="primary"
+        :loading="setLoading"
+        @click="handleSubmit(slotProp)"
+        >提交</el-button
+      >
     </template>
   </CnDialog>
 </template>
@@ -105,7 +177,8 @@ import {
   getUnitDetail,
   getUserDetail,
   editUserInfor,
-  type Unit, type UserTs
+  type Unit,
+  type UserTs
 } from '@/api/admin'
 import useDivision, { type Division2 } from '@/hooks/useDivision'
 import { phone, mobile } from '@/utils/pattern'
@@ -114,7 +187,7 @@ import GetAuth from './getAuth.vue'
 
 interface Tree {
   name: string
-  childList?: Tree[],
+  childList?: Tree[]
   disabled: boolean
 }
 interface AuthTs {
@@ -145,29 +218,75 @@ const defaultProps = {
 
 const model = reactive<{
   authList: AuthTs[]
-}
->({
-  authList:[]
+}>({
+  authList: []
 })
-const authRef = ref();
+const authRef = ref()
 const setLoading = ref(false)
 const titleType = ref()
+
+const dialogRef = ref<InstanceType<typeof CnDialog>>()
+const dialogProps = reactive<CnPage.DialogProps>({
+  title: '新增用户',
+  formProps: {
+    model: { position: [] },
+    items: [
+      { label: '基本信息', component: 'subtitle', span: 24 },
+      { label: '用户编号', prop: 'userNo', component: 'input' },
+      { label: '用户名称', prop: 'name', component: 'input' },
+      { label: '登录手机号', prop: 'phone', component: 'input' },
+      { label: '联系电话', prop: 'telephone', component: 'input' },
+      { label: '电子邮箱', prop: 'email', span: 24, component: 'input' },
+      {
+        label: '状态',
+        prop: 'status',
+        span: 24,
+        component: 'radio',
+        dict: 'USER_STATUS'
+      },
+      { prop: 'add', component: 'slot', span: 24 },
+      { prop: 'authSlot', component: 'slot', span: 24 }
+    ],
+    colSpan: 12,
+    rules: {
+      userNo: [{ required: true, message: '请输入用户编号' }],
+      name: [{ required: true, message: '请输入用户名称' }],
+      phone: [
+        { required: true, message: '请输入登录手机号' },
+        { pattern: mobile, message: '请输入正确的手机号' }
+      ],
+      telephone: [
+        { required: true, message: '请输入联系电话' },
+        { pattern: phone, message: '请输入正确的联系电话' }
+      ],
+      status: [{ required: true, message: '请选择状态' }]
+    }
+  },
+  onSubmit: () => {
+    // console.log({ ...dialogProps.formProps?.model })
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        resolve('')
+      }, 2000)
+    })
+  }
+})
 
 const emits = defineEmits(['success'])
 // 打开新增/编辑/查看
 function open(type = 'add', data = {} as UserTs) {
   titleType.value = type
-  queryPostList();
-  queryUnitList();
-  queryRoleList();
+  queryPostList()
+  queryUnitList()
+  queryRoleList()
 
   model.authList = []
   dialogProps.formProps.disabled = false
   if (type === 'look') dialogProps.formProps.disabled = true
 
-  dialogProps.title = type === 'add' ? '新增用户' : (type === 'edit' ? '编辑用户': '查看用户')
-  
-  const detailApi = data.id? getUserDetail(data.id) : Promise.resolve()
+  dialogProps.title = type === 'add' ? '新增用户' : type === 'edit' ? '编辑用户' : '查看用户'
+
+  const detailApi = data.id ? getUserDetail(data.id) : Promise.resolve()
   if (type) {
     detailApi.then((res) => {
       dialogProps.formProps!.model = res?.data || {}
@@ -175,10 +294,10 @@ function open(type = 'add', data = {} as UserTs) {
       model.authList = res?.data.roleAuthList || [{}]
       if (type !== 'add') {
         model.authList.forEach((e: AuthTs, ind: number) => {
-          changeUnit(e.unitType, ind, "detail")
+          changeUnit(e.unitType, ind, 'detail')
           changeRole(e.roleId, ind)
 
-          const code = [ e.villageCode,e.streetCode,e.districtCode,e.cityCode,e.provinceCode ]
+          const code = [e.villageCode, e.streetCode, e.districtCode, e.cityCode, e.provinceCode]
           const idx = code.findIndex(Boolean)
           e.authData = {}
           if (code[idx]) {
@@ -203,9 +322,9 @@ function open(type = 'add', data = {} as UserTs) {
 
           // 已选数据
           changeDict(ind)
-        });
+        })
       }
-    }) 
+    })
   }
   dialogRef.value?.open()
 }
@@ -214,14 +333,14 @@ defineExpose({ open })
 
 // 提交表单
 const handleSubmit = (val: any) => {
-  const valid1 = val.ref.formRef.validate();
+  const valid1 = val.ref.formRef.validate()
   const valid2 = authRef.value.validate()
   Promise.all([valid1, valid2]).then(() => {
     setLoading.value = true
     const params = dialogProps.formProps!.model || {}
     const apiName = titleType.value === 'add' ? addUserInfor : editUserInfor
     const roleAuthList: any[] = []
-    model.authList.forEach((v: AuthTs, i:number) => {
+    model.authList.forEach((v: AuthTs, i: number) => {
       roleAuthList.push({
         postId: v.postId,
         roleId: v.roleId,
@@ -238,17 +357,19 @@ const handleSubmit = (val: any) => {
           })
         }
       }
-    });
+    })
     apiName({
       ...params,
       userName: params.phone,
       roleAuthList: roleAuthList
-    } as UserTs).then((res) => {
-      emits('success')
-      dialogRef.value?.close()
-    }).finally(() => {
-      setLoading.value = false
-    })
+    } as UserTs)
+      .then((res) => {
+        emits('success')
+        dialogRef.value?.close()
+      })
+      .finally(() => {
+        setLoading.value = false
+      })
   })
 }
 
@@ -257,14 +378,18 @@ const handleCheckChange = (data: Division2, checked: boolean, index: number) => 
     model.authList[index].areaCode.push(data.value)
   } else {
     delete model.authList[index].authData[data.value]
-    model.authList[index].choseData = model.authList[index].choseData.filter((v) => v.areaValue !== data.value)
-    model.authList[index].areaCode = model.authList[index].areaCode.filter((v: string) => v !== data.value)
+    model.authList[index].choseData = model.authList[index].choseData.filter(
+      (v) => v.areaValue !== data.value
+    )
+    model.authList[index].areaCode = model.authList[index].areaCode.filter(
+      (v: string) => v !== data.value
+    )
   }
 }
 
 const addAuth = () => {
   model.authList.push({
-    unitType: "",
+    unitType: ''
   } as AuthTs)
 }
 
@@ -299,16 +424,16 @@ const queryUnitList = () => {
 // 查询单位
 const unitList = ref([] as any)
 function changeUnit(val: string, index: number, type: string) {
-  if(type !== 'detail'){
-    model.authList[index].unitId = ""
+  if (type !== 'detail') {
+    model.authList[index].unitId = ''
     model.authList[index].areaCode = []
     model.authList[index].division = []
     model.authList[index].authData = {}
     model.authList[index].choseData = []
   }
   getUnitList({
-    page:1,
-    size:999,
+    page: 1,
+    size: 999,
     obj: {
       unitType: val
     }
@@ -324,11 +449,11 @@ const getPermit = (val: number, index: number) => {
     model.authList[index].permiObj = res.data
 
     const code = [
-    model.authList[index].permiObj.villageCode,
-    model.authList[index].permiObj.streetCode,
-    model.authList[index].permiObj.districtCode,
-    model.authList[index].permiObj.cityCode,
-    model.authList[index].permiObj.provinceCode
+      model.authList[index].permiObj.villageCode,
+      model.authList[index].permiObj.streetCode,
+      model.authList[index].permiObj.districtCode,
+      model.authList[index].permiObj.cityCode,
+      model.authList[index].permiObj.provinceCode
     ]
     const idx = code.findIndex(Boolean)
     if (code[idx]) {
@@ -373,7 +498,7 @@ const arrChild = (arr: any) => {
     if (e.childList?.length) {
       arrChild(e.childList)
     }
-  });
+  })
   return arr
 }
 
@@ -399,54 +524,6 @@ const changeDict = (index: number) => {
     }
   }
 }
-
-const dialogRef = ref<InstanceType<typeof CnDialog>>()
-const dialogProps = reactive<CnPage.DialogProps>({
-  title: '新增用户',
-  formProps: {
-    model: { position: [] },
-    items: [
-      { label: '基本信息', component: 'subtitle', span: 24 },
-      { label: '用户编号', prop: 'userNo', component: 'input' },
-      { label: '用户名称', prop: 'name', component: 'input' },
-      { label: '登录手机号', prop: 'phone', component: 'input' },
-      { label: '联系电话', prop: 'telephone', component: 'input' },
-      { label: '电子邮箱', prop: 'email', span: 24, component: 'input' },
-      {
-        label: '状态',
-        prop: 'status',
-        span: 24,
-        component: 'radio',
-        dict: 'USER_STATUS'
-      },
-      { prop: 'add', component: 'slot', span: 24 },
-      { prop: 'authSlot', component: 'slot', span: 24 },
-    ],
-    colSpan: 12,
-    rules: {
-      userNo: [{ required: true, message: '请输入用户编号'}],
-      name: [{ required: true, message: '请输入用户名称'}],
-      phone: [
-        { required: true, message: '请输入登录手机号'},
-        { pattern: mobile, message: '请输入正确的手机号'}
-      ],
-      telephone: [
-        { required: true, message: '请输入联系电话'},
-        { pattern: phone, message: '请输入正确的联系电话'}
-      ],
-      status: [{ required: true, message: '请选择状态'}],
-    }
-  },
-  onSubmit: () => {
-    // console.log({ ...dialogProps.formProps?.model })
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve('')
-      }, 2000)
-    })
-  }
-})
-
 </script>
 
 <style lang="scss" scoped>
