@@ -55,7 +55,7 @@
 <script lang="ts" setup>
 import { reactive, ref, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { devGroupListUtils } from "../../utils/index";
+import { getUnitListUtils } from "../../utils/index";
 
 const timeSlotList = reactive([
   { checked: true, startTime: "09:00", endTime: "17:00" },
@@ -97,8 +97,8 @@ const basisForm: any = reactive({
     siteName: [{ required: true, message: "请输入部署场所名称" }],
     siteType: [{ required: true, message: "请选择部署场所类型" }],
     networkPolicy: [{ required: true, message: "请选择网络策略" }],
-    mac: [{ required: true, message: "请输入mac地址" }],
-    ip: [{ required: true, message: "请输入IP地址" }],
+    // mac: [{ required: true, message: "请输入mac地址" }],
+    // ip: [{ required: true, message: "请输入IP地址" }],
     businessHours: [{ required: true, message: "请选择营业时间" }],
     timerOnOff: [{ required: true, message: "请选择是否定时开关机" }],
     devManageUnit: [{ required: true, message: "请选择设备管理单位" }],
@@ -125,18 +125,21 @@ const basisForm: any = reactive({
       prop: "detailAddress",
       component: "input",
     },
-    {
-      label: "地理坐标",
-      prop: "coordinate",
-      component: "slot",
-      span: 24,
-      visible: () => props.model.type === "view",
-    },
+    // {
+    //   label: "地理坐标",
+    //   prop: "coordinate",
+    //   component: "slot",
+    //   span: 24,
+    //   visible: () => props.model.type === "view",
+    // },
     {
       label: "地理坐标",
       prop: "coordinate",
       component: "input",
-      visible: () => props.model.type !== "view",
+      props: {
+        disabled: props.model.type === "view"
+      }
+      // visible: () => props.model.type !== "view",
     },
     {
       label: "部署场所名称",
@@ -160,11 +163,13 @@ const basisForm: any = reactive({
       label: "mac地址",
       prop: "mac",
       component: "input",
+      props: { disabled: true },
     },
     {
       label: "IP地址",
       prop: "ip",
       component: "input",
+      props: { disabled: true },
     },
     {
       label: "设备营业时间",
@@ -220,7 +225,8 @@ const basisForm: any = reactive({
     {
       label: "设备技术支撑单位",
       prop: "supportingUnit",
-      component: "input",
+      component: "select",
+      props: { options: groupList },
     },
     {
       label: "运维人员",
@@ -260,9 +266,10 @@ defineExpose({ validateForm, getFormData });
 
 watchEffect(async () => {
   if (props.model) {
+    console.log("3333", props.model);
+    groupList.value = await getUnitListUtils().then(res => { return res})
+    props.model.networkPolicy = props.model.networkPolicy.split(",");
     basisForm.model = props.model;
-    groupList.value = await devGroupListUtils().then(res => { return res})
-    console.log("设备", groupList);
   }
 });
 </script>

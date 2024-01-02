@@ -32,6 +32,7 @@ axios.interceptors.response.use(
   },
   (err) => {
     close()
+    ElMessage.error('网络异常，请稍后重试')
     return err
   }
 )
@@ -202,3 +203,4 @@ export const queryUserInfo = (id: number): Promise<Res<UserInfo>> =>
 export * from './sys'
 export * from './device'
 export * from "./front"
+export * from "./monitor"

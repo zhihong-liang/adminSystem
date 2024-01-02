@@ -289,6 +289,7 @@ const props = reactive<CnPage.Props>({
             onClick: ({ row }) => {
               getDevBaseInfo(row.id).then((res: any) => {
                 if (res.code === "200") {
+                  console.log("222", res.data);
                   res.data.baseInfo.type = "edit";
                   res.data.devDeploymentSite.type = "edit";
                   res.data.devConf.type = "edit";
@@ -296,6 +297,8 @@ const props = reactive<CnPage.Props>({
                   hardwareModuleData.value = res.data.baseInfo;
                   deploymentSiteData.value = res.data.devDeploymentSite;
                   configInfoData.value = res.data.devConf;
+                  deploymentSiteData.value.ip = res.data.baseInfo.ip
+                  deploymentSiteData.value.mac = res.data.baseInfo.mac
                   dialoTitle.value = "编辑设备信息";
                   dialogRef.value?.open();
                 }
@@ -372,11 +375,23 @@ const handleSubmit = () => {
     configInfoRef.value.validateForm(),
   ];
   let isValidate = false;
+  const hardwareForm = {
+    hardware: ""
+  }
+  const deployForm = {
+    networkPolicy: ""
+  }
+  if (hardwareModuleRef.value.getFormData()) {
+    hardwareForm.hardware =  hardwareModuleRef.value.getFormData().hardware.join(",")
+  }
+  console.log(deploymentSiteRef.value.getFormData().networkPolicy.join(","));
+  
+  deployForm.networkPolicy = deploymentSiteRef.value.getFormData().networkPolicy.join(",")
   const params = {
-    baseInfo: basicInfoRef.value.getFormData(),
+    baseInfo: { ...basicInfoRef.value.getFormData(), ...hardwareForm }, //  hardwareModuleRef.value.getFormData()
     devConf: configInfoRef.value.getFormData(),
-    devDeploymentSite: deploymentSiteRef.value.getFormData(),
-    devUnitInFo: hardwareModuleRef.value.getFormData(),
+    devDeploymentSite: {...deploymentSiteRef.value.getFormData(), ...deployForm },
+    devUnitInFo: {...deploymentSiteRef.value.getFormData(), ...deployForm },
   };
   Promise.all(flagArr).then((res: any) => {
     for (let index = 0; index < res.length; index++) {
@@ -389,10 +404,17 @@ const handleSubmit = () => {
         break;
       }
     }
-    console.log(isValidate);
+    console.log(params);
     if (isValidate) {
       devBaseInfo(params).then((res) => {
-        console.log(res);
+        if (res.code === "200") {
+          dialogRef.value?.close();
+          ElMessage({
+            type: "success",
+            message: "提交成功！",
+          });
+          props.refresh = new Date().getTime()
+        }
       });
     }
   });
