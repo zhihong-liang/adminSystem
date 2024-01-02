@@ -266,9 +266,10 @@ defineExpose({ validateForm, getFormData });
 
 watchEffect(async () => {
   if (props.model) {
-    basisForm.model = props.model;
+    console.log("3333", props.model);
     groupList.value = await getUnitListUtils().then(res => { return res})
-    console.log("设备", groupList);
+    props.model.networkPolicy = props.model.networkPolicy.split(",");
+    basisForm.model = props.model;
   }
 });
 </script>
