@@ -32,6 +32,7 @@ axios.interceptors.response.use(
   },
   (err) => {
     close()
+    ElMessage.error('网络异常，请稍后重试')
     return err
   }
 )

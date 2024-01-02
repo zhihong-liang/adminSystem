@@ -38,7 +38,7 @@ export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
   axios.put(device + `/devBaseInfo/editList`, data)
 // 修改设备基本信息
 export const devBaseInfo = (data: any): Promise<ListRes> =>
-  axios.post(device + `/devBaseInfo`, data)
+  axios.put(device + `/devBaseInfo`, data)
 // 查询方案列表
 export const mattersProgrammeList = (data: any): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/list', data)

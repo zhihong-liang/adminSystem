@@ -11,14 +11,6 @@ const props = defineProps({
   },
 });
 
-onMounted(() => {
-  setTimeout(() => {
-    if (props.model.hardware && props.model.hardware.length > 0) {
-      hardwareForm.model.hardware = hardwareForm.model.hardware.split(",");
-    }
-  }, 30);
-});
-
 const hardwareRef = ref();
 
 const hardwareForm: any = reactive({
@@ -34,18 +26,9 @@ const hardwareForm: any = reactive({
       label: "硬件模块",
       prop: "hardware",
       component: "select",
-      dict: "HARDWARE_MODULE",
-      span: 24,
-      visible: () => props.model.type === "view",
-    },
-    {
-      label: "硬件模块",
-      prop: "hardware",
-      component: "select",
       props: { multiple: true },
       dict: "HARDWARE_MODULE",
       span: 24,
-      visible: () => props.model.type !== "view",
     },
   ],
 });
@@ -65,8 +48,8 @@ const getFormData = () => {
 defineExpose({ validateForm, getFormData });
 
 watchEffect(() => {
-  if (props.model) {
-    hardwareForm.model = props.model;
+  if (props.model.hardware) {
+    hardwareForm.model.hardware = props.model.hardware.split(",");
   }
 });
 </script>

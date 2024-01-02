@@ -7,7 +7,7 @@
   <CnPage v-bind="configTable"></CnPage>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, watchEffect } from "vue";
+import { reactive, ref, watchEffect, computed } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
 // import CnTable from "@/components/cn-page/CnTable.vue";
@@ -19,9 +19,10 @@ const props = defineProps({
     default: () => ({}),
   },
 });
-const basisRef = ref()
-const mattersList: any = ref([])
-const configForm = reactive({
+const basisRef = ref();
+const mattersList: any = ref([]);
+const gupList: any = ref([]);
+const configForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
@@ -34,19 +35,34 @@ const configForm = reactive({
     {
       label: "设备分组",
       prop: "groupId",
-      component: "input",
+      component: "select",
       span: 24,
+      props: { options: gupList },
     },
     {
       label: "方案名称",
       prop: "programmeId",
       component: "select",
-      props: { options: mattersList },
+      props: {
+        options: mattersList,
+        onChange: () => {
+          mattersList.value.map((item: any) => {
+            if (item.id === configForm.model.programmeId) {
+              configForm.model.themeName = item.themeName;
+              props.model.programmeId = item.id;
+              configTable.refresh = new Date().getTime()
+            }
+          });
+        },
+      },
     },
     {
       label: "事项主题名称",
-      prop: "fileds",
+      prop: "themeName",
       component: "input",
+      props: {
+        disabled: true,
+      },
     },
     {
       component: "slot",
@@ -57,7 +73,9 @@ const configForm = reactive({
 });
 
 const configTable = reactive<CnPage.Props>({
-  params: {},
+  params: {
+    programmeId: computed(() => props.model.programmeId) ,
+  },
   action: mattersProgrammeRelationList,
   table: {
     rowKey: "id",
@@ -67,42 +85,45 @@ const configTable = reactive<CnPage.Props>({
       { label: "事项名称", prop: "matterName" },
       { label: "业务部门", prop: "remark" },
       { label: "系统覆盖范围", prop: "remark" },
-      { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE"  },
+      { label: "办理类型", prop: "handleType", dict: "HANDLE_TYPE" },
       { label: "事项状态", prop: "matterStatus", dict: "MATTER_STATUS" },
     ],
   },
-  pagination: false,
-}) 
+  pagination: true,
+});
 
 const validateForm = () => {
-  // let flag = null;
-  // basisRef.value.formRef.validate((valid: boolean) => {
-  //   if (valid) {
-  //     flag = true;
-  //   } else {
-  //     flag = false;
-  //   }
-  // });
-  // return flag;
   return basisRef.value.formRef.validate((valid: boolean) => {
     if (valid) {
-      return true
+      return true;
     } else {
-      return false
+      return false;
     }
   });
 };
 const getFormData = () => {
-  return configForm.model
-}
+  return configForm.model;
+};
 defineExpose({ validateForm, getFormData });
 
 watchEffect(async () => {
   if (props.model) {
-    configForm.model = props.model
-    mattersList.value = await mattersProgrammeListPageUtils().then(res => { return res})
+    configForm.model = props.model;
+    console.log("1233", props.model);
+
+    mattersList.value = await mattersProgrammeListPageUtils().then((res) => {
+      return res;
+    });
+    gupList.value = await devGroupListUtils().then((res) => {
+      return res;
+    });
+    mattersList.value.map((item: any) => {
+      if (item.id === props.model.programmeId) {
+        configForm.model.themeName = item.themeName;
+      }
+    });
   }
-})
+});
 </script>
 <style lang="scss" scoped>
 .refuse-bottom {

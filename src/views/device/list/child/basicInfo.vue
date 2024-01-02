@@ -4,7 +4,7 @@
 <script lang="ts" setup>
 import { reactive, ref, defineProps, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { devGroupListUtils, getUnitListUtils, mattersProgrammeListPageUtils } from "../../utils/index";
+import { getUnitListUtils } from "../../utils/index";
 
 const props = defineProps({
   model: {
@@ -50,15 +50,6 @@ const basisForm = reactive({
   ],
 });
 const validateForm = () => {
-  // let flag = null;
-  // basisRef.value.formRef.validate((valid: boolean) => {
-  //   if (valid) {
-  //     flag = true;
-  //   } else {
-  //     flag = false;
-  //   }
-  // });
-  // return flag;
   return basisRef.value.formRef.validate((valid: boolean) => {
     if (valid) {
       return true
