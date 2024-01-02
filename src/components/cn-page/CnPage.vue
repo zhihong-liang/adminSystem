@@ -8,6 +8,7 @@
       @reset="handleQuery()"
     />
     <CnToolbar v-bind="toolbar" />
+    <slot name="addition"></slot>
     <CnTable v-bind="table" :data="data">
       <template
         v-for="(column, index) in table?.columns.filter(

@@ -93,7 +93,7 @@ const getData = (obj = {}) => {
 }
 // 新增
 const handleAdd = () => {
-  dealRef.value.open()
+  dealRef.value.open('', 'add')
 }
 // 修改、查看
 const handleModify = (data: any, type: string) => {

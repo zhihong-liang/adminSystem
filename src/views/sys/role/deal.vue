@@ -87,13 +87,18 @@ const open = (data?: any, _type?: string) => {
   allsubs = getAllKeys(menuList.value)
   if (_type === 'view') {
     dialogProps.formProps!.disabled = true
+    dialogProps.title = '查看'
   } else {
     dialogProps.formProps!.disabled = false
   }
-  if (!_type) {
+  if (_type == 'modify') {
+    dialogProps.title = '修改'
+  }
+  if (_type == 'add') {
     // 新增
     dialogProps.action = () => handleSubmit('add')
     type.value = 'add'
+    dialogProps.title = '新增'
     indeterminate.value = false
     allCheck.value = false
     dialogProps.formProps!.disabled = false
