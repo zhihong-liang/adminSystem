@@ -168,7 +168,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
 router.beforeEach((to, from, next) => {
   start()
-  console.log('to: ', to)
+  // console.log('to: ', to)
 
   handleRouterBeforeEach(to, next)
 })

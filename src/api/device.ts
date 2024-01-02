@@ -1,7 +1,7 @@
 import axios from 'axios'
 import type { ListReq, ListRes, Res } from '.'
-const device = "/api/device"
-const admin = "/api/admin"
+const device = '/api/device'
+const admin = '/api/admin'
 
 // 设备列表（分页）
 export const devBaseInfoListPage = (data: ListReq): Promise<ListRes> =>
@@ -45,4 +45,74 @@ export const mattersProgrammeList = (data: any): Promise<ListRes> =>
 // 查询方案-事项关联表列表(分页)
 export const mattersProgrammeRelationList = (data: any): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgrammeRelation/listPage', data)
-  
+
+/**
+ * 设备认证管理
+ */
+export interface DevAuthObj {
+  createTime?: string
+  createUser?: string
+  detailAddress?: string
+  devCode?: string
+  devUnit?: number
+  devUnitText: string
+  hardIdentificationCode?: string
+  id: number
+  params?: Object
+  privateKey?: string
+  publicKey?: string
+  regionDetail?: string
+  siteName?: string
+  status?: string
+  updateTime?: string
+  updateUser?: string
+}
+
+// 查询设备认证管理列表
+export const queryDevAuthList = (data: ListReq<DevAuthObj>): Promise<ListRes> =>
+  axios.post('/api/device/devAuth/listPage', data)
+
+// 导出设备认证管理列表
+export const queryDevAuthExport = (
+  data: Pick<
+    DevAuthObj,
+    'devCode' | 'hardIdentificationCode' | 'publicKey' | 'privateKey' | 'status'
+  >
+): Promise<ListRes> => axios.post('/api/device/devAuth/export', data, { responseType: 'blob' })
+
+// 绑定和解绑设备
+export const queryDevAuthBind = (data: { ids: string; isBind: Boolean }): Promise<any> =>
+  axios.get(`/api/device/devAuth/bind/${data.ids}`, { params: { isBind: data.isBind } })
+
+/**
+ * 设备分组
+ */
+export interface DeviceInfo {
+  createTime?: string
+  createUser?: string
+  defaultStatus?: string
+  groupName?: string
+  groupRemark?: string
+  id?: number
+  open?: boolean
+  parentId?: number
+  params?: Object
+  status?: string
+  updateTime?: string
+  updateUser?: string
+  children?: DeviceInfo[]
+}
+// 查询设备认证管理列表
+export const queryDevGroupList = (data: {
+  parentId?: number
+  groupName?: string
+  groupRemark?: string
+}): Promise<Res<DeviceInfo[]>> => axios.post('/api/device/devGroup/list', data)
+
+// 新增设备组
+export const querAddDevGroup = (data: DeviceInfo): Promise<Res> =>
+  axios.post('/api/device/devGroup', data)
+
+// 删除设备组
+export const queryDeleteDevGroup = (ids: string): Promise<Res> =>
+  axios.delete(`/api/device/devGroup/${ids}`)
