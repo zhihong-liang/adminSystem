@@ -124,7 +124,7 @@ function handleScreen() {
     userRoleSwitch(params).then((res: any) => {
       if (res.code === '200') {
         ElMessage({
-          type: 'error',
+          type: 'success',
           message: res.message
         })
 
