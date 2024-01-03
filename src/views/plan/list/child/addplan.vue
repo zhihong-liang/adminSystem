@@ -58,7 +58,7 @@ import { reactive, ref } from "vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
 import SelectionItems from "./selectionItems.vue";
-import { FromData, ThemeList } from "../../utils/type";
+import { type FromData } from "../../utils/type";
 import {
   mattersThemeLabelList,
   mattersThemeMenuRelationList,
