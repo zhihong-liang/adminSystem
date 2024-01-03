@@ -242,15 +242,6 @@ const basisForm: any = reactive({
 });
 
 const validateForm = () => {
-  // let flag = null;
-  // basisRef.value.formRef.validate((valid: boolean) => {
-  //   if (valid) {
-  //     flag = true;
-  //   } else {
-  //     flag = false;
-  //   }
-  // });
-  // return flag;
   return basisRef.value.formRef.validate((valid: boolean) => {
     if (valid) {
       return true
@@ -266,7 +257,6 @@ defineExpose({ validateForm, getFormData });
 
 watchEffect(async () => {
   if (props.model) {
-    console.log("3333", props.model);
     groupList.value = await getUnitListUtils().then(res => { return res})
     props.model.networkPolicy = props.model.networkPolicy.split(",");
     basisForm.model = props.model;
