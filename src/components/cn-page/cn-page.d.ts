@@ -85,6 +85,7 @@ declare namespace CnPage {
    * 搜索模块
    */
   interface SearchProps extends FormProps {
+    component?: string
     onSearch?: (data: unknown) => void
     onReset?: (data: unknown, el: ElFormInstance) => void
   }
@@ -119,13 +120,13 @@ declare namespace CnPage {
   type PaginationProps = {
     -readonly [K in keyof ElPaginationProps]?: ElPaginationProps[K]
   } & {
-    [K in keyof ElPaginationEmits as `on${Capitalize<K>}`]?: (val: number) => any // ElPaginationEmits[K]
-  } & {
-    page?: number
-    size?: number
-    total: number
-    onUpdate: (page: number, size: number) => any
-  }
+      [K in keyof ElPaginationEmits as `on${Capitalize<K>}`]?: (val: number) => any // ElPaginationEmits[K]
+    } & {
+      page?: number
+      size?: number
+      total: number
+      onUpdate: (page: number, size: number) => any
+    }
 
   /**
    * 表单模块

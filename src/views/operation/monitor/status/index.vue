@@ -1,55 +1,83 @@
 <template>
   <CnPage v-bind="props">
+    <!-- 搜索 -->
+    <template #device_status>
+      <div class="device-status">
+        <CnDict
+          placeholder="状态"
+          component="select"
+          dict="DEVICE_MONITOR_STATUS"
+          v-model="searchParams.status"
+        ></CnDict>
+        <CnDict
+          placeholder="故障类型"
+          component="select"
+          dict="DEVICE_FAULT_TYPE"
+          v-model="searchParams.alarm_code"
+        ></CnDict>
+        <CnDict
+          placeholder="离线时长"
+          component="select"
+          v-model="searchParams.offlineDuration"
+          dict="DEVICE_MONITOR_OFFLINEDAYS"
+        ></CnDict>
+      </div>
+    </template>
+    <template #region="{ row }">行政区划</template>
     <template #addition>dfdfdfd</template>
   </CnPage>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from 'vue'
+import { reactive, ref, onMounted } from 'vue'
 import { mattersThemeInfoListPage as ListRequest, delMattersThemeInfo as DelRequest } from '@/api'
-import { ElMessageBox, ElMessage } from 'element-plus'
+import {
+  devGroupListUtils,
+  getUnitListUtils,
+  mattersProgrammeListPageUtils
+} from '../../../device/utils/index'
 
+import { ElMessageBox, ElMessage } from 'element-plus'
+const supList: any = ref([])
 const emit = defineEmits(['changeType'])
 
 const dealRef = ref()
 const selRef = ref()
-// 删除
-const handleRemove = ({ row }: any) => {
-  ElMessageBox.confirm(`确定要删除主题${row.themeName}?`, {
-    title: '删除',
-    confirmButtonText: '确认',
-    cancelButtonText: '取消',
-    beforeClose: (action, instance, done) => {
-      if (action === 'confirm') {
-        instance.confirmButtonLoading = true
-        instance.confirmButtonText = 'Loading...'
-
-        DelRequest(row.id)
-          .then((res) => {
-            const { code, message } = res
-            if (code == '200') {
-              done()
-            }
-          })
-          .finally(() => {})
-      } else {
-        done()
-      }
-    }
-  }).then(() => {
-    ElMessage.success({ message: '删除成功' })
-    props.refresh = new Date().getTime()
-  })
-}
-
+const searchParams: any = ref({})
 const props: CnPage.Props = reactive({
-  params: {},
+  params: searchParams,
   action: (params) => ListRequest(params),
   search: {
     items: [
-      { label: '主题编号', prop: 'themeCode', component: 'input' },
-      { label: '主题名称', prop: 'themeName', component: 'input' },
-      { label: '状态', prop: 'status', component: 'select', dict: 'START_STOP' }
+      {
+        label: '行政区划',
+        prop: 'region',
+        component: 'ad',
+        props: { props: { checkStrictly: true } }
+      },
+      { label: '部署场所', prop: 'deploymentLocation', component: 'input' },
+      { label: '设备编号', prop: 'proDevCode', component: 'input' },
+      { label: '设备接入单位设备编号', prop: 'unitDevCode', component: 'input' },
+      {
+        label: '设备技术支撑单位',
+        prop: 'technicalSupportUnit',
+        component: 'select',
+        props: { options: supList }
+      },
+      { label: '设备监控状态', prop: 'device_status', component: 'slot' },
+      { label: '设备类型', prop: 'deviceType', component: 'select', dict: 'DEV_TYPE' },
+      {
+        label: 'IP最近变动时间',
+        prop: 'ipLastChange',
+        component: 'datepicker',
+        props: { type: 'daterange', unlinkPanels: true }
+      },
+      {
+        label: '离线天数',
+        prop: 'offlineDays',
+        component: 'select',
+        dict: 'DEVICE_MONITOR_OFFLINEDAYS'
+      }
     ]
   },
   toolbar: {
@@ -68,50 +96,25 @@ const props: CnPage.Props = reactive({
   table: {
     rowKey: 'id',
     columns: [
-      { prop: 'themeCode', label: '主题编号' },
-      { prop: 'themeName', label: '主题名称' },
-      { prop: 'themeName', label: '备注' },
-      { prop: 'menuCount', label: '包含菜单数', width: '120px' },
-      { prop: 'devCount', label: '使用设备数', width: '120px' },
-      { prop: 'status', label: '状态', dict: 'START_STOP', width: '120px' },
-      {
-        prop: 'action',
-        label: '操作',
-        minWidth: 120,
-        buttons: [
-          {
-            label: '编辑',
-            type: 'primary',
-            text: true,
-            onClick: ({ row }) => {
-              dealRef.value.open(row, 'edit')
-            }
-          },
-          {
-            label: '选择菜单',
-            type: 'warning',
-            text: true,
-            onClick: ({ row }) => {
-              selRef.value.open(row)
-            }
-          },
-          { label: '删除', type: 'danger', text: true, onClick: handleRemove },
-          {
-            label: '复制',
-            type: 'info',
-            text: true,
-            onClick: ({ row }) => {
-              dealRef.value.open(row, 'copy')
-            }
-          }
-        ]
-      }
+      { prop: 'proDevCode', label: '设备编号' },
+      { slot: 'region', label: '行政区划' },
+      { prop: 'address', label: '详细地址' },
+      { prop: 'status', label: '设备状态(30分钟）', dict: 'DEVICE_MONITOR_STATUS' },
+      { prop: 'dailyOnlineDuration', label: '状态持续时长（小时）' },
+      { prop: 'lastOnlineTime', label: '最近在线时间' },
+      { prop: 'ipLastChangeTime', label: 'IP最近变动时间' }
     ],
     treeProps: { children: 'childList' }
   },
   pagination: true,
   refresh: new Date().getTime()
   // transformResponse: () => {}
+})
+
+onMounted(async () => {
+  supList.value = await getUnitListUtils().then((res) => {
+    return res
+  })
 })
 </script>
 
@@ -121,5 +124,10 @@ const props: CnPage.Props = reactive({
 }
 :deep(.停用) {
   color: #f56c6c;
+}
+
+.device-status {
+  display: flex;
+  gap: 5px;
 }
 </style>
