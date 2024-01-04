@@ -44,7 +44,6 @@ const slots = ref<CnPage.FormItemSlotProps[]>([])
 watchEffect(() => {
   if (props) {
     slots.value = props.items.filter((v) => v.component === 'slot') as CnPage.FormItemSlotProps[]
-    console.log('slots.value: ', slots.value)
   }
 })
 

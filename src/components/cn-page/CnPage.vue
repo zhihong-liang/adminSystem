@@ -8,7 +8,7 @@
       @reset="handleQuery()"
     >
       <template
-        v-for="(item, index) in search.items.filter(
+        v-for="(item, index) in search?.items.filter(
           (e: CnPage.SearchProps) => e.component === 'slot'
         )"
         v-slot:[item.prop]
@@ -18,6 +18,7 @@
       </template>
     </CnSearch>
     <CnToolbar v-bind="toolbar" />
+    <slot name="addition"></slot>
     <CnTable v-bind="table" :data="data">
       <template
         v-for="(column, index) in table?.columns.filter(
