@@ -16,6 +16,7 @@
     "@wangeditor/editor-for-vue": "^5.1.12",
     "axios": "^1.6.0",
     "crypto-js": "^4.2.0",
+    "echarts": "^5.4.3",
     "element-plus": "^2.4.3",
     "lodash-es": "^4.17.21",
     "moment": "^2.29.4",
@@ -24,6 +25,7 @@
     "pinia-plugin-persistedstate": "^3.2.0",
     "sass": "^1.69.5",
     "vue": "^3.3.4",
+    "vue-echarts": "^6.5.5",
     "vue-router": "^4.2.5"
   },
   "devDependencies": {

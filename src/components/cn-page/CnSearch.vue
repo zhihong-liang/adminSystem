@@ -1,5 +1,9 @@
 <template>
   <CnForm :items="items" :col-span="colSpan" :footer-span="footerSpan || colSpan">
+    <template v-for="item in slots" v-slot:[item.prop]="slotProps" :key="item.prop">
+      <slot :name="item.prop" v-bind="slotProps" />
+    </template>
+
     <template #footer="{ data, el }">
       <el-button type="primary" @click="handleSearch(data)">搜索</el-button>
       <el-button @click="handleReset(data, el)">重置</el-button>
@@ -18,33 +22,40 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, type PropType, type UnwrapNestedRefs, onMounted } from "vue";
+import { watchEffect, ref, type PropType, type UnwrapNestedRefs, onMounted } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CnForm from './CnForm.vue'
 
-const showBtn = ref(false);
-const showMore = ref(true);
+const showBtn = ref(false)
+const showMore = ref(true)
 
 const props = defineProps({
   colSpan: { type: Number, default: 6 },
   footerSpan: { type: Number, default: 6 },
   items: {
     type: Array as PropType<UnwrapNestedRefs<CnPage.FormItem>[]>,
-    default: () => [],
-  },
+    default: () => []
+  }
 })
 
 const emits = defineEmits(['search', 'reset'])
+const slots = ref<CnPage.FormItemSlotProps[]>([])
+
+watchEffect(() => {
+  if (props) {
+    slots.value = props.items.filter((v) => v.component === 'slot') as CnPage.FormItemSlotProps[]
+  }
+})
 
 onMounted(() => {
   if (props.items.length > 3) {
-    showBtn.value = true;
+    showBtn.value = true
     props.items.map((item: any, index: number) => {
       if (index >= 3) {
-        item.display = "none";
+        item.display = 'none'
         // item.visible = () => false
       }
-    });
+    })
   }
 })
 
@@ -57,24 +68,24 @@ function handleReset(data: unknown, el?: FormInstance) {
   emits('reset', data, el)
 }
 
-function moreFun () {
-  showMore.value = !showMore.value;
+function moreFun() {
+  showMore.value = !showMore.value
   if (showMore.value) {
     props.items.map((item: any, index: number) => {
       if (index >= 3) {
-        item.display = "none";
+        item.display = 'none'
         // item.visible = () => false
       }
-    });
+    })
   } else {
     props.items.map((item: any) => {
       // if (item.visible = () => false) {
       //   item.visible = () => true
       // }
-      if (item.display === "none") {
-        item.display = "block";
+      if (item.display === 'none') {
+        item.display = 'block'
       }
-    });
+    })
   }
 }
 </script>

@@ -47,6 +47,7 @@ import DeploymentSite from "./child/deploymentSite.vue";
 import BulkEdit from "./child/bulkEdit.vue";
 import ConfigInfo from "./child/configInfo.vue";
 import { ElMessage, ElMessageBox } from "element-plus";
+import { getUnitListUtils } from "../utils/index";
 // import { getTollBarActionDialogConfig, getTableActionConfig } from './config/dialog-config';
 import {
   devBaseInfoListPage,
@@ -73,6 +74,11 @@ const hardwareModuleRef = ref();
 const deploymentSiteRef = ref();
 const configInfoRef = ref();
 const dialoTitle = ref("设备详情");
+const supList: any = ref([]);
+
+onMounted( async() => {
+  supList.value = await getUnitListUtils().then((res: any) => { return res})
+})
 
 const exportProps = reactive<CnPage.DialogProps>({
   title: "导出",
@@ -145,9 +151,9 @@ const props = reactive<CnPage.Props>({
         dict: "NETWORD_POLICY",
       },
       { label: "相关方", component: "subtitle", span: 24 },
-      { label: "设备接入单位", prop: "devUnit", component: "select" },
-      { label: "设备管理单位", prop: "devManageUnit", component: "select" },
-      { label: "设备技术支撑单位", prop: "supportingUnit", component: "select" },
+      { label: "设备接入单位", prop: "devUnit", component: "select", props: { options: supList } },
+      { label: "设备管理单位", prop: "devManageUnit", component: "select", props: { options: supList } },
+      { label: "设备技术支撑单位", prop: "supportingUnit", component: "select", props: { options: supList } },
     ],
   },
   toolbar: {
@@ -289,13 +295,13 @@ const props = reactive<CnPage.Props>({
             onClick: ({ row }) => {
               getDevBaseInfo(row.id).then((res: any) => {
                 if (res.code === "200") {
-                  console.log("222", res.data);
                   res.data.baseInfo.type = "edit";
                   res.data.devDeploymentSite.type = "edit";
                   res.data.devConf.type = "edit";
                   basicInfoData.value = res.data.baseInfo;
                   hardwareModuleData.value = res.data.baseInfo;
-                  deploymentSiteData.value = res.data.devDeploymentSite;
+                  deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite};
+                  // deploymentSiteData.value = res.data.devDeploymentSite;
                   configInfoData.value = res.data.devConf;
                   deploymentSiteData.value.ip = res.data.baseInfo.ip
                   deploymentSiteData.value.mac = res.data.baseInfo.mac
@@ -384,7 +390,6 @@ const handleSubmit = () => {
   if (hardwareModuleRef.value.getFormData()) {
     hardwareForm.hardware =  hardwareModuleRef.value.getFormData().hardware.join(",")
   }
-  console.log(deploymentSiteRef.value.getFormData().networkPolicy.join(","));
   
   deployForm.networkPolicy = deploymentSiteRef.value.getFormData().networkPolicy.join(",")
   const params = {

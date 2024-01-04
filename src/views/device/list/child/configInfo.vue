@@ -109,8 +109,6 @@ defineExpose({ validateForm, getFormData });
 watchEffect(async () => {
   if (props.model) {
     configForm.model = props.model;
-    console.log("1233", props.model);
-
     mattersList.value = await mattersProgrammeListPageUtils().then((res) => {
       return res;
     });

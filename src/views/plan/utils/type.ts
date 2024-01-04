@@ -1,4 +1,4 @@
-export interface FromData {
+export type FromData = {
     labelName: string;
 }
 export interface ThemeList {

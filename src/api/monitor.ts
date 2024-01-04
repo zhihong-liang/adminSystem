@@ -30,14 +30,14 @@ export const monitorCodeEdit = (data: monitorcodeType): Promise<Res> => axios.pu
 
 // 导出状态码监控列表
 export const monitorCodeExport = (data: monitorcodeType): Promise<ListRes> =>
-  axios.post('/api/monitor/code/export', data)
+  axios.post('/api/monitor/code/export', data, { responseType: 'blob' })
 
 // 删除状态码监控
 export const monitorCodeRemove = (ids: string | number): Promise<Res> => axios.delete('/api/monitor/code/remove/' + ids)
 
 
 /**
- * 设备监控
+ * 设备状态监控
 */
 // 查询设备监控记录统计列表
 export const monitorHeartStatisticsList = (data: ListReq<any>): Promise<ListRes> =>
@@ -55,6 +55,11 @@ export const monitorHeartStatisticsEdit = (data: any): Promise<Res> => axios.put
 // 导出设备监控记录统计列表
 export const monitorHeartStatisticsExport = (data: any): Promise<ListRes> =>
   axios.post('/api/monitor/heartStatistics/export', data)
+
+// 导出设备在线趋势图
+export const monitorHeartStatisticsChartexport = (data: any): Promise<ListRes> =>
+  axios.post('/api/monitor/heartStatistics/chartexport', data)
+
 
 // 删除设备监控记录统计
 export const monitorHeartStatisticsRemove = (ids: string | number): Promise<Res> => axios.delete('/api/monitor/heartStatistics/remove/' + ids)

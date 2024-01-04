@@ -12,8 +12,9 @@ const params = {
 };
 
 // 获取设备单位列表
-export async function getUnitListUtils() {
+export async function getUnitListUtils(obj = {}) {
   const supList: any = []
+  params.obj = obj
   await getUnitList(params).then((res) => {
     if (res.code === "200") {
       res.rows.map((item) => {
