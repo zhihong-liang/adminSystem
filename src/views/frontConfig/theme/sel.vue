@@ -3,19 +3,25 @@
     <template #tabs>
       <div class="tab-list">
         <span v-for="(item, index) in tabs">
-          <el-tag
+          <div
             v-if="item.showTab"
-            class="mx-1 pointer"
+            class="mx-1 pointer tab-item"
             :class="{ checked: tabIndex == index }"
             :key="index"
             closable
+            effect="plain"
+            type="info"
+            size="large"
             :disable-transitions="false"
             @click="onTabClick(index)"
             @dblclick="handleEditTab(item, index)"
-            @close="handleClose(item, index)"
           >
+            <div class="item-close pointer" @click.stop="handleClose(item, index)">
+              <el-icon><Close /></el-icon>
+            </div>
             <span>{{ item.labelName }}</span>
-          </el-tag>
+            <el-icon><QuestionFilled /></el-icon>
+          </div>
           <el-input
             v-else
             v-model="item.labelName"
@@ -39,8 +45,8 @@
           @keyup.enter="handleInputConfirm"
           @blur="handleInputConfirm"
         />
-        <el-button size="small" v-else @click="showAddInput" style="position: relative; top: 2px">
-          +
+        <el-button size="small" v-else @click="showAddInput" style="position: relative">
+          + 添加标签
         </el-button>
       </div>
     </template>
@@ -400,6 +406,30 @@ const setSortDown = (item: any) => {
   flex-direction: wrap;
   align-items: center;
   flex-wrap: wrap;
+  border-bottom: 1px solid #dcdfe6;
+  width: 100%;
+  .tab-item {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid #dcdfe6;
+    border-bottom: none;
+    padding: 0 5px;
+    position: relative;
+    .item-close {
+      background: #f56c6c;
+      color: #fff;
+      position: absolute;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      top: -7px;
+      right: -7px;
+      font-size: 12px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  }
 }
 .checked {
   background: #409eff;

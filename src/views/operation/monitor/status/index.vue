@@ -50,9 +50,10 @@
         <div class="content">
           <div class="item">
             <span class="label">启用设备量 ：</span>
-            <span class="value"
-              ><span class="num">{{ deviceInfo.enableCount }}</span> 台</span
-            >
+            <span class="value">
+              <span class="num">{{ deviceInfo.enableCount }} </span>
+              台
+            </span>
           </div>
           <div class="item">
             <span class="label">在线量 ：</span>
