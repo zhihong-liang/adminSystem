@@ -37,8 +37,7 @@ export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
 export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
   axios.put(device + `/devBaseInfo/editList`, data)
 // 修改设备基本信息
-export const devBaseInfo = (data: any): Promise<ListRes> =>
-  axios.put(device + `/devBaseInfo`, data)
+export const devBaseInfo = (data: any): Promise<ListRes> => axios.put(device + `/devBaseInfo`, data)
 // 查询方案列表
 export const mattersProgrammeList = (data: any): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/list', data)
@@ -55,9 +54,9 @@ export interface DevAuthObj {
   detailAddress?: string
   devCode?: string
   devUnit?: number
-  devUnitText: string
+  devUnitText?: string
   hardIdentificationCode?: string
-  id: number
+  id?: number
   params?: Object
   privateKey?: string
   publicKey?: string
@@ -71,6 +70,19 @@ export interface DevAuthObj {
 // 查询设备认证管理列表
 export const queryDevAuthList = (data: ListReq<DevAuthObj>): Promise<ListRes> =>
   axios.post('/api/device/devAuth/listPage', data)
+
+// 查询未绑定的设备数据(选择设备编号用的)
+export const queryDevAuthListPageDev = (data: ListReq<any>): Promise<any> =>
+  axios.post('/api/device/devAuth/listPageDev', data)
+
+// 新增设备认证管理
+export const queryDevAuth = (data: DevAuthObj, method: 'post' | 'put'): Promise<Res> => {
+  const api = {
+    post: (): Promise<Res> => axios.post('/api/device/devAuth', data),
+    put: (): Promise<Res> => axios.put('/api/device/devAuth', data)
+  }
+  return api[method]()
+}
 
 // 导出设备认证管理列表
 export const queryDevAuthExport = (
@@ -102,7 +114,7 @@ export interface DeviceInfo {
   updateUser?: string
   children?: DeviceInfo[]
 }
-// 查询设备认证管理列表
+// 查询设备组列表(不分页)
 export const queryDevGroupList = (data: {
   parentId?: number
   groupName?: string
