@@ -95,3 +95,9 @@ function close() {
 }
 defineExpose({ open, close, handleSubmit })
 </script>
+
+<style lang="scss" scoped>
+:deep(.el-date-editor--datetime) {
+  width: 100%  !important;
+}
+</style>

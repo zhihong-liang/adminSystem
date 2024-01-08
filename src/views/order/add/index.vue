@@ -31,7 +31,7 @@
   <addDetail ref="detailRef" />
 </template>
 <script lang="ts" setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from 'vue'
 import addDetail from './child/addDetail.vue'
 
 const detailRef = ref()
@@ -42,13 +42,13 @@ const openDialog = (type: string, title: string) => {
 
 <style lang="scss" scoped>
 .card {
-    font-size: 28px;
-    cursor: pointer;
-    &-img{
-        width: 95px;
-        vertical-align: middle;
-        margin-right: 20%;
-    }
+  font-size: 28px;
+  cursor: pointer;
+  &-img {
+    width: 95px;
+    vertical-align: middle;
+    margin-right: 20%;
+  }
 }
 .el-col {
   padding-top: 10px;

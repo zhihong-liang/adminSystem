@@ -1,11 +1,18 @@
 <template>
   <CnPage v-bind="props" />
-  <addEdit ref="serviceRef" @success="() => { props.refresh = Date.now()}" />
+  <addEdit
+    ref="serviceRef"
+    @success="
+      () => {
+        props.refresh = Date.now()
+      }
+    "
+  />
 </template>
 
 <script lang="ts" setup>
 import CnPage from '@/components/cn-page/CnPage.vue'
-import { reactive, ref } from 'vue';
+import { reactive, ref } from 'vue'
 import addEdit from './child/addEdit.vue'
 
 const props: CnPage.Props = reactive({
@@ -35,8 +42,20 @@ const props: CnPage.Props = reactive({
         prop: 'action',
         label: '操作',
         buttons: [
-          { label: '编辑', type: 'primary', text: true, onClick: ({row}) => openDialog('edit', '编辑') },
-          { label: '删除', type: 'danger', text: true, onClick: ({row}) => { console.log(1) } },
+          {
+            label: '编辑',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => openDialog('edit', '编辑')
+          },
+          {
+            label: '删除',
+            type: 'danger',
+            text: true,
+            onClick: ({ row }) => {
+              console.log(1)
+            }
+          }
         ]
       }
     ]
@@ -44,7 +63,7 @@ const props: CnPage.Props = reactive({
 })
 
 const serviceRef = ref()
-const openDialog = (type='add', title='新增') => {
+const openDialog = (type = 'add', title = '新增') => {
   serviceRef.value.open(type, title)
 }
 </script>
