@@ -71,7 +71,7 @@ function handleSubmit() {
             emits('success')
           })
           .catch((err) => {
-            ElMessage.warning(err?.message || '操作失败')
+            err?.message && ElMessage.warning(err?.message || '操作失败')
           })
           .finally(() => {
             visible.value = false
