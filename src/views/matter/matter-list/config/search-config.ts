@@ -30,6 +30,9 @@ export function getSearchConfig(
         prop: 'sysCoverage',
         component: 'cascader',
         props: {
+          'collapse-tags': 'collapse-tags',
+          'collapse-tags-tooltip': 'collapse-tags-tooltip',
+          'max-collapse-tags': '2',
           options: sysCoverAgeList!,
           props: {
             checkStrictly: false,
