@@ -106,6 +106,9 @@ export function getAddActionDialogConfig(
           component: 'cascader',
           props: {
             options: optionsMap!.sysCoverage,
+            'collapse-tags': 'collapse-tags',
+            'collapse-tags-tooltip': 'collapse-tags-tooltip',
+            'max-collapse-tags': '3',
             props: {
               checkStrictly: false,
               multiple: true,
@@ -249,6 +252,9 @@ export function getEditActionDialogConfig(
       prop: 'sysCoverage',
       component: 'cascader',
       props: {
+        'collapse-tags': 'collapse-tags',
+        'collapse-tags-tooltip': 'collapse-tags-tooltip',
+        'max-collapse-tags': '3',
         options: optionsMap!.sysCoverage,
         props: {
           checkStrictly: false,
