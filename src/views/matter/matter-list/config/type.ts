@@ -1,6 +1,7 @@
 export type ActionType =
   | 'add'
   | 'label'
+  | 'delLabel'
   | 'export'
   | 'detail'
   | 'edit'

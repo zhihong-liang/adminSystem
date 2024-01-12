@@ -63,6 +63,11 @@ export function getSearchConfig(
         prop: 'matterStatus',
         component: 'select',
         dict: 'MATTER_STATUS'
+      },
+      {
+        label: '标签',
+        prop: 'lableName',
+        component: 'input'
       }
     ],
     colSpan: 8,
