@@ -2,7 +2,7 @@
   <div class="mr-lg flex flex-center">
     <el-dropdown>
       <div class="el-dropdown-link sculpture">
-        <el-avatar class="mr-lg" :size="40" :src="circleUrl" />
+        <el-avatar class="mr-lg" :size="40" :src="avatarImage" />
       </div>
       <template #dropdown>
         <el-dropdown-menu>
@@ -32,8 +32,7 @@
 </template>
 
 <script setup lang="ts">
-const circleUrl = 'https://cube.elemecdn.com/3/7c/3ea6beec64369c2642b92c6726f1epng.png'
-import { reactive, ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 import { ElAvatar } from 'element-plus'
 import { useUserStore, useHomeStore, useLoginStore } from '@/stores'
 import { useRouter } from 'vue-router'
@@ -55,6 +54,8 @@ const useRoleIdList = loginInfo.$state.userInfo?.useRoleIdList || []
 const currentRoleId = loginInfo.$state.userInfo?.currentRoleId
 const userId = loginInfo.$state.userInfo?.userId
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
+
+const avatarImage = computed(() => store.userInfo.headImage)
 
 const dialogProps = reactive<CnPage.DialogProps>({
   title: '角色切换',

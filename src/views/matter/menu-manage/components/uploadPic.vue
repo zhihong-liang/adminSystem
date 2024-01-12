@@ -19,7 +19,7 @@
 
   <CnDialog ref="dialogRef">
     <div class="flex flex-center">
-      <el-image style="width: 400px; height: 400px;" :src="dialogImageUrl" alt="" />
+      <el-image style="min-width: 400px; min-height: 400px;" :src="dialogImageUrl" alt="" />
     </div>
 
     <template #footer>
