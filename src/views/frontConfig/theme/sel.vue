@@ -20,7 +20,7 @@
               <el-icon><Close /></el-icon>
             </div>
             <span>{{ item.labelName }}</span>
-            <el-icon><QuestionFilled /></el-icon>
+            <!-- <el-icon><QuestionFilled /></el-icon> -->
           </div>
           <el-input
             v-else
@@ -402,7 +402,7 @@ const setSortDown = (item: any) => {
 <style lang="scss" scoped>
 .tab-list {
   display: flex;
-  gap: 5px;
+  gap: 8px;
   flex-direction: wrap;
   align-items: center;
   flex-wrap: wrap;

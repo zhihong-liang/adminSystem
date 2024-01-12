@@ -128,7 +128,7 @@ const handleLogin = async () => {
 
           router.push('/system/usercenter') // 默认跳到个人中心
         } else if (res.data.isAuth === '0') {
-          router.push('/noauth')
+          router.push('/noauth?a=' + form.username)
         }
       })
     }
