@@ -33,6 +33,10 @@ export const addMatter = (data: any): Promise<Res> => axios.post('/api/matters/i
 export const getMatterInfo = (id: string): Promise<Res> => axios.get(`/api/matters/info/get/${id}`)
 // 所属标签
 export const infoLabel = (data: any): Promise<Res> => axios.post(`/api/matters/info/label`, data)
+// 删除标签
+export const removeLabel = (data: any): Promise<Res> =>
+  axios.post(`/api/matters/info/remove/Label`, data)
+
 // 导出事项信息列表
 export const exportMatterList = (data: any): Promise<Res> =>
   axios.post(`/api/matters/info/export`, data, {
@@ -141,19 +145,19 @@ export const putMattersProgramme = (data: any): Promise<Res> =>
 
 // 修改方案管理表
 export const mattersProgrammeRelationListProgrammeMatters = (data: any): Promise<Res> =>
-  axios.post( matters + `/mattersProgrammeRelation/listProgrammeMatters`, data)
+  axios.post(matters + `/mattersProgrammeRelation/listProgrammeMatters`, data)
 
 // 新增方案-事项关联表(list,列表)
 export const mattersProgrammeRelationAddList = (data: any): Promise<Res> =>
-  axios.post( matters + `/mattersProgrammeRelation/addList`, data)
+  axios.post(matters + `/mattersProgrammeRelation/addList`, data)
 
 // 查询方案-事项关联表列表(不分页)
 export const mattersProgrammeRelationList = (data: any): Promise<Res> =>
-  axios.post( matters + `/mattersProgrammeRelation/list`, data)
+  axios.post(matters + `/mattersProgrammeRelation/list`, data)
 
 // 删除事项主题菜单列表关联表
 export const detMattersProgrammeRelation = (ids: any): Promise<Res> =>
-  axios.delete( matters + `/mattersProgrammeRelation/${ids}`,)
+  axios.delete(matters + `/mattersProgrammeRelation/${ids}`)
 
 /**
  * 菜单管理
@@ -233,7 +237,9 @@ export const lowwerMatterMenuRelation = (id: number): Promise<Res> =>
   axios.get(`/api/matters/mattersMenuRelation/below/${id}`)
 
 // 是否置顶-事项关联表
-export const isTopMatterMenuRelation = (data: Pick<MatterMenuResponse, 'id' | 'isTop'>): Promise<Res> =>
+export const isTopMatterMenuRelation = (
+  data: Pick<MatterMenuResponse, 'id' | 'isTop'>
+): Promise<Res> =>
   axios.get(`/api/matters/mattersMenuRelation/top/${data.id}`, { params: { isTop: data.isTop } })
 
 /*

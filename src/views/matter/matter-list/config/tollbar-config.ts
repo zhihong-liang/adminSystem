@@ -19,6 +19,13 @@ export default function getTollbarConifg(
         }
       },
       {
+        label: '删除标签',
+        type: '',
+        onClick: () => {
+          clickCb('delLabel')
+        }
+      },
+      {
         label: '导出',
         type: '',
         onClick: () => {

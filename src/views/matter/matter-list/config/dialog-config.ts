@@ -47,7 +47,9 @@ export function getLabelActionDialogConfig(params: getDialogConfigParams): CnPag
 // 新建事项
 export function getAddActionDialogConfig(
   params: getDialogConfigParams,
-  entryUnitValidator?: (rule: any, value: any, callback: any) => void
+  entryUnitValidator?: (rule: any, value: any, callback: any) => void,
+  hardwareModuleValidator?: (rule: any, value: any, callback: any) => void,
+  networdPolicyValidator?: (rule: any, value: any, callback: any) => void
 ): CnPage.DialogProps {
   const { dialogSubmitSuccess, optionsMap, visible, onClose } = params
   return {
@@ -133,6 +135,12 @@ export function getAddActionDialogConfig(
         },
         {
           label: '',
+          prop: 'checkAllIdentityAuthItem',
+          visible: visible?.['identityAuthItem'],
+          component: 'slot'
+        },
+        {
+          label: '',
           prop: 'identityAuthItem',
           component: 'checkbox',
           visible: visible?.['identityAuthItem'],
@@ -148,6 +156,12 @@ export function getAddActionDialogConfig(
         },
         {
           label: '',
+          prop: 'checkAllPayWay',
+          visible: visible?.['payWay'],
+          component: 'slot'
+        },
+        {
+          label: '',
           prop: 'payWay',
           component: 'checkbox',
           visible: visible?.['payWay'],
@@ -155,16 +169,24 @@ export function getAddActionDialogConfig(
             options: optionsMap!.payWay
           }
         },
-        // { label: '中文编码', prop: 'cnCode', component: 'input' },
-        // { label: '访问路径', prop: 'accessPath', component: 'input' },
         {
           label: '硬件模块',
+          prop: 'checkAllHardwareModule',
+          component: 'slot'
+        },
+        {
+          label: '',
           prop: 'hardwareModule',
           component: 'checkbox',
           dict: 'HARDWARE_MODULE'
         },
         {
           label: '网络策略',
+          prop: 'checkAllNetwordPolicy',
+          component: 'slot'
+        },
+        {
+          label: '',
           prop: 'networdPolicy',
           component: 'checkbox',
           dict: 'NETWORD_POLICY'
@@ -193,7 +215,13 @@ export function getAddActionDialogConfig(
         payStatus: [{ required: true, message: '请选择是否涉及支付方式' }],
         payWay: [{ required: true, message: '请选择支付方式' }],
         hardwareModule: [{ required: true, message: '请选择硬件模块' }],
-        networdPolicy: [{ required: true, message: '请选择网络策略' }]
+        networdPolicy: [{ required: true, message: '请选择网络策略' }],
+        checkAllHardwareModule: [
+          { required: true, validator: hardwareModuleValidator, trigger: 'submit' }
+        ],
+        checkAllNetwordPolicy: [
+          { required: true, validator: networdPolicyValidator, trigger: 'submit' }
+        ]
       }
     },
     onSuccess: dialogSubmitSuccess,

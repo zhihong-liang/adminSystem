@@ -208,16 +208,17 @@ async function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
     // 新建/编辑
-    const model = handle === 'edit' ? { ...window.structuredClone(toRaw(row)) } : undefined
-    if (model) {
+    const model = handle === 'edit' ? { ...window.structuredClone(toRaw(row)) } : {}
+    if (handle === 'edit') {
       // 编辑
       model.date = [model.startDate, model.endDate]
       model.pushAreaCode = model.pushAreaCode.split(',')
       model.deviceType = model.deviceType.split(',')
     } else {
-      model.date = [(moment().format('YYYY-MM-DD HH:mm:ss'), '')]
+      model.date = [moment().format('YYYY-MM-DD HH:mm:ss'), '']
     }
     const dialogConfig = getDialogConfig(handle)({
+      handle,
       model,
       dialogSubmitSuccess
     })

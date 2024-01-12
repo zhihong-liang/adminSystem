@@ -8,4 +8,5 @@ export interface getDialogConfigParams {
   dialogSubmitSuccess?: () => void
   optionsMap?: optionsMap
   model?: Record<string, any>
+  handle?: ActionType
 }

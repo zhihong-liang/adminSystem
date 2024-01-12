@@ -42,6 +42,40 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
+      <!-- 控制新增全选 -->
+      <template #checkAllIdentityAuthItem>
+        <el-checkbox
+          v-model="checkAllInfo.identityAuthItem.check"
+          :indeterminate="checkAllInfo.identityAuthItem.isIndeterminate"
+          @change="(val: boolean) => handleCheckAllChange(val, 'identityAuthItem')"
+          >全选</el-checkbox
+        >
+      </template>
+      <template #checkAllPayWay>
+        <el-checkbox
+          v-model="checkAllInfo.payWay.check"
+          :indeterminate="checkAllInfo.payWay.isIndeterminate"
+          @change="(val: boolean) => handleCheckAllChange(val, 'payWay')"
+          >全选</el-checkbox
+        >
+      </template>
+      <template #checkAllHardwareModule>
+        <el-checkbox
+          v-model="checkAllInfo.hardwareModule.check"
+          :indeterminate="checkAllInfo.hardwareModule.isIndeterminate"
+          @change="(val: boolean) => handleCheckAllChange(val, 'hardwareModule')"
+          >全选</el-checkbox
+        >
+      </template>
+      <template #checkAllNetwordPolicy>
+        <el-checkbox
+          v-model="checkAllInfo.networdPolicy.check"
+          :indeterminate="checkAllInfo.networdPolicy.isIndeterminate"
+          @change="(val: boolean) => handleCheckAllChange(val, 'networdPolicy')"
+          >全选</el-checkbox
+        >
+      </template>
+      <!-- 选择单位信息 -->
       <template #entryUnit>
         <el-autocomplete
           v-model="dialogProps.formProps!.model.entryUnit"
@@ -66,7 +100,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, toRaw, onMounted, computed } from 'vue'
+import { reactive, ref, toRaw, onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
 
 import CnPage from '@/components/cn-page/CnPage.vue'
@@ -86,6 +120,7 @@ import {
   exportMatterList,
   getMatterLabelList,
   infoLabel,
+  removeLabel,
   pushDownDept
 } from '@/api/matter'
 import { getDictionary } from '@/api'
@@ -101,6 +136,11 @@ const identityAuthItemOptions = ref<any[]>()
 const payWayOptions = ref<any[]>()
 // 业务部门options
 const businessUnitOptions = ref<any[]>()
+// 硬件模块options
+const hardwareModuleOptions = ref<any[]>()
+// 网络策略options
+const networdPolicyOptions = ref<any[]>()
+
 // 当前搜索出的单位列表
 const unitListOptions = ref<any[]>()
 
@@ -113,8 +153,102 @@ const dialogProps = reactive<CnPage.DialogProps>({})
 
 const activeName = ref<tabsActivateName>('basicInfo')
 
+// 控制全选
+const checkAllInfo = reactive({
+  identityAuthItem: {
+    check: false,
+    isIndeterminate: true
+  },
+  payWay: {
+    check: false,
+    isIndeterminate: true
+  },
+  hardwareModule: {
+    check: false,
+    isIndeterminate: true
+  },
+  networdPolicy: {
+    check: false,
+    isIndeterminate: true
+  }
+})
+
+function handleCheckAllChange(val: boolean, field: string) {
+  if (field === 'identityAuthItem') {
+    checkAllInfo['identityAuthItem'].isIndeterminate = false
+    dialogProps.formProps!.model.identityAuthItem = val
+      ? identityAuthItemOptions.value?.map((i) => i.value)
+      : []
+  } else if (field === 'payWay') {
+    checkAllInfo['payWay'].isIndeterminate = false
+    dialogProps.formProps!.model.payWay = val ? payWayOptions.value?.map((i) => i.value) : []
+  } else if (field === 'hardwareModule') {
+    checkAllInfo['hardwareModule'].isIndeterminate = false
+    dialogProps.formProps!.model.hardwareModule = val
+      ? hardwareModuleOptions.value?.map((i) => i.value)
+      : []
+  } else {
+    checkAllInfo['networdPolicy'].isIndeterminate = false
+    dialogProps.formProps!.model.networdPolicy = val
+      ? networdPolicyOptions.value?.map((i) => i.value)
+      : []
+  }
+}
+
+watch(
+  () => dialogProps.formProps?.model.identityAuthItem,
+  (newVal) => {
+    const checkedCount = newVal?.length
+    checkAllInfo['identityAuthItem'].check = checkedCount === identityAuthItemOptions.value?.length
+    checkAllInfo['identityAuthItem'].isIndeterminate =
+      checkedCount > 0 && identityAuthItemOptions.value
+        ? checkedCount < identityAuthItemOptions.value?.length
+        : false
+  }
+)
+
+watch(
+  () => dialogProps.formProps?.model.payWay,
+  (newVal) => {
+    const checkedCount = newVal?.length
+    checkAllInfo['payWay'].check = checkedCount === payWayOptions.value?.length
+    checkAllInfo['payWay'].isIndeterminate =
+      checkedCount > 0 && payWayOptions.value ? checkedCount < payWayOptions.value?.length : false
+  }
+)
+
+watch(
+  () => dialogProps.formProps?.model.hardwareModule,
+  (newVal) => {
+    const checkedCount = newVal?.length
+    checkAllInfo['hardwareModule'].check = checkedCount === hardwareModuleOptions.value?.length
+    checkAllInfo['hardwareModule'].isIndeterminate =
+      checkedCount > 0 && hardwareModuleOptions.value
+        ? checkedCount < hardwareModuleOptions.value?.length
+        : false
+  }
+)
+
+watch(
+  () => dialogProps.formProps?.model.networdPolicy,
+  (newVal) => {
+    const checkedCount = newVal?.length
+    checkAllInfo['networdPolicy'].check = checkedCount === networdPolicyOptions.value?.length
+    checkAllInfo['networdPolicy'].isIndeterminate =
+      checkedCount > 0 && networdPolicyOptions.value
+        ? checkedCount < networdPolicyOptions.value?.length
+        : false
+  }
+)
+
 onMounted(async () => {
-  const res = await getDictionary(['SYS_COVERAGE', 'IDENTITY_AUTH_ITEM', 'PAY_WAY'])
+  const res = await getDictionary([
+    'SYS_COVERAGE',
+    'IDENTITY_AUTH_ITEM',
+    'PAY_WAY',
+    'HARDWARE_MODULE',
+    'NETWORD_POLICY'
+  ])
   const { data } = res
   sysCoverageOptions.value = handlesysCoverageOptionsTree(data['SYS_COVERAGE'])
   identityAuthItemOptions.value = data['IDENTITY_AUTH_ITEM'].map((i) => ({
@@ -122,6 +256,14 @@ onMounted(async () => {
     label: i.description
   }))
   payWayOptions.value = data['PAY_WAY'].map((i) => ({ value: i.subtype, label: i.description }))
+  hardwareModuleOptions.value = data['HARDWARE_MODULE'].map((i) => ({
+    value: i.subtype,
+    label: i.description
+  }))
+  networdPolicyOptions.value = data['NETWORD_POLICY'].map((i) => ({
+    value: i.subtype,
+    label: i.description
+  }))
   const { rows } = await getDeptList({ page: 1, size: 1000, obj: {} })
   businessUnitOptions.value = rows.map((i) => ({
     value: i.id,
@@ -174,6 +316,22 @@ function authenticationTypeVisible() {
 function entryUnitValidator(rule: any, value: any, callback: any) {
   if (!unitListOptions.value!.find((v) => v.label === value)) {
     callback(new Error('请填写正确的单位'))
+  } else {
+    callback()
+  }
+}
+
+function hardwareModuleValidator(rule: any, value: any, callback: any) {
+  if (!dialogProps.formProps?.model.hardwareModule.length) {
+    callback(new Error(''))
+  } else {
+    callback()
+  }
+}
+
+function networdPolicyValidator(rule: any, value: any, callback: any) {
+  if (!dialogProps.formProps?.model.networdPolicy.length) {
+    callback(new Error(''))
   } else {
     callback()
   }
@@ -299,13 +457,28 @@ function infoLabelAction() {
   })
 }
 
+// 删除标签
+async function delLabelAction() {
+  const mattersIds = tableSelection.value!.map((item) => item.id)
+  try {
+    const result = await removeLabel({
+      labelId: null,
+      mattersIds
+    })
+    props.refresh = new Date().getTime()
+    ElMessage.success(result.message || '操作成功')
+  } catch (err: any) {
+    ElMessage.error(err)
+  }
+}
+
 // 显示新建事项/所属标签窗口/导出事项列表
 async function showDialogByAddOrLabel(handle: ActionType) {
   openDialogHandle.value = handle
   if (handle === 'export') {
     exportMatterListAction()
     return
-  } else if (handle === 'label') {
+  } else if (handle === 'label' || handle === 'delLabel') {
     if (!tableSelection.value || !tableSelection.value.length)
       return ElMessage.warning('请先勾选事项')
     const result = await getMatterLabelList({ page: 1, size: 1000, obj: {} })
@@ -323,7 +496,11 @@ async function showDialogByAddOrLabel(handle: ActionType) {
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]
     }
-    dialogProps.action = () => infoLabelAction()
+    if (handle === 'label') {
+      dialogProps.action = () => infoLabelAction()
+    } else {
+      return delLabelAction()
+    }
   } else {
     const dialogConfig = getDialogConfig(handle)(
       {
@@ -337,7 +514,9 @@ async function showDialogByAddOrLabel(handle: ActionType) {
         visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible },
         onClose: handleDialogClose
       },
-      entryUnitValidator
+      entryUnitValidator,
+      hardwareModuleValidator,
+      networdPolicyValidator
     )
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]

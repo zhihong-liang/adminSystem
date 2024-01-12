@@ -12,6 +12,7 @@ export default function getTableConfig(
       { label: '业务部门', prop: 'businessUnit' },
       { label: '系统覆盖范围', prop: 'sysCoverage' },
       { label: '办理类型', prop: 'handleType', dict: 'HANDLE_TYPE' },
+      { label: '标签', prop: 'lableName' },
       { label: '事项状态', prop: 'matterStatus', slot: 'matterStatus' },
       {
         label: '操作',

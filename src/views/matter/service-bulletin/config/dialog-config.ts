@@ -14,11 +14,12 @@ export function getDialogConfig(actionType: ActionType) {
 
 // 新建公告
 export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { model, dialogSubmitSuccess } = params
+  const { model, dialogSubmitSuccess, handle } = params
+  console.log(model)
   return {
-    title: model ? '编辑服务公告' : '新建服务公告',
+    title: handle === 'edit' ? '编辑服务公告' : '新建服务公告',
     formProps: {
-      model: model ?? {},
+      model: model!,
       labelPosition: 'left',
       items: [
         {
