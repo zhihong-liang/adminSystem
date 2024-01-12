@@ -21,9 +21,9 @@ function useConfirm(opts: UseConfirmParams): void {
           ElMessage.success(res.message || '操作成功')
           success && success()
         })
-        .catch(({ message }) => {
-          message && ElMessage.warning(message)
-        })
+        // .catch(({ message }) => {
+        //   message && ElMessage.warning(message)
+        // })
     })
     .catch(() => ({}))
 }

@@ -197,7 +197,7 @@ declare namespace CnPage {
   interface FormItemSelectProps extends FormItemProps {
     component: 'select'
     props?: ExtractPropTypes<typeof ElSelect> & {
-      options: OptionProps[]
+      options?: OptionProps[]
     }
   }
   interface OptionProps {

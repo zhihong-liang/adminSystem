@@ -2,10 +2,26 @@
   <el-cascader
     ref="adRef"
     :clearable="true"
+    v-bind="$attrs"
     v-model="current"
     :options="division"
     @change="handleChange"
   />
+  <el-form-item v-show="false" prop="provinceCode">
+    <input v-model="model.provinceCode" type="hidden" />
+  </el-form-item>
+  <el-form-item v-show="false" prop="cityCode">
+    <input v-model="model.cityCode" type="hidden" />
+  </el-form-item>
+  <el-form-item v-show="false" prop="districtCode">
+    <input v-model="model.districtCode" type="hidden" />
+  </el-form-item>
+  <el-form-item v-show="false" prop="streetCode">
+    <input v-model="model.streetCode" type="hidden" />
+  </el-form-item>
+  <el-form-item v-show="false" prop="villageCode">
+    <input v-model="model.villageCode" type="hidden" />
+  </el-form-item>
 </template>
 
 <script lang="ts" setup>

@@ -86,9 +86,6 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
                   ElMessage.success(res.message || '操作成功')
                   props.refresh = Date.now()
                 })
-                .catch((err) => {
-                  ElMessage.warning(err.message || '操作失败')
-                })
             }
           },
           {
@@ -99,9 +96,6 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
                 .then((res) => {
                   ElMessage.success(res.message || '操作成功')
                   props.refresh = Date.now()
-                })
-                .catch((err) => {
-                  ElMessage.warning(err.message || '操作失败')
                 })
             }
           },

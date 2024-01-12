@@ -117,8 +117,8 @@ const basisForm: any = reactive({
     },
     {
       label: "行政区划",
-      prop: "regionDetail",
-      component: "input",
+      prop: "ad",
+      component: "ad",
     },
     {
       label: "详细地址",
@@ -134,7 +134,7 @@ const basisForm: any = reactive({
     // },
     {
       label: "地理坐标",
-      prop: "coordinate",
+      prop: "pointLatLng",
       component: "input",
       props: {
         disabled: props.model.type === "view"
@@ -175,12 +175,7 @@ const basisForm: any = reactive({
       label: "设备营业时间",
       prop: "businessHours",
       component: "select",
-      props: {
-        options: [
-          { lable: "7 * 24 小时", value: "7 * 24 小时" },
-          { lable: "自定义", value: "自定义" },
-        ],
-      },
+      dict: 'DEV_BUSINESS_HOURS'
     },
     {
       label: "定时开关机",
@@ -193,7 +188,7 @@ const basisForm: any = reactive({
       prop: "businessHours",
       component: "slot",
       span: 24,
-      visible: () => basisForm.model?.businessHours === "自定义",
+      visible: () => basisForm.model?.businessHours === "3",
     },
 
     {
@@ -251,7 +246,14 @@ const validateForm = () => {
   });
 };
 const getFormData = () => {
-  return basisForm.model
+  const businessHours = timeSlotList.reduce((acc, cur, index) => {
+    acc[`businessHours${index + 1}`] = [cur.startTime, cur.endTime].filter(Boolean).join(' - ');
+    return acc
+  }, {} as Record<string, string>)
+  return {
+    ...basisForm.model,
+    ...businessHours
+  }
 }
 defineExpose({ validateForm, getFormData });
 
@@ -260,6 +262,13 @@ watchEffect(async () => {
     groupList.value = await getUnitListUtils().then(res => { return res})
     props.model.networkPolicy = props.model.networkPolicy.split(",");
     basisForm.model = props.model;
+    const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
+    ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((v, i) => {
+      const [startTime, endTime] = v.split(' - ')
+      timeSlotList[i].checked = !!startTime
+      timeSlotList[i].startTime = startTime
+      timeSlotList[i].endTime = endTime
+    })
   }
 });
 </script>

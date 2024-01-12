@@ -4,7 +4,7 @@
       <span class="blurtext" @click="viewDetail(row)"> {{ row.proDevCode }}</span>
     </template>
   </CnPage>
-  <CnDialog ref="dialogRef">
+  <CnDialog ref="dialogRef" title="设备详情">
     <el-tabs v-model="activeName" class="demo-tabs">
       <el-tab-pane label="基本信息" name="1">
         <BasicInfo ref="basicInfoRef" :model="basicInfoData"></BasicInfo>
@@ -115,27 +115,28 @@ const props = reactive<CnPage.Props>({
       { label: "设备基本信息", component: "subtitle", span: 24 },
       { label: "设备编号", prop: "proDevCode", component: "input" },
       { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input" },
-      { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
+      { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE", props: { multiple: true } },
       { label: "设备型号", prop: "status", component: "input" },
       {
         label: "硬件模块",
         prop: "hardware",
         component: "select",
         dict: "HARDWARE_MODULE",
+        props: { multiple: true }
       },
-      { label: "操作系统", prop: "operSystem", component: "select" },
+      { label: "操作系统", prop: "operSystem", component: "select", dict: 'DEV_OPER_SYSTEM' },
       {
         label: "设备接入方式",
         prop: "accesType",
         component: "select",
         dict: "DEV_ACCES_TYPE",
       },
-      { label: "政务程序版本号", prop: "procedureVersion", component: "select" },
-      { label: "安装激活时间", prop: "installActivateTime", component: "select" },
+      { label: "政务程序版本号", prop: "procedureVersion", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
+      { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { type: 'datetimerange' } },
       { label: "设备分组", prop: "group", component: "select" },
       { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
       { label: "部署场所", component: "subtitle", span: 24 },
-      { label: "行政区划", prop: "townCode", component: "ad" },
+      { label: "行政区划", prop: "ad", component: "ad", props: { props: { checkStrictly: true } } },
       { label: "部署场所", prop: "siteName", component: "input" },
       {
         label: "部署场所类型",
@@ -149,12 +150,29 @@ const props = reactive<CnPage.Props>({
         prop: "networkPolicy",
         component: "select",
         dict: "NETWORD_POLICY",
+        props: { multiple: true }
       },
       { label: "相关方", component: "subtitle", span: 24 },
       { label: "设备接入单位", prop: "devUnit", component: "select", props: { options: supList } },
       { label: "设备管理单位", prop: "devManageUnit", component: "select", props: { options: supList } },
       { label: "设备技术支撑单位", prop: "supportingUnit", component: "select", props: { options: supList } },
     ],
+  },
+  transformRequest(params, page, size) {
+    const [installActivateStartTime, installActivateEndTime] = params?.installActivateTime || []
+    return {
+      page,
+      size,
+      obj: {
+        ...params,
+        devType: params.devType?.join(','),
+        // hardware: params.hardware?.join(','),
+        networkPolicy: params.networkPolicy?.join(','),
+        procedureVersion: params.procedureVersion?.join(','),
+        installActivateStartTime,
+        installActivateEndTime
+      }
+    }
   },
   toolbar: {
     items: [
@@ -390,7 +408,7 @@ const handleSubmit = () => {
   if (hardwareModuleRef.value.getFormData()) {
     hardwareForm.hardware =  hardwareModuleRef.value.getFormData().hardware.join(",")
   }
-  
+
   deployForm.networkPolicy = deploymentSiteRef.value.getFormData().networkPolicy.join(",")
   const params = {
     baseInfo: { ...basicInfoRef.value.getFormData(), ...hardwareForm }, //  hardwareModuleRef.value.getFormData()
