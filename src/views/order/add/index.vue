@@ -2,42 +2,36 @@
   <div>查看<span style="color: var(--system-primary-color)">《服务标准》</span></div>
   <el-row :gutter="20">
     <el-col :span="24" style="font-size: 22px">请选择工单类型</el-col>
-    <el-col :span="8">
-      <el-card class="card" @click="openDialog('yw', '运维工单')">
-        <img class="card-img" src="@/assets/images/logo.png" alt="粤智助开放平台" />
-        <span>运维工单</span>
-      </el-card>
-    </el-col>
-    <el-col :span="8">
-      <el-card class="card" @click="openDialog('hc', '耗材工单')">
-        <img class="card-img" src="@/assets/images/logo.png" alt="粤智助开放平台" />
-        <span>耗材工单</span>
-      </el-card>
-    </el-col>
-    <el-col :span="8">
-      <el-card class="card" @click="openDialog('az', '安装工单')">
-        <img class="card-img" src="@/assets/images/logo.png" alt="粤智助开放平台" />
-        <span>安装工单</span>
-      </el-card>
-    </el-col>
-    <el-col :span="8">
-      <el-card class="card" @click="openDialog('sj', '升级工单')">
-        <img class="card-img" src="@/assets/images/logo.png" alt="粤智助开放平台" />
-        <span>升级工单</span>
+    <el-col :span="8" v-for="(item, index) in list" :key="item.id">
+      <el-card class="card" @click="openDialog(item)">
+        <img class="card-img" :src="item.imgUrl" alt="粤智助开放平台" />
+        <span>{{item.workTypeName}}</span>
       </el-card>
     </el-col>
   </el-row>
 
-  <addDetail ref="detailRef" />
+  <addOrder ref="orderRef" />
 </template>
 <script lang="ts" setup>
 import { ref, computed } from 'vue'
-import addDetail from './child/addDetail.vue'
+import addOrder from './child/addOrder.vue'
+import { getOrderType } from '@/api/order'
 
-const detailRef = ref()
-const openDialog = (type: string, title: string) => {
-  detailRef.value.open(type, title)
+const orderRef = ref()
+const list = ref([] as any)
+const openDialog = (data: any) => {
+  orderRef.value.open(data)
 }
+
+getOrderType({
+  page: 1,
+  size: 1000,
+  obj: {}
+}).then((res) => {
+  if (res.code === '200') {
+    list.value = res.rows
+  }
+})
 </script>
 
 <style lang="scss" scoped>

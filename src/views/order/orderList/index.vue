@@ -3,6 +3,16 @@
     <template #codeSlot="{ row }">
       <el-button link @click="handleOpen('Look')">{{ row.name }}</el-button>
     </template>
+
+    <template #addition>
+      <div class="tip">
+        <div class="tip_cond">查看<span style="color: var(--system-primary-color)">《服务标准》</span></div>
+        <div class="tip_num">
+          <span class="tip_num_title">工单超时</span>
+          <span>超时工单 5 笔，即将超时工单 5 笔</span>
+        </div>
+      </div>
+    </template>
   </CnPage>
   <detail ref="detailRef"></detail>
   <repulse ref="repulseRef"></repulse>
@@ -128,3 +138,24 @@ const props: CnPage.Props = reactive({
   }
 })
 </script>
+
+<style lang="scss" scoped>
+.tip {
+  margin-bottom: 10px;
+  &_cond {
+    text-align: right;
+    margin-bottom: 10px;
+  }
+  &_num {
+    border: 1px solid #e5e5e5;
+    line-height: 56px;
+    &_title {
+      display: inline-block;
+      background:var(--system-primary-color);
+      color: #fff;
+      padding: 0 20px;
+      margin-right: 30px;
+    }
+  }
+}
+</style>

@@ -14,7 +14,7 @@ export default function useSearch(type: string) {
     { label: '运维单位', prop: 'phone', component: 'select' },
     { label: '生产厂商', prop: 'phone', component: 'select', show: ['Dispatch', 'NotHandle', 'InHandle', 'Handled', 'Finished', 'Closed'] },
     { label: '行政区域', prop: 'phone', component: 'ad' },
-    { label: '工单状态', prop: 'phone', component: 'select', show: ['Finished','Closed'] },
+    { label: '工单状态', prop: 'phone', component: 'select', show: ['Finished', 'Closed'] },
     { label: '完成情况', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
     { label: '客户评价', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
     { label: '客户评价满意度', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
