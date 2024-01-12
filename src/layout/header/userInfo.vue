@@ -52,6 +52,7 @@ const roleIdList = loginInfo.$state.userInfo?.roleIdList || []
 const useRoleIdList = loginInfo.$state.userInfo?.useRoleIdList || []
 
 const currentRoleId = loginInfo.$state.userInfo?.currentRoleId
+
 const userId = loginInfo.$state.userInfo?.userId
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 
@@ -91,14 +92,17 @@ function switchRoles() {
     size: 999
   }
   getRoleList(params).then((res: any) => {
+    console.log('res: ', res)
     if (res.code === '200') {
       roleList.value = []
+      console.log('useRoleIdList: ', useRoleIdList)
       res.rows.map((item: any) => {
         item.label = item.name
         item.value = item.id
-        if (!useRoleIdList.includes(item.id)) {
-          item.disabled = true
-        }
+
+        // if (!roleIdList.includes(item.id)) {
+        //   item.disabled = true
+        // }
 
         for (let index = 0; index < roleIdList.length; index++) {
           const element = roleIdList[index]
@@ -123,6 +127,7 @@ function handleScreen() {
       currentRoleId: dialogProps.formProps!.model.currentRoleId
     }
     userRoleSwitch(params).then((res: any) => {
+      console.log('res: ', res)
       if (res.code === '200') {
         ElMessage({
           type: 'success',

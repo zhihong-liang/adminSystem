@@ -1,6 +1,6 @@
 <template>
   <div class="wrap">
-    <div class="row1">登录账号：admin</div>
+    <div class="row1" v-if="account">登录账号：{{ account || '' }}</div>
     <div class="row2">
       <el-icon class="icon"><SuccessFilled /></el-icon>登录成功
     </div>
@@ -9,7 +9,12 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import { SuccessFilled } from '@element-plus/icons-vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const account: any = ref('')
+account.value = route.query.a
 </script>
 
 <style scoped lang="scss">
