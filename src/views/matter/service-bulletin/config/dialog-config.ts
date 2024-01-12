@@ -53,7 +53,9 @@ export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.
           prop: 'date',
           component: 'datepicker',
           props: {
-            type: 'daterange',
+            timeFormat: 'HH:mm',
+            format: 'YYYY-MM-DD HH:mm',
+            type: 'datetimerange',
             rangeSeparator: '至'
           }
         },
@@ -151,7 +153,8 @@ export function getEditOrEditActionConfig(params: getDialogConfigParams): CnPage
         },
         {
           label: '设备类型',
-          prop: 'deviceType'
+          prop: 'deviceType',
+          dict: 'DEV_TYPE'
         },
         {
           label: '信息展示期',

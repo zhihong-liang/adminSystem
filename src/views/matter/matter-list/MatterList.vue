@@ -306,7 +306,8 @@ async function showDialogByAddOrLabel(handle: ActionType) {
     exportMatterListAction()
     return
   } else if (handle === 'label') {
-    if (!tableSelection.value || !tableSelection.value.length) return
+    if (!tableSelection.value || !tableSelection.value.length)
+      return ElMessage.warning('请先勾选事项')
     const result = await getMatterLabelList({ page: 1, size: 1000, obj: {} })
     const options = result.rows.map((item: any) => ({ label: item.lableName, value: item.id }))
     const matterNameList = tableSelection.value.map((item) => item.matterName)

@@ -64,7 +64,7 @@ async function handleBeforeUpload(rawFile: any) {
   if (type === 'image/jpeg' || type === 'image/png' || type === 'image/svg+xml') {
     return true
   } else {
-    ElMessage.warning('材料需JPG/PNG/SVG格式')
+    ElMessage.warning('材料需JPEG/PNG/SVG格式')
     return false
   }
 }

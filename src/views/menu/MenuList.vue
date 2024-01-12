@@ -127,7 +127,13 @@ const props: CnPage.Props = reactive({
         onClick: () => {
           dialogRef.value?.open()
           dialogProps.formProps!.model = {}
-          dialogProps.action = () => handleSubmit('add')
+          dialogProps.action = () => {
+            return new Promise((resolve, reject) =>
+              handleSubmit('add')
+                .then((res) => resolve(res))
+                .catch(() => reject())
+            )
+          }
         }
       }
     ]
@@ -195,7 +201,7 @@ function handleSubmit(action: 'add' | 'edit') {
 
   if (action === 'add') {
     params = Object.assign({}, params, {
-      createTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      createTime: moment().format('YYYY-MM-DD HH:mm:ss')
       // createUser: 'ceshi'
     })
 
@@ -206,7 +212,7 @@ function handleSubmit(action: 'add' | 'edit') {
     }
   } else {
     params = Object.assign({}, params, {
-      updateTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      updateTime: moment().format('YYYY-MM-DD HH:mm:ss')
       // updateUser: 'ceshi'
     })
   }
@@ -218,17 +224,20 @@ function handleSubmit(action: 'add' | 'edit') {
 function handleEdit({ row }: any) {
   dialogRef.value?.open()
   dialogProps.formProps!.model = row
-  dialogProps.action = () => handleSubmit('edit')
+  dialogProps.action = () => {
+    return new Promise((resolve, reject) =>
+      handleSubmit('edit')
+        .then((res) => resolve(res))
+        .catch(() => reject())
+    )
+  }
 }
 
 function handleRemove({ row }: any) {
   const opts = {
     message: `确定要删除${row.name}?`,
     title: '删除',
-    action: () =>
-      removeMenu({
-        ids: row.id || ''
-      }),
+    action: () => removeMenu({ ids: row.id || '' }),
     success: () => {
       // 更新tab
       updateTabList(tabList.value.filter((t) => t.id !== row.id))

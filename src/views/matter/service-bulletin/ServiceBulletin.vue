@@ -40,6 +40,9 @@
       <template #pushAreaCode>
         <el-cascader
           ref="cascaderRef"
+          collapse-tags
+          collapse-tags-tooltip
+          max-collapse-tags="5"
           v-model="dialogProps.formProps!.model.pushAreaCode"
           :props="cascaderProps.props"
           :options="cascaderProps.options"
@@ -154,8 +157,8 @@ function dialogSubmitSuccess() {
 function addServiceNoticeAction() {
   const { userInfo } = JSON.parse(localStorage.getItem('user')!)
   const model = dialogProps.formProps?.model || {}
-  model.startDate = model.date[0] + ' 00:00:00'
-  model.endDate = model.date[1] + ' 00:00:00'
+  model.startDate = moment(model.date[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
+  model.endDate = moment(model.date[1], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
   model.pushAreaCode = model.pushAreaCode.join(',')
   model.deviceType = model.deviceType.join(',')
   model.createUser = userInfo.name
@@ -169,8 +172,8 @@ function addServiceNoticeAction() {
 // 编辑服务公告
 function editServiceNoticeAction() {
   const model = dialogProps.formProps?.model || {}
-  model.startDate = model.date[0].length === 10 ? model.date[0] + ' 00:00:00' : model.date[0]
-  model.endDate = model.date[1].length === 10 ? model.date[1] + ' 00:00:00' : model.date[1]
+  model.startDate = moment(model.date[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
+  model.endDate = moment(model.date[1], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
   model.pushAreaCode = model.pushAreaCode.join(',')
   model.deviceType = model.deviceType.join(',')
   let nodesInfo = cascaderRef.value?.getCheckedNodes(true)
@@ -201,7 +204,7 @@ function pushDownServiceNoticeAction() {
 }
 
 // 设置tollbar点击弹窗的配置
-function showDialog(handle: ActionType, row?: any) {
+async function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
     // 新建/编辑
@@ -211,6 +214,8 @@ function showDialog(handle: ActionType, row?: any) {
       model.date = [model.startDate, model.endDate]
       model.pushAreaCode = model.pushAreaCode.split(',')
       model.deviceType = model.deviceType.split(',')
+    } else {
+      model.date = [(moment().format('YYYY-MM-DD HH:mm:ss'), '')]
     }
     const dialogConfig = getDialogConfig(handle)({
       model,
@@ -232,13 +237,13 @@ function showDialog(handle: ActionType, row?: any) {
     }
   } else {
     // 查看详情
-    const model = window.structuredClone(toRaw(row))
+    let model = window.structuredClone(toRaw(row))
     model.date =
-      moment(model.startDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日') +
+      moment(model.startDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日HH时mm分') +
       ' 至 ' +
-      moment(model.endDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日')
+      moment(model.endDate, 'YYYY-MM-DD HH:mm:ss').format('YYYY年MM月DD日HH时mm分')
     noticeStatus.value = model.noticeStatus
-    model.deviceType = useDictionary('DEV_TYPE', stringToArray(model.deviceType)).value
+    model.deviceType = stringToArray(model.deviceType)
     const dialogConfig = getDialogConfig(handle)({ model })
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]

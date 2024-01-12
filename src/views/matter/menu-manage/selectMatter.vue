@@ -62,7 +62,6 @@ import { ElMessage } from 'element-plus'
 import UploadPic from './components/uploadPic.vue'
 import CnForm from '@/components/cn-page/CnForm.vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
-import CnIcon from '@/components/cn-page/CnIcon.vue'
 import TransferFormDialog from './components/transferFormDialog.vue'
 
 import type { MatterMenuRelation, MatterMenuResponse } from '@/views/matter/menu-manage/config/type'
