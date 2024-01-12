@@ -101,9 +101,31 @@ declare namespace CnPage {
   /**
    * 表格模块
    */
-  interface TableProps<T = Record<string, any>> extends ElTableProps<T> {
+  // 表格事件类型
+  type ElTableEmits =
+    | 'onSelect'
+    | 'onExpandChange'
+    | 'onCurrentChange'
+    | 'onSelectAll'
+    | 'onSelectionChange'
+    | 'onCellMouseEnter'
+    | 'onCellMouseLeave'
+    | 'onCellContextmenu'
+    | 'onCellClick'
+    | 'onCellDblclick'
+    | 'onRowClick'
+    | 'onRowContextmenu'
+    | 'onRowDblclick'
+    | 'onHeaderClick'
+    | 'onHeaderContextmenu'
+    | 'onSortChange'
+    | 'onFilterChange'
+    | 'onHeaderDragend'
+  type TableProps<T = Record<string, any>> = ElTableProps<T> & {
     columns: TableColumnProps<T>[]
     selectionChange?: (selection: any) => void
+  } & {
+    [K in ElTableEmits]?: ((...args: any[]) => any)
   }
   type TableColumnProps<T = Record<string, any>> = Partial<
     ElTableColumnCtx<T> & {
