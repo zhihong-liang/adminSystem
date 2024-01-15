@@ -115,11 +115,11 @@ const props = reactive<CnPage.Props>({
       { label: "设备基本信息", component: "subtitle", span: 24 },
       { label: "设备编号", prop: "proDevCode", component: "input" },
       { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input" },
-      { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE", props: { multiple: true } },
+      { label: "设备类型", prop: "devTypeList", component: "select", dict: "DEV_TYPE", props: { multiple: true } },
       { label: "设备型号", prop: "status", component: "input" },
       {
         label: "硬件模块",
-        prop: "hardware",
+        prop: "hardwareList",
         component: "select",
         dict: "HARDWARE_MODULE",
         props: { multiple: true }
@@ -131,7 +131,7 @@ const props = reactive<CnPage.Props>({
         component: "select",
         dict: "DEV_ACCES_TYPE",
       },
-      { label: "政务程序版本号", prop: "procedureVersion", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
+      { label: "政务程序版本号", prop: "procedureVersionList", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
       { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { type: 'datetimerange' } },
       { label: "设备分组", prop: "group", component: "select" },
       { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
@@ -147,7 +147,7 @@ const props = reactive<CnPage.Props>({
       { label: "自助终端管理员", prop: "managePersonName", component: "select" },
       {
         label: "网络策略",
-        prop: "networkPolicy",
+        prop: "networkPolicyList",
         component: "select",
         dict: "NETWORD_POLICY",
         props: { multiple: true }
@@ -165,10 +165,6 @@ const props = reactive<CnPage.Props>({
       size,
       obj: {
         ...params,
-        devType: params.devType?.join(','),
-        // hardware: params.hardware?.join(','),
-        networkPolicy: params.networkPolicy?.join(','),
-        procedureVersion: params.procedureVersion?.join(','),
         installActivateStartTime,
         installActivateEndTime
       }
