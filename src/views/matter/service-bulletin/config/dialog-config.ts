@@ -15,7 +15,6 @@ export function getDialogConfig(actionType: ActionType) {
 // 新建公告
 export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.DialogProps {
   const { model, dialogSubmitSuccess, handle } = params
-  console.log(model)
   return {
     title: handle === 'edit' ? '编辑服务公告' : '新建服务公告',
     formProps: {
@@ -51,14 +50,8 @@ export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.
         },
         {
           label: '信息展示期',
-          prop: 'date',
-          component: 'datepicker',
-          props: {
-            timeFormat: 'HH:mm',
-            format: 'YYYY-MM-DD HH:mm',
-            type: 'datetimerange',
-            rangeSeparator: '至'
-          }
+          prop: 'startDate',
+          component: 'slot'
         },
         {
           label: '公告内容',
@@ -77,7 +70,7 @@ export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.
         noticeTyle: [{ required: true, message: '请选择类型' }],
         pushAreaCode: [{ required: true, message: '请选择发布区域' }],
         deviceType: [{ required: true, message: '请选择设备类型' }],
-        date: [{ required: true, message: '请选择信息展示期' }],
+        startDate: [{ required: true, message: '请选择信息展示期' }],
         content: [{ required: true, message: '请输入公告内容' }]
       },
       labelWidth: 120
