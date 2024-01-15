@@ -253,7 +253,7 @@ async function showDialog(handle: ActionType, row?: any) {
       model.pushAreaCode = model.pushAreaCode.split(',')
       model.deviceType = model.deviceType.split(',')
     } else {
-      model.startDate = moment().format('YYYY-MM-DD HH:mm:ss')
+      model.startDate = moment().format('YYYY-MM-DD HH:mm:00')
     }
     const dialogConfig = getDialogConfig(handle)({
       handle,
