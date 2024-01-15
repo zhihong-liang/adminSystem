@@ -262,6 +262,8 @@ watchEffect(async () => {
     groupList.value = await getUnitListUtils().then(res => { return res})
     props.model.networkPolicy = props.model.networkPolicy.split(",");
     basisForm.model = props.model;
+    // 传的时候还是字符串，取的时候变成数字了
+    if (typeof props.model.supportingUnit === 'number') basisForm.model.supportingUnit = String(props.model.supportingUnit)
     const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
     ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((v, i) => {
       const [startTime, endTime] = v.split(' - ')
