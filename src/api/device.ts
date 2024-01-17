@@ -128,3 +128,26 @@ export const querAddDevGroup = (data: DeviceInfo): Promise<Res> =>
 // 删除设备组
 export const queryDeleteDevGroup = (ids: string): Promise<Res> =>
   axios.delete(`/api/device/devGroup/${ids}`)
+
+/**
+ * 查询设备接入申请表列表
+ */
+interface DeviceAccessInfo {
+  id?: string
+  devAccessUnit?: string
+  auditStatus?: string
+}
+interface ManagePerson {
+  currentRoleId: string
+  status: string
+  name: string
+}
+// 查询事项信息列表
+export const getDevAccessApplyList = (data: ListReq<DeviceAccessInfo>): Promise<ListRes> =>
+  axios.post('/api/device/devAccessApply/listPage', data)
+// 查询自助终端管理员
+export const getManagePersonList = (data: ListReq<ManagePerson>): Promise<ListRes> =>
+  axios.post('/api/admin/user/list', data)
+// 新增设备接入申请表
+export const devAccessApply = (data: any): Promise<Res> =>
+  axios.post('/api/device/devAccessApply', data)

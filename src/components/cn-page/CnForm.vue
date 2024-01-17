@@ -136,7 +136,7 @@ defineExpose({ formRef })
 :deep(.el-input-number),
 :deep(.el-date-editor),
 :deep(.el-date-editor .el-input__wrapper) {
-  width: 100%;
+  width: 100% !important;
 }
 :deep(.el-date-editor .el-input__wrapper) {
   box-sizing: border-box;
