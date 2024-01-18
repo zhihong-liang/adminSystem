@@ -22,7 +22,7 @@ export default function getSearchConfig(
       { label: '设备接入单位设备编号', prop: 'unitDevCode', component: 'input' },
       {
         label: '设备接入单位',
-        prop: 'unitHisId',
+        prop: 'devUnit',
         component: 'select',
         props: {
           options: unitOptions,
@@ -174,11 +174,15 @@ export default function getSearchConfig(
       {
         label: '生产厂商',
         prop: 'manufacturer',
-        component: 'select'
+        component: 'select',
+        props: {
+          options: unitOptions,
+          filterable: 'filterable'
+        }
       },
       {
         label: '设备技术支撑单位',
-        prop: 'devUnit',
+        prop: 'supportingUnit',
         component: 'select',
         props: {
           options: unitOptions,
@@ -197,7 +201,7 @@ export default function getSearchConfig(
       }
     ],
     rules: {
-      unitHisId: [{ required: true, message: '请选择设备接入单位' }],
+      devUnit: [{ required: true, message: '请选择设备接入单位' }],
       devType: [{ required: true, message: '请选择设备类型' }],
       devModelNo: [{ required: true, message: '请输入设备型号' }],
       hardware: [{ required: true, message: '请选择硬件模块' }],

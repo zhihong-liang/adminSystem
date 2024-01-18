@@ -151,3 +151,9 @@ export const getManagePersonList = (data: ListReq<ManagePerson>): Promise<ListRe
 // 新增设备接入申请表
 export const devAccessApply = (data: any): Promise<Res> =>
   axios.post('/api/device/devAccessApply', data)
+// 撤回申请
+export const revokeDevApply = (ids: string, data: any): Promise<Res> =>
+  axios.post(`/api/device/devAccessApply/revoke/${ids}`, data)
+// 获取设备接入申请表详细信息
+export const devAccessApplyDetail = (id: string): Promise<Res> =>
+  axios.get(`/api/device/devAccessApply/${id}`)

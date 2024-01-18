@@ -8,29 +8,18 @@ export default function getTableConfig(
     data: [],
     selectionChange,
     columns: [
-      { type: 'selection' },
-      { label: '标签名称', prop: 'lableName', slot: 'lableName' },
-      { label: '使用事项数', prop: 'mattersCount' },
-      { label: '创建时间', prop: 'createTime' },
+      { label: '申请编号', prop: 'id', width: '180px' },
+      { label: '设备接入单位', prop: 'devAccessUnit', slot: 'devAccessUnit' },
+      { label: '批次号', prop: 'batchNo' },
+      { label: '设备数', prop: 'devNum' },
+      { label: '申请人', prop: 'applyPerson' },
+      { label: '申请时间', prop: 'applyTime' },
+      { label: '状态', prop: 'auditCurrentStep', dict: 'DEV_APPLY_NODE' },
+      { label: '审核时间', prop: 'auditEndTime' },
       {
         label: '操作',
         prop: 'action',
-        buttons: [
-          {
-            label: '编辑',
-            type: 'text',
-            onClick: (params: any) => {
-              tableClickCb('edit', params.row)
-            }
-          },
-          {
-            label: '删除',
-            type: 'text',
-            onClick: (params: any) => {
-              tableClickCb('delete', params.row)
-            }
-          }
-        ]
+        slot: 'action'
       }
     ]
   }

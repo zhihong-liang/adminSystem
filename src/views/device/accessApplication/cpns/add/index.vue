@@ -56,8 +56,9 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, toRaw, onMounted, computed, watch } from 'vue'
+import { reactive, ref, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
+import moment from 'moment'
 
 import getFormConfig from './form-config'
 
@@ -107,6 +108,7 @@ async function querySearch(queryString: string, cb: any) {
 
 // 自助终端管理员校验
 function managePersonValidator(rule: any, value: any, callback: any) {
+  if (!value) callback()
   if (!managePersonList.value?.find((v) => v.label === value)) {
     callback(new Error('请填写正确的自助终端管理员'))
   } else {
@@ -121,10 +123,76 @@ function handleTimeChange(val: number) {
   console.log(val)
 }
 
+async function addDevAccessApply() {
+  try {
+    const { userInfo } = JSON.parse(localStorage.getItem('user')!)
+    formProps.model.hardware = formProps.model.hardware.join(',')
+    formProps.model.networkPolicy = formProps.model.networkPolicy.join(',')
+    formProps.model.comeTime = formProps.model.comeTime + ' 00:00:00'
+    formProps.model.managePersonId = managePersonList.value?.find(
+      (v) => v.label === formProps.model.managePersonId
+    )?.['id']
+    formProps.model.devUnit = parseInt(formProps.model.devUnit)
+    formProps.model.devManageUnit = parseInt(formProps.model.devManageUnit)
+    const businessHoursInfo = handleBusinessHoursInfo()
+    const point = formProps.model.point.split(',')
+    formProps.model.pointLatLng = point[0]
+    formProps.model.pointLat = point[1]
+    delete formProps.model.businessHoursList
+    delete formProps.model.timeSlot
+    const data = {
+      applyFile: '',
+      applyPerson: userInfo.name,
+      applyTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+      auditCurrentStep: '',
+      auditEndTime: '',
+      auditStatus: '',
+      batchNo: '',
+      createTime: '',
+      createUser: '',
+      dataUnits: [],
+      details: [
+        {
+          ...formProps.model,
+          ...businessHoursInfo
+        }
+      ],
+      devAccessUnit: formProps.model.devUnit,
+      devNum: 1,
+      id: '',
+      params: {},
+      updateTime: '',
+      updateUser: ''
+    }
+
+    await devAccessApply(data)
+    ElMessage.success('操作成功')
+    emits('success')
+  } catch (err) {
+    formProps.model = {
+      businessHours: '2',
+      timeSlot: [],
+      businessHoursList: [
+        { label: '周一', startTime: '', endTime: '' },
+        { label: '周二', startTime: '', endTime: '' },
+        { label: '周三', startTime: '', endTime: '' },
+        { label: '周四', startTime: '', endTime: '' },
+        { label: '周五', startTime: '', endTime: '' },
+        { label: '周六', startTime: '', endTime: '' },
+        { label: '周日', startTime: '', endTime: '' }
+      ]
+    }
+  }
+}
+
 function handleSubmit() {
-  console.log(formProps.model)
+  formRefWrapper.value?.formRef?.validate().then(() => {
+    addDevAccessApply()
+  })
+}
+
+function handleBusinessHoursInfo() {
   const { businessHours, timeSlot, businessHoursList } = formProps.model
-  console.log(timeSlot)
   const businessHoursInfo: any = {
     businessHours1: '',
     businessHours2: '',
@@ -157,21 +225,7 @@ function handleSubmit() {
         businessHoursList[index].startTime + ' - ' + businessHoursList[index].endTime
     }
   }
-  console.log(businessHoursInfo)
-  // formRefWrapper.value?.formRef?.validate().then(() => {
-  //   console.log(formProps.model)
-  // })
-  // emits('success')
-}
-
-async function addDevAccessApply() {
-  try {
-    const data = {}
-    const result = await devAccessApply(data)
-    console.log(result)
-  } catch (err) {
-    console.log(err)
-  }
+  return businessHoursInfo
 }
 
 function handleCancel() {

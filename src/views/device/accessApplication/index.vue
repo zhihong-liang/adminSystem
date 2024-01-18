@@ -1,10 +1,30 @@
 <template>
-  <!-- <div class="list">
-    <CnPage v-bind="props"> </CnPage>
+  <div class="list" v-if="pageStatus === 'list'">
+    <CnPage v-bind="props">
+      <template #devAccessUnit="{ row }">
+        {{ getUnitName(row.devAccessUnit) }}
+      </template>
+      <template #action="{ row }">
+        <el-button type="text" @click="showDialog('detail', row)"> 查看 </el-button>
+        <el-button
+          v-if="row.auditCurrentStep === '100'"
+          type="text"
+          @click="showDialog('revoke', row)"
+        >
+          撤回
+        </el-button>
+      </template>
+    </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps"> </CnDialog>
-  </div> -->
-  <div class="add">
-    <Add :unitOptions="unitOptions"></Add>
+  </div>
+  <div class="add" v-else-if="pageStatus === 'add'">
+    <Add :unitOptions="unitOptions" @success="showList" @cancel="showList"></Add>
+  </div>
+  <div class="detail" v-else-if="pageStatus === 'detail'">
+    <Detail @back="showList" :id="detailId" :unitOptions="unitOptions"></Detail>
+  </div>
+  <div class="import" v-else>
+    <Import @cancel="pageStatus = 'list'"></Import>
   </div>
 </template>
 
@@ -12,9 +32,13 @@
 import { reactive, ref, toRaw, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
 
+import { useLoginStore } from '@/stores'
+
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import Add from './cpns/add/index.vue'
+import Import from './cpns/import/index.vue'
+import Detail from './cpns/detail/index.vue'
 
 import getSearchConfig from './config/search-config'
 import getTableConfig from './config/table-config'
@@ -23,17 +47,19 @@ import { getDialogConfig } from './config/dialog-config'
 
 import type { ActionType } from './config/type'
 
-import { getDevAccessApplyList } from '@/api/device'
+import { getDevAccessApplyList, revokeDevApply } from '@/api/device'
 import { getUnitList } from '@/api/admin'
 
 const actionType = ref<ActionType>()
-
+const pageStatus = ref('list')
 const tableSelection = ref<any[]>()
-
+const detailId = ref('')
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
 
 const unitOptions = ref<CnPage.OptionProps[]>()
+
+const userStore = useLoginStore()
 
 onMounted(async () => {
   const res = await getUnitList({ page: 1, size: 1000, obj: {} })
@@ -57,6 +83,33 @@ const props = reactive<CnPage.Props>({
   }
 })
 
+function showList() {
+  pageStatus.value = 'list'
+}
+
+function getUnitName(id: number) {
+  if (unitOptions.value) {
+    return unitOptions.value.find((v) => v.value === id)?.label ?? id
+  } else {
+    return id
+  }
+}
+
+async function revokeAction(row: any) {
+  try {
+    const { userId, unitId } = userStore.userInfo
+    console.log(userStore)
+    const data = {
+      handleDept: unitId,
+      handleUser: userId
+    }
+
+    await revokeDevApply(row.id, data)
+    ElMessage.success('操作成功')
+    props.refresh = new Date().getTime()
+  } catch (err) {}
+}
+
 // 弹窗确定按钮的点击
 function dialogSubmitSuccess() {
   props.refresh = new Date().getTime()
@@ -69,11 +122,18 @@ function selectionChange(selection: any[]) {
 // 显示添加/删除/标签弹窗
 function showDialog(action: ActionType, row?: any) {
   actionType.value = action
-  const dialogConfig = getDialogConfig(action)({})
-  for (const key of Object.keys(dialogConfig)) {
-    dialogProps[key] = dialogConfig[key]
+  if (action === 'add' || action === 'import' || action === 'detail') {
+    if (action === 'detail') detailId.value = row.id
+    pageStatus.value = action
+  } else if (action === 'revoke') {
+    revokeAction(row)
+  } else {
+    const dialogConfig = getDialogConfig(action)({})
+    for (const key of Object.keys(dialogConfig)) {
+      dialogProps[key] = dialogConfig[key]
+    }
+    dialogRef.value?.open()
   }
-  dialogRef.value?.open()
 }
 </script>
 
@@ -95,5 +155,15 @@ function showDialog(action: ActionType, row?: any) {
 
 .add {
   width: 1200px;
+}
+
+:deep(.待审核) {
+  color: #ff6600;
+}
+:deep(.同意) {
+  color: #19b300;
+}
+:deep(.拒绝) {
+  color: #f56c6c;
 }
 </style>
