@@ -1,5 +1,5 @@
 <template>
-  <CnForm :items="items" :col-span="colSpan" :footer-span="footerSpan || colSpan">
+  <CnForm :items="items" :col-span="6" :footer-span="footerSpan || 6">
     <template v-for="item in slots" v-slot:[item.prop]="slotProps" :key="item.prop">
       <slot :name="item.prop" v-bind="slotProps" />
     </template>
@@ -30,7 +30,7 @@ const showBtn = ref(false)
 const showMore = ref(true)
 
 const props = defineProps({
-  colSpan: { type: Number, default: 6 },
+  colSpan: { type: Number, default: 6 }, // 弃用，本属性不支持自定义配置
   footerSpan: { type: Number, default: 6 },
   items: {
     type: Array as PropType<UnwrapNestedRefs<CnPage.FormItem>[]>,

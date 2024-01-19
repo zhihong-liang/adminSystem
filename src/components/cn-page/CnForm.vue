@@ -9,7 +9,7 @@ const props = defineProps({
   model: { type: Object, default: () => ({}) },
   readonly: Boolean,
   labelWidth: [String, Number],
-  labelPosition: { type: String, default: 'top' },
+  labelPosition: { type: String, default: 'top' }, // 弃用，本属性不支持自定义配置
   colSpan: { type: Number, default: 24 },
   footerSpan: { type: Number, default: 24 },
   rules: Object,
@@ -85,7 +85,7 @@ defineExpose({ formRef })
     :rules="readonly ? undefined : rules"
     :inline="colSpan === 0"
     :label-width="colSpan === 0 ? undefined : labelWidth"
-    :label-position="labelPosition"
+    :label-position="'top'"
   >
     <el-row :gutter="colSpan ? 20 : 0">
       <el-col
@@ -121,8 +121,8 @@ defineExpose({ formRef })
         </el-form-item>
       </el-col>
 
-      <el-col v-if="$slots.footer" :span="footerSpan">
-        <el-form-item :label="labelPosition === 'top' ? '　' : undefined">
+      <el-col v-if="$slots.footer" :span="footerSpan" class="footer-col">
+        <el-form-item>
           <slot name="footer" v-bind="{ data: model, el: formRef }" />
         </el-form-item>
       </el-col>
@@ -153,5 +153,9 @@ defineExpose({ formRef })
 }
 .block {
   display: block !important;
+}
+
+.footer-col {
+  align-self: flex-end;
 }
 </style>
