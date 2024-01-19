@@ -3,7 +3,7 @@
   <CnDialog ref="bulkEditRef" v-bind="dialogProps">
     <div v-if="step1 === 1">
       <CnForm ref="bulkEditFromRef" v-bind="bulkEditFrom">
-        <template #propsBtn>
+        <template #footer>
           <div>
             <el-button type="primary" @click="handleScreen">筛选</el-button>
             <el-button @click="handleReset">重置</el-button>
@@ -201,40 +201,41 @@ const propsTable = reactive<CnPage.TableProps>({
 const bulkEditFrom = reactive({
   labelWidth: 120,
   colSpan: 8,
+  footerSpan: 8,
   model: {},
   items: [
     { label: "请批量筛选设备", component: "divider", span: 24 },
-    { label: "设备接入单位", prop: "devUnit", component: "select" },
-    { label: "设备管理单位", prop: "devManageUnit", component: "select" },
-    { label: "设备技术支撑单位", prop: "supportingUnit", component: "select" },
+    { label: "设备接入单位", prop: "devUnit", component: "select", dict: 'UNIT_LIST' },
+    { label: "设备管理单位", prop: "devManageUnit", component: "select", dict: 'UNIT_LIST' },
+    { label: "设备技术支撑单位", prop: "supportingUnit", component: "select", dict: 'UNIT_LIST' },
     { label: "设备型号", prop: "devModelNo", component: "input" },
     { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
     { label: "行政区划", prop: "regionDetail", component: "ad" },
     { label: "部署场所", prop: "siteName", component: "input" },
     {
       label: "部署场所类型",
-      prop: "siteType",
+      prop: "siteTypeList",
       component: "select",
-      //   props: { multiple: true },
       dict: "DEV_SITE_TYPE",
+      props: { multiple: true },
     },
     { label: "硬件模块", prop: "hardware", component: "select", dict: "HARDWARE_MODULE" },
     {
       label: "网络策略",
-      prop: "networkPolicy",
+      prop: "networkPolicyList",
       component: "select",
-      //   props: { multiple: true },
       dict: "NETWORD_POLICY",
+      props: { multiple: true },
     },
     { label: "自助终端管理员", prop: "managePersonName", component: "input" },
     {
       label: "政务程序版本号",
-      prop: "procedureVersion",
+      prop: "procedureVersionList",
       component: "select",
-      //   props: { multiple: true },
+      dict: 'DEV_VERSION',
+      props: { multiple: true }
     },
     { label: "设备分组", prop: "groupId", component: "select" },
-    { prop: "propsBtn", component: "slot", span: 16 },
   ],
 });
 const stpeTowBulkEditFrom: any = reactive({
@@ -268,7 +269,6 @@ const stpeTowBulkEditFrom: any = reactive({
     },
     { prop: "networkInfo", component: "slot", span: 24 },
     {
-      label: "网络策略",
       prop: "networdPolicy",
       component: "checkbox",
       props: {
@@ -440,13 +440,8 @@ const stpeThreeBulkEditFrom: any = reactive({
       label: "设备营业时间",
       prop: "businessHours",
       component: "select",
+      dict: "DEV_BUSINESS_HOURS",
       span: 24,
-      props: {
-        options: [
-          { lable: "7 * 24 小时", value: "7 * 24 小时" },
-          { lable: "自定义", value: "自定义" },
-        ],
-      },
       visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
     },
     {
