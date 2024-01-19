@@ -1,15 +1,15 @@
 <template>
   <el-timeline class="line">
-    <el-timeline-item v-for="(item, index) in 3" :key="index">
+    <el-timeline-item v-for="(item, index) in list" :key="index">
       <div class="line_left">
-        <div>张三</div>
-        <div>广东创能科技股份有限公司</div>
+        <div>{{item.handleUser}}</div>
+        <div>{{item.handleDept}}</div>
       </div>
       <div class="line_right">
-        <div class="line_right_tl">回访</div>
-        <div>态度：<el-rate v-model="value" disabled /></div>
-        <div>处理结果：已完成</div>
-        <div>评价：服务周到热情，结果好</div>
+        <div class="line_right_tl">{{useDictionary('WORK_AUDIT_TYPE', item.workAuditType)}}</div>
+        <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
+        <div>处理结果：{{item.handleOpion}}</div>
+        <div>评价：{{item.remark}}</div>
         <div>
           <el-image
             v-for="(items, indexs) in srcList"
@@ -31,6 +31,17 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { orderProcess } from '@/api/order'
+import useDictionary from '@/hooks/useDictionary'
+
+const props = defineProps({
+  id: {
+    type: String,
+    default: ''
+  }
+})
+
+const list = ref()
 
 const value = ref(5)
 const srcList = [
@@ -38,6 +49,12 @@ const srcList = [
   'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
   'https://fuss10.elemecdn.com/0/6f/e35ff375812e6b0020b6b4e8f9583jpeg.jpeg'
 ]
+
+orderProcess(props.id).then((res) => {
+  if (res.code === '200') {
+    list.value = res.data
+  }
+})
 </script>
 
 <style lang="scss" scoped>
