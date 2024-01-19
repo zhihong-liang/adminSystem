@@ -157,3 +157,9 @@ export const revokeDevApply = (ids: string, data: any): Promise<Res> =>
 // 获取设备接入申请表详细信息
 export const devAccessApplyDetail = (id: string): Promise<Res> =>
   axios.get(`/api/device/devAccessApply/${id}`)
+// 查询设备基本信息-记录列表（分页)
+export const devBaseInfoHisList = (data: any): Promise<Res> =>
+  axios.post(`/api/device/devBaseInfoHis/listPage`, data)
+// 获取设备接入流程信息
+export const getDevAccessApplyHis = (id: string): Promise<Res> =>
+  axios.get(`/api/device/devAccessApply/getHis/${id}`)

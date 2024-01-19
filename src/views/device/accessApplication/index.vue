@@ -1,15 +1,15 @@
 <template>
-  <div class="list" v-if="pageStatus === 'list'">
+  <div class="list" v-if="cpnName === 'list'">
     <CnPage v-bind="props">
       <template #devAccessUnit="{ row }">
         {{ getUnitName(row.devAccessUnit) }}
       </template>
       <template #action="{ row }">
-        <el-button type="text" @click="showDialog('detail', row)"> 查看 </el-button>
+        <el-button type="text" @click="handleAction('detail', row)"> 查看 </el-button>
         <el-button
           v-if="row.auditCurrentStep === '100'"
           type="text"
-          @click="showDialog('revoke', row)"
+          @click="handleAction('revoke', row)"
         >
           撤回
         </el-button>
@@ -17,14 +17,18 @@
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps"> </CnDialog>
   </div>
-  <div class="add" v-else-if="pageStatus === 'add'">
-    <Add :unitOptions="unitOptions" @success="showList" @cancel="showList"></Add>
+  <div class="add" v-else-if="cpnName === 'add'">
+    <Add :unitOptions="unitOptions" @success="cpnName = 'list'" @cancel="cpnName = 'list'"></Add>
   </div>
-  <div class="detail" v-else-if="pageStatus === 'detail'">
-    <Detail @back="showList" :id="detailId" :unitOptions="unitOptions"></Detail>
+  <div class="detail" v-else-if="cpnName === 'detail'">
+    <Detail @back="cpnName = 'list'" :id="detailId" :unitOptions="unitOptions!"></Detail>
   </div>
   <div class="import" v-else>
-    <Import @cancel="pageStatus = 'list'"></Import>
+    <Import
+      @cancel="cpnName = 'list'"
+      @success="cpnName = 'list'"
+      :unitOptions="unitOptions!"
+    ></Import>
   </div>
 </template>
 
@@ -43,7 +47,6 @@ import Detail from './cpns/detail/index.vue'
 import getSearchConfig from './config/search-config'
 import getTableConfig from './config/table-config'
 import getTollbarConifg from './config/tollbar-config'
-import { getDialogConfig } from './config/dialog-config'
 
 import type { ActionType } from './config/type'
 
@@ -51,7 +54,7 @@ import { getDevAccessApplyList, revokeDevApply } from '@/api/device'
 import { getUnitList } from '@/api/admin'
 
 const actionType = ref<ActionType>()
-const pageStatus = ref('list')
+const cpnName = ref('list')
 const tableSelection = ref<any[]>()
 const detailId = ref('')
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
@@ -75,17 +78,13 @@ const props = reactive<CnPage.Props>({
   },
   action: getDevAccessApplyList,
   search: getSearchConfig(computed(() => unitOptions.value)),
-  toolbar: getTollbarConifg(showDialog),
-  table: getTableConfig(showDialog, selectionChange),
+  toolbar: getTollbarConifg(handleAction),
+  table: getTableConfig(),
   pagination: {
     page: 1,
     size: 10
   }
 })
-
-function showList() {
-  pageStatus.value = 'list'
-}
 
 function getUnitName(id: number) {
   if (unitOptions.value) {
@@ -98,9 +97,8 @@ function getUnitName(id: number) {
 async function revokeAction(row: any) {
   try {
     const { userId, unitId } = userStore.userInfo
-    console.log(userStore)
     const data = {
-      handleDept: unitId,
+      handleDept: unitId + '',
       handleUser: userId
     }
 
@@ -110,29 +108,14 @@ async function revokeAction(row: any) {
   } catch (err) {}
 }
 
-// 弹窗确定按钮的点击
-function dialogSubmitSuccess() {
-  props.refresh = new Date().getTime()
-}
-
-function selectionChange(selection: any[]) {
-  tableSelection.value = selection
-}
-
 // 显示添加/删除/标签弹窗
-function showDialog(action: ActionType, row?: any) {
+function handleAction(action: ActionType, row?: any) {
   actionType.value = action
   if (action === 'add' || action === 'import' || action === 'detail') {
     if (action === 'detail') detailId.value = row.id
-    pageStatus.value = action
+    cpnName.value = action
   } else if (action === 'revoke') {
     revokeAction(row)
-  } else {
-    const dialogConfig = getDialogConfig(action)({})
-    for (const key of Object.keys(dialogConfig)) {
-      dialogProps[key] = dialogConfig[key]
-    }
-    dialogRef.value?.open()
   }
 }
 </script>

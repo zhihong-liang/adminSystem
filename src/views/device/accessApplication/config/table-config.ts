@@ -1,12 +1,6 @@
-import type { ActionType } from './type'
-
-export default function getTableConfig(
-  tableClickCb: (handleType: ActionType, params: any) => void,
-  selectionChange?: (selection: any) => void
-): CnPage.TableProps {
+export default function getTableConfig(): CnPage.TableProps {
   return {
     data: [],
-    selectionChange,
     columns: [
       { label: '申请编号', prop: 'id', width: '180px' },
       { label: '设备接入单位', prop: 'devAccessUnit', slot: 'devAccessUnit' },

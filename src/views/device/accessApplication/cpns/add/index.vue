@@ -11,7 +11,7 @@
         <div class="title">管理单位、技术支持单位</div>
       </template>
       <template #timeSlot v-if="formProps.model!.businessHours === '3'">
-        <el-checkbox-group v-model="formProps.model!.timeSlot" @change="handleTimeChange">
+        <el-checkbox-group v-model="formProps.model!.timeSlot">
           <el-checkbox
             :label="index"
             v-for="(item, index) in formProps.model!.businessHoursList"
@@ -119,25 +119,21 @@ function managePersonValidator(rule: any, value: any, callback: any) {
   }
 }
 
-function handleTimeChange(val: number) {
-  console.log(val)
-}
-
+// 新增申请
 async function addDevAccessApply() {
   try {
     const { userInfo } = JSON.parse(localStorage.getItem('user')!)
     formProps.model.hardware = formProps.model.hardware.join(',')
     formProps.model.networkPolicy = formProps.model.networkPolicy.join(',')
-    formProps.model.comeTime = formProps.model.comeTime + ' 00:00:00'
+    formProps.model.comeTime = formProps.model.comeTime
+      ? formProps.model.comeTime + ' 00:00:00'
+      : ''
     formProps.model.managePersonId = managePersonList.value?.find(
       (v) => v.label === formProps.model.managePersonId
     )?.['id']
     formProps.model.devUnit = parseInt(formProps.model.devUnit)
     formProps.model.devManageUnit = parseInt(formProps.model.devManageUnit)
     const businessHoursInfo = handleBusinessHoursInfo()
-    const point = formProps.model.point.split(',')
-    formProps.model.pointLatLng = point[0]
-    formProps.model.pointLat = point[1]
     delete formProps.model.businessHoursList
     delete formProps.model.timeSlot
     const data = {
@@ -154,7 +150,8 @@ async function addDevAccessApply() {
       details: [
         {
           ...formProps.model,
-          ...businessHoursInfo
+          ...businessHoursInfo,
+          pointLatLng: formProps.model.point
         }
       ],
       devAccessUnit: formProps.model.devUnit,
@@ -220,7 +217,6 @@ function handleBusinessHoursInfo() {
     businessHoursInfo.businessHours7 = '00:00 - 23:45'
   } else {
     for (const index of timeSlot) {
-      console.log(businessHoursList[index])
       businessHoursInfo[`businessHours${index + 1}`] =
         businessHoursList[index].startTime + ' - ' + businessHoursList[index].endTime
     }
