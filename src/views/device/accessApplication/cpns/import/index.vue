@@ -202,6 +202,7 @@ function selectionChange(selection: any[]) {
 
 // 新增申请
 async function addDevAccessApply() {
+  if (!importTableData.value.length) return ElMessage.warning('请先导入设备信息')
   try {
     const { userInfo } = JSON.parse(localStorage.getItem('user')!)
     const data = {
