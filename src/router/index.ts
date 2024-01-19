@@ -120,6 +120,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const hasToken = !!getToken()
 
   if (to.path === '/login') {
+    refresh.value = true
     resetAll()
     next()
     return
