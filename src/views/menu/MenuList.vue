@@ -127,13 +127,12 @@ const props: CnPage.Props = reactive({
         onClick: () => {
           dialogRef.value?.open()
           dialogProps.formProps!.model = {}
-          dialogProps.action = () => {
-            return new Promise((resolve, reject) =>
+          dialogProps.action = () =>
+            new Promise((resolve, reject) =>
               handleSubmit('add')
                 .then((res) => resolve(res))
                 .catch(() => reject())
             )
-          }
         }
       }
     ]

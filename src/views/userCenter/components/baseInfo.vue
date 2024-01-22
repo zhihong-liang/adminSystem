@@ -33,7 +33,7 @@ const DEFAULT_ITEMS = [
   },
   {
     label: '用户名称',
-    prop: 'unitType',
+    prop: 'name',
     component: undefined,
     span: 8
   },
@@ -62,7 +62,7 @@ const baseFormPropsModel = computed(() => {
     userNo: userInfo.value.userNo,
     phone: userInfo.value.phone,
     email: userInfo.value.email,
-    unitType: userInfo.value.unitType,
+    name: userInfo.value.name,
     telephone: userInfo.value.telephone,
     status: userInfo.value.status
   }
@@ -134,7 +134,7 @@ function getUserDetail(id: number) {
         userNo: data.userNo,
         phone: data.phone,
         email: data.email,
-        unitType: data.unitType,
+        name: data.name,
         telephone: data.telephone,
         status: data.status
       }

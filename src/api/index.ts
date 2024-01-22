@@ -142,10 +142,12 @@ export interface UserInfo {
   unitLevel?: string
   unitName?: string
   unitType?: string
+  unitId?: string
   updateTime?: string
   updateUser?: string
   userAuthType?: string
   userName?: string
+  username?: string
   userNo?: string
   userType?: string
   roleIdList?: []

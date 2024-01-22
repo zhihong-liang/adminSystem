@@ -128,3 +128,86 @@ export const querAddDevGroup = (data: DeviceInfo): Promise<Res> =>
 // 删除设备组
 export const queryDeleteDevGroup = (ids: string): Promise<Res> =>
   axios.delete(`/api/device/devGroup/${ids}`)
+
+/**
+ *设备接入审核记录
+ */
+export interface DeviceAccessRecord {
+  applyNo?: string | number
+  devAccessUnit?: number
+  auditCurrentStep?: string
+}
+
+export interface DeviceAccessRecordResponse {
+  applyFile?: string
+  applyPerson?: string
+  applyTime?: string
+  auditCurrentStep?: string
+  auditEndTime?: string
+  auditStatus?: string
+  batchNo?: string
+  devAccessUnit?: number
+  devNum?: number
+  id?: number
+}
+
+// 查询设备接入申请表列表
+export const queryDevAuditHistoryList = (
+  data: ListReq<DeviceAccessRecord>
+): Promise<ListRes<DeviceAccessRecordResponse[]>> =>
+  axios.post('/api/device/devAccessApply/listPage', data)
+
+export interface DevAccessAgreeOrReject {
+  id: number
+  expirationDate?: string
+  hanlleTime?: string
+  handleUser?: string
+  handleOpinion?: string
+  handleDept?: string
+  flowId?: number
+  auditStep?: string
+}
+// 同意 或 拒绝
+export const queryDevAccessApplyAgreeOrReject = (
+  data: DevAccessAgreeOrReject,
+  action: 'agree' | 'reject'
+): Promise<Res<DeviceAccessRecordResponse>> => {
+  if (action === 'agree') {
+    return axios.post(`/api/device/devAccessApply/success/${data.id}`, data)
+  } else {
+    return axios.post(`/api/device/devAccessApply/fail/${data.id}`, data)
+  }
+}
+
+// 获取设备接入申请表详细信息
+export const queryDevAccessDetail = (id: number): Promise<Res<DeviceAccessRecordResponse>> =>
+  axios.get(`/api/device/devAccessApply/${id}`)
+
+export interface DevAccessAuditFlowResponse {
+  auditStep?: string
+  handleDept?: number
+  handleDeptText?: string
+  handleOpinion?: string
+  handleUser?: number
+  handleUserText?: string
+  hanlleTime?: string
+  id?: number
+}
+// 获取设备接入流程信息
+export const queryDevAccessGetHis = (id: number): Promise<Res<DevAccessAuditFlowResponse[]>> =>
+  axios.get(`/api/device/devAccessApply/getHis/${id}`)
+
+// 获取设备接入流程信息
+export const queryDevAccessListPage = (data: {
+  cityCode?: string
+  devType?: string
+  districtCode?: string
+  flowId?: number
+  id?: number
+  provinceCode?: string
+  siteName?: string
+  streetCode?: string
+  unitDevCode?: string
+  villageCode?: string
+}): Promise<ListRes<unknown[]>> =>
+  axios.post('/api/device/devBaseInfoHis/listPage', data)

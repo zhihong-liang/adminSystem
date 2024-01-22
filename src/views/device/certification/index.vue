@@ -160,10 +160,7 @@ function DialogAction() {
     params['updateUser'] = userInfo.value.userName || '--'
   }
 
-  console.log('params: ', params)
-
   return queryDevAuth(params, model.value === 'add' ? 'post' : 'put')
-  // return Promise.resolve()
 }
 
 // 解绑
