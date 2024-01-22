@@ -53,6 +53,8 @@ import { ElMessage } from 'element-plus'
 import type { UploadProps, ElUpload } from 'element-plus'
 import moment from 'moment'
 
+import { useLoginStore } from '@/stores'
+
 import CnSearch from '@/components/cn-page/CnSearch.vue'
 import CnTable from '@/components/cn-page/CnTable.vue'
 // import CnPagination from '@/components/cn-page/CnPagination.vue'
@@ -71,6 +73,8 @@ interface Props {
   unitOptions: CnPage.OptionProps[]
 }
 const props = defineProps<Props>()
+
+const userStore = useLoginStore()
 
 const fileList = ref<any[]>([])
 const uploadRef = ref<InstanceType<typeof ElUpload>>()
@@ -205,6 +209,7 @@ async function addDevAccessApply() {
   if (!importTableData.value.length) return ElMessage.warning('请先导入设备信息')
   try {
     const { userInfo } = JSON.parse(localStorage.getItem('user')!)
+    const { unitId } = userStore.userInfo
     const data = {
       applyFile: '',
       applyPerson: userInfo.name,
@@ -217,7 +222,7 @@ async function addDevAccessApply() {
       createUser: '',
       dataUnits: [],
       details: importTableData.value,
-      devAccessUnit: '',
+      devAccessUnit: unitId,
       devNum: importTableData.value.length,
       id: '',
       params: {},

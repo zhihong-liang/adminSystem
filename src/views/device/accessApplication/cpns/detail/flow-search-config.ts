@@ -3,7 +3,7 @@ export default function getSearchConfig(): CnPage.SearchProps {
     model: {},
     labelPosition: 'left',
     items: [
-      { label: '设备接入单位设备编号', prop: 'id', component: 'input', labelWidth: 200 },
+      { label: '设备接入单位设备编号', prop: 'unitDevCode', component: 'input', labelWidth: 200 },
       { label: '部署场所', prop: 'siteName', component: 'input' },
       {
         label: '行政区划',
