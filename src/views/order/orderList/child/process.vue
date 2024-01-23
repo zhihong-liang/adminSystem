@@ -16,18 +16,7 @@
             <div>评价：{{item.remark}}</div>
           </div>
           <div v-if="item.workAuditType ==='99' && item.handleFile">
-            <el-image
-              v-for="(items, indexs) in item.handleFile.split(',')"
-              style="width: 100px; height: 100px; margin-right: 10px"
-              :src="items"
-              :key="indexs"
-              :zoom-rate="1.2"
-              :max-scale="7"
-              :min-scale="0.2"
-              :preview-src-list="[items]"
-              :initial-index="0"
-              fit="cover"
-            />
+            <CnImage :modelValue = item.handleFile />
           </div>
         </el-col>
         <el-col :span="6" v-if="item.handleTime">
@@ -44,6 +33,7 @@ import { ref } from 'vue'
 import { orderProcess } from '@/api/order'
 import useDictionary from '@/hooks/useDictionary'
 import moment from 'moment'
+import CnImage from '@/components/cn-page/CnImage.vue'
 
 const props = defineProps({
   id: {
@@ -53,13 +43,6 @@ const props = defineProps({
 })
 
 const list = ref()
-
-const value = ref(5)
-const srcList = [
-  'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-  'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-  'https://fuss10.elemecdn.com/0/6f/e35ff375812e6b0020b6b4e8f9583jpeg.jpeg'
-]
 
 orderProcess(props.id).then((res) => {
   if (res.code === '200') {

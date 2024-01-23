@@ -11,6 +11,7 @@ import CnReadonly from './CnReadonly.vue'
 import CnIcon from './CnIcon.vue'
 import CnTree from './CnTree.vue'
 import CnUpload from './CnUpload.vue'
+import CnImage from './CnImage.vue'
 
 defineProps(['component', 'dict', 'readonly'])
 </script>
@@ -28,4 +29,5 @@ defineProps(['component', 'dict', 'readonly'])
   <CnInputNumber v-else-if="component === 'inputnumber'" />
   <CnTree v-else-if="component === 'tree'" />
   <CnUpload v-else-if="component === 'upload'" />
+  <CnImage v-else-if="component === 'image'" />
 </template>

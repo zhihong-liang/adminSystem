@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { orderBaseListPage } from '@/api/order'
+import { orderBaseListPage, orderHistoryList } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
@@ -44,67 +44,67 @@ const toolBtn: any[] = [
   //   label: '分拨',
   //   type: 'primary',
   //   onClick: () => handleOpen('Allocation', {}, '', true),
-  //   visible: ['Allocation']
+  //   show: ['Allocation']
   // },
   // {
   //   label: '派单',
   //   type: 'primary',
   //   onClick: () => handleOpen('Dispatch', {}, '', true),
-  //   visible: ['Dispatch']
+  //   show: ['Dispatch']
   // },
   // {
   //   label: '转派',
   //   type: 'primary',
   //   onClick: () => handleOpen('Transfer', {}, '', true),
-  //   visible: ['NotHandle', 'InHandle']
+  //   show: ['NotHandle', 'InHandle']
   // },
   // {
   //   label: '处理',
   //   type: 'primary',
   //   onClick: () => handleOpen('Handle', {}, '', true),
-  //   visible: ['NotHandle']
+  //   show: ['NotHandle']
   // },
   // {
   //   label: '完成处理',
   //   type: 'primary',
   //   onClick: () => handleOpen('FinishDeal', {}, '', true),
-  //   visible: ['InHandle']
+  //   show: ['InHandle']
   // },
   // {
   //   label: '退回工单',
   //   type: 'primary',
   //   onClick: () => handleOpen('Back', {}, '', true),
-  //   visible: ['Dispatch', 'NotHandle']
+  //   show: ['Dispatch', 'NotHandle']
   // },
   // {
   //   label: '关闭工单',
   //   type: 'primary',
   //   onClick: () => handleOpen('Close', {}, '', true),
-  //   visible: ['Allocation', 'Dispatch', 'NotHandle']
+  //   show: ['Allocation', 'Dispatch', 'NotHandle']
   // },
   // {
   //   label: '完成',
   //   type: 'primary',
   //   onClick: () => handleOpen('Finish', {}, '', true),
-  //   visible: ['Handled']
+  //   show: ['Handled']
   // },
   // {
   //   label: '评价',
   //   type: 'primary',
   //   onClick: () => handleOpen('Evaluate', {}, '', true),
-  //   visible: ['Handled']
+  //   show: ['Handled']
   // },
   // {
   //   label: '回访',
   //   type: 'primary',
   //   onClick: () => handleOpen('Visit', {}, '', true),
-  //   visible: ['Handled']
+  //   show: ['Handled']
   // },
-  // { label: '打回工单', type: 'primary', onClick: () => handleOpen('Repulse', {}, '', true), visible: ['Handled'] },
+  // { label: '打回工单', type: 'primary', onClick: () => handleOpen('Repulse', {}, '', true), show: ['Handled'] },
   {
     label: '导出',
     type: 'primary',
-    visible: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History']
+    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History']
   }
 ]
 
@@ -114,84 +114,84 @@ const tableBtn: any[] = [
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Supply', row, '95'),
-    visible: ['Allocation']
+    show: ['Allocation']
   },
   {
     label: '分拨',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Allocation', row, '2'),
-    visible: ['Allocation']
+    show: ['Allocation']
   },
   {
     label: '派单',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
-    visible: ['Dispatch']
+    show: ['Dispatch']
   },
   {
     label: '转派',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Transfer', row, '4'),
-    visible: ['NotHandle', 'InHandle']
+    show: ['NotHandle', 'InHandle']
   },
   {
     label: '处理',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Handle', row, '6'),
-    visible: ['NotHandle']
+    show: ['NotHandle']
   },
   {
     label: '完成处理',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
-    visible: ['InHandle']
+    show: ['InHandle']
   },
   {
     label: '退回工单',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Back', row, '5'),
-    visible: ['Dispatch', 'NotHandle']
+    show: ['Dispatch', 'NotHandle']
   },
   {
     label: '关闭工单',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Close', row, '0'),
-    visible: ['Allocation', 'Dispatch', 'NotHandle']
+    show: ['Allocation', 'Dispatch', 'NotHandle']
   },
   {
     label: '完成',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Finish', row, '99'),
-    visible: ['Handled']
+    show: ['Handled']
   },
   {
     label: '评价',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
-    visible: ['Handled']
+    show: ['Handled']
   },
   {
     label: '回访',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Visit', row, '97'),
-    visible: ['Handled']
+    show: ['Handled']
   },
   {
     label: '打回工单',
     type: 'primary',
     text: true,
     onClick: ({ row }) => handleOpen('Repulse', row, '98'),
-    visible: ['Handled']
+    show: ['Handled']
   }
 ]
 
@@ -203,46 +203,49 @@ const columns: any[] = [
   { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
   { prop: 'devCode', label: '设备编号', width: 160 },
   { prop: 'createUnitId', label: '创建单位' },
-  { prop: 'xxx', label: '派单员', visible: ['Closed'] },
+  { prop: 'xxx', label: '派单员', show: ['Closed'] },
   {
     prop: 'operationPersonName',
     label: '运维人员',
-    visible: ['NotHandle', 'InHandle', 'Handled', 'History', 'Closed']
+    show: ['NotHandle', 'InHandle', 'Handled', 'History', 'Closed']
   },
   { prop: 'orderApplyTime', label: '创建时间', width: 165 },
-  { prop: 'orderCloseTime', label: '完成时间', visible: ['Closed'] },
-  { prop: 'takeUpTime', label: '工单耗时', visible: ['History', 'Closed'] },
+  { prop: 'orderCloseTime', label: '完成时间', show: ['Closed'] },
+  { prop: 'takeUpTime', label: '工单耗时', show: ['History', 'Closed'] },
   {
     prop: 'urgencyLevel',
     label: '紧急程度',
     dict: 'WORK_URGENCY_LEVEL',
-    visible: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle']
+    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle']
   },
   { prop: 'bpmNodeCode', label: '状态', dict: 'WORK_BPM_NODE_CODE' },
-  { prop: 'custom_evaluation', label: '客户评价', visible: ['Handled', 'History'] },
-  { prop: 'followUp', label: '回访情况', visible: ['Handled', 'History'] },
-  { prop: 'xxx', label: '关闭原因', visible: ['Closed'] },
-  { prop: 'xxx', label: '备注', visible: ['Closed'] },
+  { prop: 'custom_evaluation', label: '客户评价', show: ['Handled', 'History'] },
+  { prop: 'followUp', label: '回访情况', show: ['Handled', 'History'] },
+  { prop: 'xxx', label: '关闭原因', show: ['Closed'] },
+  { prop: 'xxx', label: '备注', show: ['Closed'] },
   {
     prop: 'action',
     label: '操作',
     width: 220,
-    visible: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled'],
-    buttons: tableBtn.filter((v) => v.visible?.includes(props.type))
+    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled'],
+    buttons: tableBtn.filter((v) => v.show?.includes(props.type))
   }
 ]
 
 const pages: CnPage.Props = reactive({
-  params: { bpmNodeCode: props.bpmNodeCode },
-  action: orderBaseListPage,
+  params:
+    props.type === 'History'
+      ? { bpmNodeCodeList: ['1500', '1550'] }
+      : { bpmNodeCode: props.bpmNodeCode },
+  action: props.type === 'History' ? orderHistoryList : orderBaseListPage,
   search: {
     items: useSearch(props.type)
   },
   toolbar: {
-    items: toolBtn.filter((v) => !v.visible || v.visible?.includes(props.type))
+    items: toolBtn.filter((v) => !v.show || v.show?.includes(props.type))
   },
   table: {
-    columns: columns.filter((v) => !v.visible || v.visible?.includes(props.type)),
+    columns: columns.filter((v) => !v.show || v.show?.includes(props.type)),
     data: [{}]
   }
 })

@@ -76,7 +76,8 @@ declare namespace CnPage {
   type ButtonProps<Row = Record<string, any>> = {
     -readonly [K in keyof ElButtonProps]?: ElButtonProps[K]
   } & {
-    label: string
+    label: string,
+    visible?: (data: ElRenderRowData<Row>) => boolean,
     directives?: Recode<string, DirectiveArguments>
     onClick?: (data: ElRenderRowData<Row>, evt?: MouseEvent) => any
   }
