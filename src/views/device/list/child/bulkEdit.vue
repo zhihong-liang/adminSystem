@@ -161,10 +161,8 @@ const stpeThreeBulkEditFromRef = ref();
 const supList: any = ref([]);
 const gupList: any = ref([]);
 const matList: any = ref([]);
-const venueInfoOptions: any = reactive({
-  data: [],
-});
-const dialoTitle = ref("设备详情");
+const venueInfoOptions: any = ref([]);
+const dialoTitle = ref("批量编辑");
 const emits = defineEmits(["onSubmit"]);
 const propsTableLength = ref(0);
 const timeList = reactive([
@@ -210,7 +208,7 @@ const bulkEditFrom = reactive({
     { label: "设备技术支撑单位", prop: "supportingUnit", component: "select", dict: 'UNIT_LIST' },
     { label: "设备型号", prop: "devModelNo", component: "input" },
     { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
-    { label: "行政区划", prop: "regionDetail", component: "ad" },
+    { label: "行政区划", prop: "regionDetail", component: "ad", props: { props: { checkStrictly: true } } },
     { label: "部署场所", prop: "siteName", component: "input" },
     {
       label: "部署场所类型",
@@ -264,7 +262,7 @@ const stpeTowBulkEditFrom: any = reactive({
       component: "checkbox",
       span: 24,
       props: {
-        options: venueInfoOptions.data,
+        options: venueInfoOptions,
       },
     },
     { prop: "networkInfo", component: "slot", span: 24 },
@@ -507,7 +505,7 @@ function handleScreen() {
     if (res.code === "200") {
       propsTable.data = res.data;
       propsTableLength.value = res.data.length;
-      venueInfoOptions.data.push(
+      venueInfoOptions.value = [
         {
           label: "行政区划",
           value: "provinceCode",
@@ -533,7 +531,7 @@ function handleScreen() {
         { label: "自助终端管理员", value: "managePersonName" },
         { label: "设备营业时间", value: "businessHours" },
         { label: "定时开关机", value: "timerOnOff" }
-      );
+      ]
     }
   });
 }

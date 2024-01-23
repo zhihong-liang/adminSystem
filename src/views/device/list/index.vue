@@ -290,10 +290,10 @@ const props = reactive<CnPage.Props>({
       { type: "selection" },
       { label: "设备编号", slot: "proDevCode" },
       { label: "设备接入单位设备编号", prop: "unitDevCode" },
-      { label: "设备型号", prop: "status", dict: "devModelNo" },
+      { label: "设备型号", prop: "devModelNo" },
       { label: "行政区划", prop: "regionDetail" },
       { label: "详细地址", prop: "detailAddress" },
-      { label: "自助终端管理员联系方式", prop: "terminalManagePhone" },
+      { label: "自助终端管理员联系方式", prop: "managePersonContact" },
       { label: "安装激活时间", prop: "installActivateTime" },
       { label: "政务程序版本号", prop: "procedureVersion" },
       { label: "状态", prop: "status", dict: "DEV_STATUS" },
@@ -314,7 +314,7 @@ const props = reactive<CnPage.Props>({
                   res.data.devConf.type = "edit";
                   basicInfoData.value = res.data.baseInfo;
                   hardwareModuleData.value = res.data.baseInfo;
-                  deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite};
+                  deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
                   // deploymentSiteData.value = res.data.devDeploymentSite;
                   configInfoData.value = res.data.devConf;
                   deploymentSiteData.value.ip = res.data.baseInfo.ip
@@ -344,7 +344,7 @@ function viewDetail(row: any) {
       res.data.devConf.type = "view";
       basicInfoData.value = res.data.baseInfo;
       hardwareModuleData.value = res.data.baseInfo;
-      deploymentSiteData.value = res.data.devDeploymentSite;
+      deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
       configInfoData.value = res.data.devConf;
       dialoTitle.value = "设备详情";
       dialogRef.value?.open();

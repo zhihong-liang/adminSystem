@@ -85,7 +85,7 @@ const selectTm = ref(true);
 const mattersMenuId = ref();
 const selectionItemsRef = ref();
 const selectData = ref()
-const emits = defineEmits(["onSubmit"]);
+const emits = defineEmits(["submit"]);
 
 const props = {
   label: "menuName",
@@ -335,11 +335,15 @@ function handleSubmit(action: "add" | "edit" | "select") {
   let params: any = {
     ...dialogProps.formProps!.model,
   };
-  emits("onSubmit");
+
   if (action === "add") {
-    return addMattersProgramme(params);
+    return addMattersProgramme(params).then(() => {
+      emits("submit");
+    });
   } else if (action === "edit") {
-    return putMattersProgramme(params);
+    return putMattersProgramme(params).then(() => {
+      emits("submit");
+    });
   } else if (action === "select") {
     dialogRef.value.close()
   }
