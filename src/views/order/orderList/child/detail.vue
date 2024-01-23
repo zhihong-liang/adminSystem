@@ -53,7 +53,10 @@ provide(
   computed(() => hdType.value)
 )
 
-provide('homeData', computed(() => baseData.value))
+provide(
+  'homeData',
+  computed(() => baseData.value)
+)
 
 const { userInfo } = useLoginStore()
 
