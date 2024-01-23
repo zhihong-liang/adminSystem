@@ -59,9 +59,9 @@ const allForm: any = reactive({
       props: {
         options: computed(() => userList.value),
         onChange: (val: string) => {
-          baseForm.model.operationPersonContact = userList.value.filter(
+          baseForm.model.operationPersonContact = userList.value.find(
             (v: { id: string }) => val === v.id
-          )[0].telephone
+          ).telephone
         }
       }
     },
@@ -85,7 +85,7 @@ const allForm: any = reactive({
     {
       label: '到达现场',
       prop: 'position',
-      component: 'select',
+      component: 'input',
       visible: () => baseForm.model?.repairType === '2'
     },
     {
@@ -133,6 +133,10 @@ const allForm: any = reactive({
   Visit: [
     { label: '是否满意', prop: 'followUp', component: 'radio', dict: 'WORK_ORDER_SATISFACTION' },
     { label: '回访记录', prop: 'remark', component: 'input', props: { type: 'textarea' } }
+  ],
+  Repulse: [
+    { label: '打回原因', prop: 'dfResult', component: 'select', dict: 'WORK_ORDER_REPULSE' },
+    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } }
   ]
 } as Record<string, unknown>)
 
@@ -143,11 +147,16 @@ const baseForm = reactive<CnPage.DialogProps>({
   colSpan: 24,
   rules: {
     operationUnitId: [{ required: true, message: '请选择运维单位' }],
+    operationPersonId: [{ required: true, message: '请选择运维人员' }],
     dfThresult: [{ required: true, message: '请选择退回原因' }],
     dfGbresult: [{ required: true, message: '请选择关闭原因' }],
     dfEcresult: [{ required: true, message: '请选择完成原因' }],
     dfClesult: [{ required: true, message: '请选择处理结果' }],
     followUp: [{ required: true, message: '请选择是否满意' }],
+    dfResult: [{ required: true, message: '请选择打回原因' }],
+    repairType: [{ required: btnType.value === 'Handle', message: '请选择运维方式' }],
+    position: [{ required: true, message: '不能为空' }],
+    handleFile: [{ required: true, message: '请上传签收单' }],
     eveaSlot: [
       {
         required: true,
@@ -159,17 +168,24 @@ const baseForm = reactive<CnPage.DialogProps>({
           }
         }
       }
+    ],
+    remark: [
+      {
+        required: ['Supply', 'Transfer', 'FinishDeal'].includes(btnType.value),
+        message: '不能为空'
+      }
     ]
   }
 })
 
 switch (btnType.value) {
   case 'Handle':
-  case 'FinishDeal':
     baseForm.model.operationPersonName = homeData.value.operationPersonName
     baseForm.model.operationPersonContact = homeData.value.operationPersonContact
     break
   case 'FinishDeal':
+    baseForm.model.operationPersonName = homeData.value.operationPersonName
+    baseForm.model.operationPersonContact = homeData.value.operationPersonContact
     baseForm.model.repairType = homeData.value.repairType
     break
 }
@@ -187,7 +203,6 @@ const pdPage: CnPage.Props = reactive({
   },
   table: {
     columns: [
-      { type: 'selection' },
       { prop: 'regionName', label: '行政区域' },
       { prop: 'name', label: '运维人员' },
       { prop: 'phone', label: '手机号码' }

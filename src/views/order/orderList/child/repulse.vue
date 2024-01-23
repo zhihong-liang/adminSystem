@@ -1,3 +1,4 @@
+<!-- 暂时不用了 -->
 <template>
   <CnDialog v-bind="dialogProps" ref="dialogRef"></CnDialog>
 </template>

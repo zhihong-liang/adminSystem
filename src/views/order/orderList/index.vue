@@ -1,7 +1,7 @@
 <template>
   <CnPage v-bind="props">
     <template #codeSlot="{ row }">
-      <el-button link @click="handleOpen('Look', {})">{{ row.workOrderNumber }}</el-button>
+      <el-button link @click="handleOpen('Look', row)">{{ row.workOrderNumber }}</el-button>
     </template>
 
     <template #addition>
@@ -15,23 +15,16 @@
     </template>
   </CnPage>
   <detail ref="detailRef"></detail>
-  <repulse ref="repulseRef"></repulse>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, provide } from 'vue'
+import { reactive, ref } from 'vue'
 import { orderListPageAll } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
-import repulse from './child/repulse.vue'
 import useSearch from './hooks/useSearch'
 
 const detailRef = ref()
-const repulseRef = ref()
-
-const detailData = ref()
-
-provide('homeData', computed(() => detailData.value))
 
 const props: CnPage.Props = reactive({
   params: {},
@@ -119,19 +112,19 @@ const props: CnPage.Props = reactive({
             label: '评价',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Evaluate', row)
+            onClick: ({ row }) => handleOpen('Evaluate', row, '96')
           },
           {
             label: '回访',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Visit', row)
+            onClick: ({ row }) => handleOpen('Visit', row, '97')
           },
           {
             label: '打回工单',
             type: 'primary',
             text: true,
-            onClick: () => handleRepuse()
+            onClick: ({ row }) => handleOpen('Repulse', row, '98')
           }
         ]
       }
@@ -141,12 +134,7 @@ const props: CnPage.Props = reactive({
 })
 
 const handleOpen = (type: string, data: any, workAuditType='', all = false) => {
-  detailData.value = data
   detailRef.value.open(type, data, workAuditType, all)
-}
-
-const handleRepuse = () => {
-  repulseRef.value.open()
 }
 </script>
 

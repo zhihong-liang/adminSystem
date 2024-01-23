@@ -1,7 +1,7 @@
 <template>
   <CnPage v-bind="pages">
     <template #codeSlot="{ row }">
-      <el-button link @click="handleOpen('Look', {})">{{ row.workOrderNumber }}</el-button>
+      <el-button link @click="handleOpen('Look', row)">{{ row.workOrderNumber }}</el-button>
     </template>
   </CnPage>
   <detail
@@ -12,15 +12,13 @@
       }
     "
   ></detail>
-  <repulse ref="repulseRef"></repulse>
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, computed, provide } from 'vue'
+import { reactive, ref } from 'vue'
 import { orderBaseListPage } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
-import repulse from './child/repulse.vue'
 import useSearch from './hooks/useSearch'
 
 const props = defineProps({
@@ -36,19 +34,9 @@ const props = defineProps({
 })
 
 const detailRef = ref()
-const repulseRef = ref()
-
-const detailData = ref()
-
-provide('homeData', computed(() => detailData.value))
 
 const handleOpen = (type: string, data: any, workAuditType = '', all = false) => {
-  detailData.value = data
   detailRef.value.open(type, data, workAuditType, all)
-}
-
-const handleRepuse = (data: any) => {
-  repulseRef.value.open(data)
 }
 
 const toolBtn: any[] = [
@@ -112,7 +100,7 @@ const toolBtn: any[] = [
   //   onClick: () => handleOpen('Visit', {}, '', true),
   //   visible: ['Handled']
   // },
-  // { label: '打回工单', type: 'primary', onClick: () => handleRepuse(), visible: ['Handled'] },
+  // { label: '打回工单', type: 'primary', onClick: () => handleOpen('Repulse', {}, '', true), visible: ['Handled'] },
   {
     label: '导出',
     type: 'primary',
@@ -202,14 +190,14 @@ const tableBtn: any[] = [
     label: '打回工单',
     type: 'primary',
     text: true,
-    onClick: ({ row }) => handleRepuse(row),
+    onClick: ({ row }) => handleOpen('Repulse', row, '98'),
     visible: ['Handled']
   }
 ]
 
 const columns: any[] = [
   { type: 'selection' },
-  { slot: 'codeSlot', label: '工单编号', width: 130 },
+  { slot: 'codeSlot', label: '工单编号', width: 140 },
   { prop: 'workTypeIdText', label: '工单类型' },
   { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS' },
   { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },

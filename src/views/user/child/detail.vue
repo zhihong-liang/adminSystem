@@ -110,6 +110,7 @@
                 :props="defaultProps"
                 node-key="id"
                 show-checkbox
+                check-strictly
                 :default-checked-keys="item.checkedKeys"
                 class="defTreecs"
               />

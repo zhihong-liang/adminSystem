@@ -17,6 +17,7 @@ const baseForm = reactive({
   model: props.data,
   items: [
     { label: '工单编号', prop: 'workOrderNumber' },
+    { label: '关联工单', prop: 'relationOrderNumber' },
     { label: '工单来源系统', prop: 'orderSourceOs', dict: 'ORDER_SOURCE_OS' },
     { label: '工单来源', prop: 'orderSource', dict: 'ORDER_SOURCE' },
     { label: '提交人姓名', prop: 'submitterName' },

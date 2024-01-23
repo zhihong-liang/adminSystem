@@ -35,7 +35,7 @@ import baseInfor from './baseInfor.vue'
 import orderInfor from './orderInfor.vue'
 import process from './process.vue'
 import orderForm from './orderForm.vue'
-import { orderBaseDetail, orderAudit } from '@/api/order'
+import { orderBaseDetail, orderAudit, orderRepulse } from '@/api/order'
 import { useLoginStore } from '@/stores'
 import { ElMessage } from 'element-plus'
 import useDictionary from '@/hooks/useDictionary'
@@ -53,6 +53,8 @@ provide(
   computed(() => hdType.value)
 )
 
+provide('homeData', computed(() => baseData.value))
+
 const { userInfo } = useLoginStore()
 
 const titleName = reactive({
@@ -67,7 +69,8 @@ const titleName = reactive({
   Close: '关闭工单',
   Finish: '完成',
   Evaluate: '评价',
-  Visit: '回访'
+  Visit: '回访',
+  Repulse: '打回工单'
 } as Record<string, string>)
 
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -106,52 +109,91 @@ const queryDetail = (id: string) => {
 const handleSubmit = () => {
   const valid = detailformRef.value.formRef.formRef.validate()
   valid.then(() => {
-    const params = {
-      ...detailformRef.value.model,
-      bpmInstId: homeData.value.bpmInstId,
-      bpmNodeCode: homeData.value.bpmNodeCode,
-      defId: homeData.value.defId,
-      taskId: homeData.value.taskId,
-      workOrderId: homeData.value.id,
-      workAuditType: workAuditType.value,
-      handleUser: userInfo.name, // 处理人姓名
-      handleUserId: userInfo.userId,
-      handleUserPhone: userInfo.telephone,
-      handleDept: userInfo.unitName,
-      handleDeptId: userInfo.unitId,
-    }
-
-    // 完成、退回、关闭、评价，原因和备注拼在一起
-    switch (hdType.value) {
-      case 'Finish':
-        params.remark = useDictionary('WORK_ORDER_END_TYPE', params.dfEcresult).value + params.remark
-        break
-      case 'Back':
-        params.remark = useDictionary('WORK_ORDER_REPULSE_TYPE', params.dfThresult).value + params.remark
-        break
-      case 'Close':
-        params.remark = useDictionary('WORK_ORDER_CLOSE_TYPE', params.dfGbresult).value + params.remark
-        break
-      case 'Evaluate':
-        params.remark = useDictionary('WORK_ORDER_RESULT', params.dfClesult).value + params.remark
-        break
-      case 'Transfer':
-        if (String(params.operationPersonId) === userInfo.userId) {
-          ElMessage.error('不能转派给当前运维人员！')
-          return
-        }
-        break
-    }
-
-    orderAudit(params).then((res) => {
-      if (res.code === '200') {
-        dialogRef.value.close()
-        ElMessage.success(res.message)
-        emits('success')
+    if (hdType.value === 'Repulse') {
+      // 打回工单
+      const params = {
+        ...baseData.value,
+        relationOrderNumber: baseData.value.workOrderNumber,
+        relationOrderId: baseData.value.id,
+        remark:
+          useDictionary('WORK_ORDER_REPULSE', detailformRef.value.model.dfResult).value +
+          detailformRef.value.model.remark
       }
-    }).catch((arr) => {
-      console.log(arr)
-    })
+      delete params.id, delete params.workOrderNumber
+
+      orderRepulse(params)
+        .then((res) => {
+          if (res.code === '200') {
+            dialogRef.value.close()
+            ElMessage.success(res.message)
+            emits('success')
+          }
+        })
+        .catch((arr) => {
+          console.log(arr)
+        })
+    } else {
+      const params = {
+        ...detailformRef.value.model,
+        bpmInstId: homeData.value.bpmInstId,
+        bpmNodeCode: homeData.value.bpmNodeCode,
+        defId: homeData.value.defId,
+        taskId: homeData.value.taskId,
+        workOrderId: homeData.value.id,
+        workAuditType: workAuditType.value,
+        handleUser: userInfo.name, // 处理人姓名
+        handleUserId: userInfo.userId,
+        handleUserPhone: userInfo.telephone,
+        handleDept: userInfo.unitName,
+        handleDeptId: userInfo.unitId
+      }
+
+      // 完成、退回、关闭、评价，原因和备注拼在一起
+      switch (hdType.value) {
+        case 'Finish':
+          params.remark =
+            useDictionary('WORK_ORDER_END_TYPE', params.dfEcresult).value + params.remark
+          break
+        case 'Back':
+          params.remark =
+            useDictionary('WORK_ORDER_REPULSE_TYPE', params.dfThresult).value + params.remark
+          break
+        case 'Close':
+          params.remark =
+            useDictionary('WORK_ORDER_CLOSE_TYPE', params.dfGbresult).value + params.remark
+          break
+        case 'Evaluate':
+          params.remark = useDictionary('WORK_ORDER_RESULT', params.dfClesult).value + params.remark
+          break
+        case 'Transfer':
+          if (String(params.operationPersonId) === userInfo.userId) {
+            ElMessage.error('不能转派给当前运维人员！')
+            return
+          } else if (!params.operationPersonId) {
+            ElMessage.error('请选择运维人员！')
+            return
+          }
+          break
+        case 'Dispatch':
+          if (!params.operationPersonId) {
+            ElMessage.error('请选择运维人员！')
+            return
+          }
+          break
+      }
+
+      orderAudit(params)
+        .then((res) => {
+          if (res.code === '200') {
+            dialogRef.value.close()
+            ElMessage.success(res.message)
+            emits('success')
+          }
+        })
+        .catch((arr) => {
+          console.log(arr)
+        })
+    }
   })
 }
 </script>

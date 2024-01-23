@@ -5,26 +5,36 @@
         <div>{{item.handleUser}}</div>
         <div>{{item.handleDept}}</div>
       </div>
-      <div class="line_right">
-        <div class="line_right_tl">{{useDictionary('WORK_AUDIT_TYPE', item.workAuditType)}}</div>
-        <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
-        <div>处理结果：{{item.handleOpion}}</div>
-        <div>评价：{{item.remark}}</div>
-        <div>
-          <el-image
-            v-for="(items, indexs) in srcList"
-            style="width: 100px; height: 100px; margin-right: 10px"
-            :src="items"
-            :key="indexs"
-            :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
-            :preview-src-list="[items]"
-            :initial-index="0"
-            fit="cover"
-          />
-        </div>
-      </div>
+      <el-row class="line_right">
+        <el-col :span="18">
+          <div class="line_right_tl">{{useDictionary('WORK_AUDIT_TYPE', item.workAuditType)}}</div>
+          <div v-if="['3','4','97','99'].includes(item.workAuditType)">{{item.remark}}</div>
+          <div v-if="item.workAuditType === '96'">
+            <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
+            <div>效率：<el-rate v-model="item.evaluationEfficiency" disabled /></div>
+            <div>处理结果：{{item.handleOpion}}</div>
+            <div>评价：{{item.remark}}</div>
+          </div>
+          <div v-if="item.workAuditType ==='99' && item.handleFile">
+            <el-image
+              v-for="(items, indexs) in item.handleFile.split(',')"
+              style="width: 100px; height: 100px; margin-right: 10px"
+              :src="items"
+              :key="indexs"
+              :zoom-rate="1.2"
+              :max-scale="7"
+              :min-scale="0.2"
+              :preview-src-list="[items]"
+              :initial-index="0"
+              fit="cover"
+            />
+          </div>
+        </el-col>
+        <el-col :span="6" v-if="item.handleTime">
+          <div>{{moment(item.handleTime).format('YYYY-MM-DD')}}</div>
+          <div>{{moment(item.handleTime).format('HH:mm:ss')}}</div>
+        </el-col>
+      </el-row>
     </el-timeline-item>
   </el-timeline>
 </template>
@@ -33,6 +43,7 @@
 import { ref } from 'vue'
 import { orderProcess } from '@/api/order'
 import useDictionary from '@/hooks/useDictionary'
+import moment from 'moment'
 
 const props = defineProps({
   id: {
