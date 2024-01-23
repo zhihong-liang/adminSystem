@@ -209,5 +209,50 @@ export const queryDevAccessListPage = (data: {
   streetCode?: string
   unitDevCode?: string
   villageCode?: string
-}): Promise<ListRes<unknown[]>> =>
-  axios.post('/api/device/devBaseInfoHis/listPage', data)
+}): Promise<ListRes<unknown[]>> => axios.post('/api/device/devBaseInfoHis/listPage', data)
+
+/**
+ * 设备注册码管理
+ */
+export interface DevLicenseInfo {
+  authorizationContent?: string
+  batchNo?: string
+  createTime?: string
+  createUser?: string
+  dataUnits?: any[]
+  devCode?: string
+  devId?: number
+  expirationDate?: string
+  id?: number
+  ids?: number[]
+  macAddress?: string
+  params?: any
+  privateKey?: string
+  publicKey?: string
+  remark?: string
+  serialNumber?: string
+  status?: string
+  unitDevCode?: string
+  updateTime?: string
+  updateUser?: string
+}
+
+export interface DevLicenseInfoResponse extends DevLicenseInfo {
+  statusText?: string
+  devUnit?: number
+  devUnitText?: string
+  regionDetail?: string
+  siteName?: string
+}
+// 查询设备许可信息列表
+export const queryDevLicenseListPage = (
+  data: ListReq<DevLicenseInfo>
+): Promise<ListRes<DevLicenseInfoResponse[]>> => axios.post('/api/device/devLicense/listPage', data)
+
+// 修改设备许可信息
+export const queryEditDevLicense = (data: DevLicenseInfo): Promise<Res> =>
+  axios.put('/api/device/devLicense', data)
+
+// 导出设备许可信息列表
+export const queryExportDevLicense = (data: DevLicenseInfo): Promise<Res> =>
+  axios.post('/api/device/devLicense/export', data, { responseType: 'blob' })

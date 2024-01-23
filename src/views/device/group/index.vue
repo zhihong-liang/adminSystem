@@ -161,8 +161,6 @@ const props: CnPage.Props = reactive({
 
 function handleTableResolve(pid: number | undefined, callback: Function): void {
   queryDevGroupList({ parentId: pid }).then((res: any) => {
-    console.log('res: ', res)
-
     callback(res.data)
   })
 }

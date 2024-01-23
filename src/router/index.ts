@@ -3,7 +3,8 @@ import {
   createRouter,
   createWebHistory,
   type NavigationGuardNext,
-  type RouteLocationNormalized
+  type RouteLocationNormalized,
+  type RouteRecordRaw
 } from 'vue-router'
 import { start, close } from '@/utils/nprogress'
 import Routes from './routes'
@@ -56,7 +57,8 @@ const formatMenus = (menus: Menu[], modules: any) => {
         name,
         id,
         parentId,
-        status: parseInt(status!),
+        component,
+        status: Number(status),
         authButtons: buttons
       }
     })
@@ -67,7 +69,7 @@ const formatMenus = (menus: Menu[], modules: any) => {
   return list
 }
 
-// 动态路由
+// 添加动态路由
 export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   const _children = [
     ...formatMenus(menuList, modules)
@@ -83,6 +85,28 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   }
 
   router.addRoute(baseRoute)
+}
+
+function findNodeByPath(routes: RouteRecordRaw[], path: string) {
+  for (let i = 0; i < routes.length; i += 1) {
+    const element = routes[i]
+
+    if (element.path === path) return element
+
+    findNodeByPath(element.children || [], path)
+  }
+}
+
+export const addRoutes = (parentPath: string, routes: RouteRecordRaw[]) => {
+  if (!parentPath) {
+    routes.forEach((r) => router.addRoute('layout', r))
+  }
+
+  const curNode = findNodeByPath(router.getRoutes(), parentPath)
+
+  if (curNode?.children) {
+    curNode.children
+  }
 }
 
 // 处理面包屑组件数据
@@ -150,6 +174,10 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
           })
           // 更新权限按钮组
           to.meta?.authButtons && updateAuthButtions(to.meta.authButtons as Menu[])
+
+          console.log(findNodeByPath(router.getRoutes(), to.path))
+
+          console.log('to: ', to)
         }
 
         updateBreadcrumb(searchParentNode(to.meta.id as number))
@@ -168,7 +196,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
 router.beforeEach((to, from, next) => {
   start()
-  // console.log('to: ', to)
+  console.log('router: ', router)
 
   handleRouterBeforeEach(to, next)
 })

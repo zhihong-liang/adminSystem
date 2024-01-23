@@ -39,10 +39,11 @@
 
 <script setup lang="ts">
 import { ref, reactive, useAttrs, computed } from 'vue'
-import { queryDevAccessApplyAgreeOrReject, type DevAccessAgreeOrReject } from '@/api/device'
 import { useLoginStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { queryDevAccessApplyAgreeOrReject, type DevAccessAgreeOrReject } from '@/api/device'
 
+import { ElMessage } from 'element-plus'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import CnDatePicker from '@/components/cn-page/CnDatePicker.vue'
 
@@ -91,6 +92,7 @@ function handleSubmit() {
   queryDevAccessApplyAgreeOrReject(params, dataBase.value.action).then((res) => {
     if (res.code === '200') {
       dialogRef.value.close()
+      ElMessage({type: "success", message: '操作成功'})
       emits('onSuccess')
     }
   })

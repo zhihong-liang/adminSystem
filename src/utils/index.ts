@@ -30,3 +30,30 @@ export function Tree2Flat(tree: unknown[], opts: any) {
 
   return result
 }
+
+interface exportFileOpts {
+  fileName: string // 文件名称
+  headers?: string // blob请求头的content-type
+  fileType?: string // 导出文件类型（xlsx、word ...）
+}
+/**
+ * @param data blob文件流
+ * @param opts 可选项
+ */
+export function exportBlob(data: BlobPart, opts: exportFileOpts) {
+  let { fileName, fileType = 'xlsx' } = opts
+
+  fileName = (fileName?.match(/(\S*)\./)?.[0] || '文件') + fileType
+
+  let blob = new Blob([data], {
+    type: opts.headers || 'application/vnd.ms-excel'
+  })
+
+  let href = window.URL.createObjectURL(blob)
+  let downloadElement = document.createElement('a')
+  downloadElement.href = href
+  downloadElement.download = opts.fileName
+  document.body.appendChild(downloadElement)
+  downloadElement.click() //点击下载
+  document.body.removeChild(downloadElement) //下载完成移除元素
+}

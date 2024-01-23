@@ -14,7 +14,28 @@
         <CnTable v-bind="tableProps"></CnTable>
       </el-tab-pane>
     </el-tabs>
+    <el-affix
+      v-if="formProps.model.auditCurrentStep === '100'"
+      class="mt-lg"
+      position="bottom"
+      :offset="40"
+    >
+      <el-button
+        type="primary"
+        @click="() => ActionDialogRef.open({ action: 'agree', row: formProps.model })"
+        >同意</el-button
+      >
+      <el-button
+        type="danger"
+        @click="() => ActionDialogRef.open({ action: 'reject', row: formProps.model })"
+        >拒绝</el-button
+      >
+    </el-affix>
   </div>
+  <ActionDialog
+    ref="ActionDialogRef"
+    @on-success="init"
+  />
 </template>
 
 <script setup lang="ts">
@@ -22,6 +43,7 @@ import { onBeforeMount, reactive, ref } from 'vue'
 import { queryDevAccessDetail, queryDevAccessGetHis, queryDevAccessListPage } from '@/api/device'
 import { useRoute } from 'vue-router'
 
+import ActionDialog from './actionDialog.vue'
 import CnForm from '@/components/cn-page/CnForm.vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnTable from '@/components/cn-page/CnTable.vue'
@@ -29,6 +51,8 @@ import CnTable from '@/components/cn-page/CnTable.vue'
 const route = useRoute()
 
 const activeName = ref('base')
+
+const ActionDialogRef = ref()
 
 const formProps: CnPage.FormProps = reactive({
   model: {},
@@ -111,10 +135,10 @@ const tableProps: CnPage.TableProps = reactive({
       prop: 'auditStep',
       label: '流程节点',
       align: 'center',
-      dict: 'DEV_ACCESS_NODE'
+      dict: 'DEV_ACCESS_AUDIT_TYPE'
     },
-    { prop: 'handleDept', label: '处理单位', align: 'center' },
-    { prop: 'handleUser', label: '处理人', align: 'center' },
+    { prop: 'handleDeptText', label: '处理单位', align: 'center' },
+    { prop: 'handleUserText', label: '处理人', align: 'center' },
     { prop: 'handleOpinion', label: '处理说明', align: 'center' },
     { prop: 'hanlleTime', label: '处理时间', align: 'center' }
   ],
