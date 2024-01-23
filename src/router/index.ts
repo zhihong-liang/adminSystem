@@ -57,7 +57,7 @@ const formatMenus = (menus: Menu[], modules: any) => {
         name,
         id,
         parentId,
-        component,
+        // component,
         status: Number(status),
         authButtons: buttons
       }
@@ -175,9 +175,9 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
           // 更新权限按钮组
           to.meta?.authButtons && updateAuthButtions(to.meta.authButtons as Menu[])
 
-          console.log(findNodeByPath(router.getRoutes(), to.path))
+          // console.log(findNodeByPath(router.getRoutes(), to.path))
 
-          console.log('to: ', to)
+          // console.log('to: ', to)
         }
 
         updateBreadcrumb(searchParentNode(to.meta.id as number))
@@ -196,7 +196,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
 router.beforeEach((to, from, next) => {
   start()
-  console.log('router: ', router)
+  // console.log('router: ', router)
 
   handleRouterBeforeEach(to, next)
 })
