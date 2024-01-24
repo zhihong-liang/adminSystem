@@ -1,5 +1,5 @@
 <template>
-  <CnDialog v-bind="dialogProps" ref="dialogRef">
+  <CnDialog v-bind="dialogProps" width="900px" ref="dialogRef">
     <template #add>
       <div class="sqtitle">
         <span>授权信息</span>
@@ -539,16 +539,17 @@ const changeDict = (index: number) => {
   align-items: center;
   display: flex;
   width: 100%;
+  :deep(.el-checkbox) {
+    margin-right: 16px;
+  }
 }
 .tree_auth {
   margin-left: 10px;
 }
 .sqtitle {
-  position: relative;
+  width: 100%;
   &-but {
-    position: absolute;
-    right: -1500%;
-    top: 16%;
+    float: right;
   }
 }
 </style>
