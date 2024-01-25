@@ -3,9 +3,14 @@
     <!-- 面包屑 -->
     <div class="flex flex-between">
       <div class="flex flex-center">
-        <el-button v-if="showBackUpButton" class="mr-lg" icon="Back" @click="() => router.back()"
-          >返回</el-button
+        <el-button
+          v-if="showBackUpButton"
+          class="mr-lg"
+          icon="Back"
+          @click="router.back"
         >
+          返回
+        </el-button>
         <el-breadcrumb class="cn-breadcrumb" separator="/">
           <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.id">{{
             item.name
@@ -46,7 +51,6 @@ import CnIcon from '@/components/cn-page/CnIcon.vue'
 
 const [route, router, store] = [useRoute(), useRouter(), useHomeStore()]
 
-console.log('route: ', route)
 const showBackUpButton = computed(() => route.meta.status === 0)
 const { breadcrumbList, containerStyle } = storeToRefs(store)
 </script>

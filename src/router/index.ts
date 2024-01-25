@@ -43,6 +43,7 @@ const formatMenus = (menus: Menu[], modules: any) => {
         type: 'dirt',
         status: '0'
       }))
+      // 防止重复添加路由
       whiteRoutes = whiteRoutes.concat(differenceBy(list, whiteRoutes, 'code'))
     }
 
