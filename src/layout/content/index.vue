@@ -2,11 +2,16 @@
   <div class="content-root ofh">
     <!-- 面包屑 -->
     <div class="flex flex-between">
-      <el-breadcrumb class="cn-breadcrumb" separator="/">
-        <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.id">{{
-          item.name
-        }}</el-breadcrumb-item>
-      </el-breadcrumb>
+      <div class="flex flex-center">
+        <el-button v-if="showBackUpButton" class="mr-lg" icon="Back" @click="() => router.back()"
+          >返回</el-button
+        >
+        <el-breadcrumb class="cn-breadcrumb" separator="/">
+          <el-breadcrumb-item v-for="item in breadcrumbList" :key="item.id">{{
+            item.name
+          }}</el-breadcrumb-item>
+        </el-breadcrumb>
+      </div>
 
       <div class="flex flex-center">
         <CnIcon size="20px" html="SwitchFilled" />
@@ -31,13 +36,18 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import { RouterView } from 'vue-router'
 import { useHomeStore } from '@/stores'
 import { storeToRefs } from 'pinia'
+import { useRoute, useRouter } from 'vue-router'
 
 import CnIcon from '@/components/cn-page/CnIcon.vue'
 
-const store = useHomeStore()
+const [route, router, store] = [useRoute(), useRouter(), useHomeStore()]
+
+console.log('route: ', route)
+const showBackUpButton = computed(() => route.meta.status === 0)
 const { breadcrumbList, containerStyle } = storeToRefs(store)
 </script>
 

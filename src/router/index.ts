@@ -12,10 +12,12 @@ import Demo from './demo'
 import { useHomeStore, useLoginStore, useUserStore } from '@/stores'
 import { storeToRefs } from 'pinia'
 import { getToken } from '@/utils/auth'
-
-import BaseLayout from '../layout/index.vue'
+import whileList from './whiteList'
+import { differenceBy } from 'lodash-es'
 
 import type { BreadcrumbItem, Menu } from '@/layout/type'
+
+let whiteRoutes: any = []
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -24,12 +26,25 @@ const router = createRouter({
 
 // 菜单转换为路由
 const formatMenus = (menus: Menu[], modules: any) => {
-  let list = []
-
+  let list
   list = menus.map((m: Menu) => {
-    const { name, id, parentId, path, childList, component, code, type, status } = m
+    const { name, id, parentId, path, childList, component = '', code, type, status } = m
+
     let menu: any = {}
     let buttons: any[] = []
+
+    // 每次菜单转换为路由都判断当前菜单是否在 路由白名单 里，存在则把白名单里的菜单也转换为路由
+    let white = whileList[component]
+    if (Array.isArray(white)) {
+      const list = white.map((r, idx) => ({
+        ...r,
+        parentId: id,
+        id: new Date().getTime() + idx,
+        type: 'dirt',
+        status: '0'
+      }))
+      whiteRoutes = whiteRoutes.concat(differenceBy(list, whiteRoutes, 'code'))
+    }
 
     if (type === 'menu' && childList && childList.length) {
       menu.children = formatMenus(childList, modules)
@@ -57,8 +72,8 @@ const formatMenus = (menus: Menu[], modules: any) => {
         name,
         id,
         parentId,
-        // component,
-        status: Number(status),
+        component,
+        status: +status!,
         authButtons: buttons
       }
     })
@@ -72,19 +87,11 @@ const formatMenus = (menus: Menu[], modules: any) => {
 // 添加动态路由
 export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
   const _children = [
-    ...formatMenus(menuList, modules)
+    ...formatMenus(menuList, modules), // 菜单转换为路由
+    ...formatMenus(whiteRoutes, modules) // 白名单转换为路由
     // TODO 添加404
   ]
-
-  const baseRoute: any = {
-    path: '/',
-    name: 'layout',
-    component: BaseLayout,
-    redirect: '/system/usercenter',
-    children: _children
-  }
-
-  router.addRoute(baseRoute)
+  addRoutes('/', _children)
 }
 
 function findNodeByPath(routes: RouteRecordRaw[], path: string) {
@@ -100,12 +107,16 @@ function findNodeByPath(routes: RouteRecordRaw[], path: string) {
 export const addRoutes = (parentPath: string, routes: RouteRecordRaw[]) => {
   if (!parentPath) {
     routes.forEach((r) => router.addRoute('layout', r))
+    return
   }
 
   const curNode = findNodeByPath(router.getRoutes(), parentPath)
 
   if (curNode?.children) {
-    curNode.children
+    routes.forEach(
+      (r) => !router.hasRoute(r.name as string) && router.addRoute(curNode.name as string, r)
+    )
+    // router.addRoute(curNode.name as string, r)
   }
 }
 
@@ -113,19 +124,24 @@ export const addRoutes = (parentPath: string, routes: RouteRecordRaw[]) => {
 function searchParentNode(id?: number): BreadcrumbItem[] {
   if (!id) return []
 
-  const home = useHomeStore()
-  const { flatMenuList } = storeToRefs(home)
+  let { flatMenuList } = useHomeStore()
+  flatMenuList = [...flatMenuList, ...whiteRoutes]
 
   let _id = id
   const result: BreadcrumbItem[] = []
 
   while (_id !== 0) {
-    const target = flatMenuList.value.find((m) => m.id === _id) || {}
+    // TODO 稍有不慎容易跑进循环，需要优化
+    const target = flatMenuList.find((m) => m.id === _id) || {}
+
+    if (target.parentId === _id) break // 如果 parentId 和 _id 相同就跳出循环，防止跑进循环
+
     const isEmpty = !Object.keys(target).length
     if (!isEmpty) {
       const { id, name, path } = target
       result.unshift({ id, name, path: path as string })
     }
+
     _id = target.parentId as number
   }
 
@@ -141,15 +157,13 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { getMenuList, addTabToList, resetAll, updateBreadcrumb } = home
   const { updateAuthButtions } = userStore
 
-  const hasToken = !!getToken()
-
   if (to.path === '/login') {
     resetAll()
     next()
     return
   }
 
-  if (hasToken) {
+  if (!!getToken()) {
     if (refresh.value && menuList.value.length) {
       await dymanicAddRoute(menuList.value, modules.value)
       refresh.value = false
@@ -174,10 +188,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
           })
           // 更新权限按钮组
           to.meta?.authButtons && updateAuthButtions(to.meta.authButtons as Menu[])
-
-          // console.log(findNodeByPath(router.getRoutes(), to.path))
-
-          // console.log('to: ', to)
         }
 
         updateBreadcrumb(searchParentNode(to.meta.id as number))
@@ -196,7 +206,6 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
 
 router.beforeEach((to, from, next) => {
   start()
-  // console.log('router: ', router)
 
   handleRouterBeforeEach(to, next)
 })

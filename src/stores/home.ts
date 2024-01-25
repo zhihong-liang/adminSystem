@@ -29,6 +29,8 @@ export const useHomeStore = defineStore(
       // 扁平化菜单列表
       return Tree2Flat(menuList.value, { children: 'childList' })
     })
+
+
     // 请求菜单列表
     async function getMenuList({
       manual = false,
@@ -110,11 +112,11 @@ export const useHomeStore = defineStore(
       collapse,
       tabList,
       menuList,
-      flatMenuList,
       activeTab,
       modules,
       breadcrumbList,
       containerStyle,
+      flatMenuList,
       getMenuList,
       updateCollapse,
       addTabToList,
