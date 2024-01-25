@@ -48,6 +48,10 @@ watchEffect(() => {
     ) {
       model[last] = []
     }
+    // 选择框支持多选，且非独占一行，默认折叠标签
+    if (item.component === 'select' && item.props?.multiple && (item.span === undefined ? props.colSpan !== 24 : item.span !== 24)) {
+      item.props.collapseTags = item.props.collapseTags === undefined ? true : item.props.collapseTags
+    }
 
     // 设置组件的双向绑定
     if (item.component === 'ad') {

@@ -8,7 +8,10 @@
       <div class="tip">
         <div class="tip_num">
           <span class="tip_num_title">工单超时</span>
-          <span>超时工单 5 笔，即将超时工单 5 笔</span>
+          <span
+            >超时工单 {{ timeoutData?.timeOut }} 笔，即将超时工单
+            {{ timeoutData?.soonTimeOut }} 笔</span
+          >
           <span class="tip_num_cond">查看<span>《服务标准》</span></span>
         </div>
       </div>
@@ -19,12 +22,13 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { orderListPageAll } from '@/api/order'
+import { orderListPageAll, orderQueryWorkTimeout } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
 
 const detailRef = ref()
+const timeoutData = ref()
 
 const props: CnPage.Props = reactive({
   params: {},
@@ -58,73 +62,85 @@ const props: CnPage.Props = reactive({
             label: '补充',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Supply', row, '95')
+            onClick: ({ row }) => handleOpen('Supply', row, '95'),
+            visible: ({ row }) => row.bpmNodeCode === '1001'
           },
           {
             label: '分拨',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Allocation', row, '2')
+            onClick: ({ row }) => handleOpen('Allocation', row, '2'),
+            visible: ({ row }) => row.bpmNodeCode === '1001'
           },
           {
             label: '派单',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Dispatch', row, '3')
+            onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
+            visible: ({ row }) => row.bpmNodeCode === '1100'
           },
           {
             label: '转派',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Transfer', row, '4')
+            onClick: ({ row }) => handleOpen('Transfer', row, '4'),
+            visible: ({ row }) => ['1200', '1300'].includes(row.bpmNodeCode)
           },
           {
             label: '处理',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Handle', row, '6')
+            onClick: ({ row }) => handleOpen('Handle', row, '6'),
+            visible: ({ row }) => row.bpmNodeCode === '1200'
           },
           {
             label: '完成处理',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('FinishDeal', row, '8')
+            onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
+            visible: ({ row }) => row.bpmNodeCode === '1300'
           },
           {
             label: '退回工单',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Back', row, '5')
+            onClick: ({ row }) => handleOpen('Back', row, '5'),
+            visible: ({ row }) => ['1100', '1200'].includes(row.bpmNodeCode)
           },
           {
             label: '关闭工单',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Close', row, '0')
+            onClick: ({ row }) => handleOpen('Close', row, '0'),
+            visible: ({ row }) => ['1001', '1100', '1200'].includes(row.bpmNodeCode)
           },
           {
             label: '完成',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Finish', row, '99')
+            onClick: ({ row }) => handleOpen('Finish', row, '99'),
+            visible: ({ row }) => row.bpmNodeCode === '1400'
           },
           {
             label: '评价',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Evaluate', row, '96')
+            onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
+            visible: ({ row }) => row.bpmNodeCode === '1500'
           },
           {
             label: '回访',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Visit', row, '97')
+            onClick: ({ row }) => handleOpen('Visit', row, '97'),
+            visible: ({ row }) => row.bpmNodeCode === '1500'
           },
           {
             label: '打回工单',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => handleOpen('Repulse', row, '98')
+            onClick: ({ row }) => handleOpen('Repulse', row, '98'),
+            visible: ({ row }) => row.bpmNodeCode === '1400'
           }
         ]
       }
@@ -133,7 +149,16 @@ const props: CnPage.Props = reactive({
   }
 })
 
-const handleOpen = (type: string, data: any, workAuditType='', all = false) => {
+const queryTimeout = () => {
+  orderQueryWorkTimeout(props.params).then((res) => {
+    if (res.code === '200') {
+      timeoutData.value = res.data
+    }
+  })
+}
+queryTimeout()
+
+const handleOpen = (type: string, data: any, workAuditType = '', all = false) => {
   detailRef.value.open(type, data, workAuditType, all)
 }
 </script>

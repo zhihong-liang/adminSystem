@@ -155,18 +155,31 @@ const handleSubmit = () => {
       switch (hdType.value) {
         case 'Finish':
           params.remark =
-            useDictionary('WORK_ORDER_END_TYPE', params.dfEcresult).value + params.remark
+            '完成原因：' +
+            useDictionary('WORK_ORDER_END_TYPE', params.dfEcresult).value +
+            '\n' +
+            params.remark
           break
         case 'Back':
           params.remark =
-            useDictionary('WORK_ORDER_REPULSE_TYPE', params.dfThresult).value + params.remark
+            '退回原因：' +
+            useDictionary('WORK_ORDER_REPULSE_TYPE', params.dfThresult).value +
+            '\n' +
+            params.remark
           break
         case 'Close':
           params.remark =
-            useDictionary('WORK_ORDER_CLOSE_TYPE', params.dfGbresult).value + params.remark
+            '关闭原因：' +
+            useDictionary('WORK_ORDER_CLOSE_TYPE', params.dfGbresult).value +
+            '\n' +
+            params.remark
           break
         case 'Evaluate':
-          params.remark = useDictionary('WORK_ORDER_RESULT', params.dfClesult).value + params.remark
+          params.remark =
+            '处理结果：' +
+            useDictionary('WORK_ORDER_RESULT', params.dfClesult).value +
+            '\n' +
+            params.remark
           break
         case 'Transfer':
           if (String(params.operationPersonId) === userInfo.userId) {

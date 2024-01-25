@@ -25,9 +25,17 @@ export const orderAddUpgrade = (data: Record<string, unknown>): Promise<Res> =>
 export const orderListPageAll = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/work/workOrderBase/listPage2', data)
 
+// 查询超时数量
+export const orderQueryWorkTimeout = (data: Record<string, unknown>): Promise<Res> =>
+  axios.post('/api/work/workOrderBase/queryWorkTimeout', data)
+
 // 查询工单基本信息表列表
 export const orderBaseListPage = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/work/workOrderBase/listPage', data)
+
+// 查询工单历史
+export const orderHistoryList = (data: ListReq): Promise<ListRes> =>
+  axios.post('/api/work/workOrderBase/listPage3', data)
 
 // 查询基本信息和工单信息
 export const orderBaseDetail = (id: string): Promise<Res> =>

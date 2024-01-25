@@ -1,6 +1,6 @@
 <template>
   <CnPage v-bind="props"></CnPage>
-  <Addplan ref="addplayRef" @onSubmit="onSubmit"></Addplan>
+  <Addplan ref="addplayRef" @submit="onSubmit"></Addplan>
 </template>
 
 <script setup lang="ts">
@@ -106,7 +106,6 @@ const props: CnPage.Props = reactive({
   // transformResponse: () => {}
 });
 const onSubmit = () => {
-    console.log(122312);
     props.refresh = new Date().getTime();
 }
 </script>

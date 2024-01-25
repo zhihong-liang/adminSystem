@@ -63,7 +63,7 @@ export default {
                           }
                         })
                       }
-                      return elButton
+                      return (!button.visible || button.visible(params)) && elButton
                     })
                   } else if (column.icons) {
                     return column.icons.map((icon) => {
