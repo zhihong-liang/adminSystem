@@ -2,20 +2,22 @@
   <el-timeline class="line">
     <el-timeline-item v-for="(item, index) in list" :key="index">
       <div class="line_left">
-        <div>{{item.handleUser}}</div>
-        <div>{{item.handleDept}}</div>
+        <div>{{ item.handleUser }}</div>
+        <div>{{ item.handleDept }}</div>
       </div>
       <el-row class="line_right">
         <el-col :span="18">
-          <div class="line_right_tl">{{useDictionary('WORK_AUDIT_TYPE', item.workAuditType)}}</div>
-          <div v-if="['3','4','97','99'].includes(item.workAuditType)">{{item.remark}}</div>
+          <div class="line_right_tl">
+            {{ useDictionary('WORK_AUDIT_TYPE', item.workAuditType) }}
+          </div>
+          <div v-if="['3', '4', '97', '99'].includes(item.workAuditType)">{{ item.remark }}</div>
           <div v-if="item.workAuditType === '96'">
             <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
             <div>效率：<el-rate v-model="item.evaluationEfficiency" disabled /></div>
-            <div>处理结果：{{item.handleOpion}}</div>
-            <div>评价：{{item.remark}}</div>
+            <div>处理结果：{{ item.handleOpion }}</div>
+            <div>评价：{{ item.remark }}</div>
           </div>
-          <div v-if="item.workAuditType ==='99' && item.handleFile">
+          <div v-if="item.workAuditType === '99' && item.handleFile">
             <el-image
               v-for="(items, indexs) in item.handleFile.split(',')"
               style="width: 100px; height: 100px; margin-right: 10px"
@@ -31,8 +33,8 @@
           </div>
         </el-col>
         <el-col :span="6" v-if="item.handleTime">
-          <div>{{moment(item.handleTime).format('YYYY-MM-DD')}}</div>
-          <div>{{moment(item.handleTime).format('HH:mm:ss')}}</div>
+          <div>{{ moment(item.handleTime).format('YYYY-MM-DD') }}</div>
+          <div>{{ moment(item.handleTime).format('HH:mm:ss') }}</div>
         </el-col>
       </el-row>
     </el-timeline-item>
