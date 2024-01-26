@@ -16,7 +16,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { orderBaseListPage, orderHistoryList } from '@/api/order'
+import { orderBaseListPage, orderHistoryList, orderInfoExport } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
@@ -104,7 +104,16 @@ const toolBtn: any[] = [
   {
     label: '导出',
     type: 'primary',
-    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History']
+    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History'],
+    exportProps: {
+      action: orderInfoExport,
+      fileName: '工单列表',
+      dict: 'WORK_EXPORT_COLUMN',
+      // options: [
+      //   {label: '标签1', value: '1'},
+      // ],
+      // otherParams: {}
+    },
   }
 ]
 

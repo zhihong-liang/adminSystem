@@ -1,21 +1,41 @@
 <script lang="ts">
-import { h, resolveDirective, withDirectives } from 'vue'
+import { ref, h, resolveDirective, withDirectives } from 'vue'
 import { ElButton } from 'element-plus'
+import CnExport from './CnExport.vue'
 
 // defineProps(['items'])
 
 export default {
-  props: ['items'],
+  props: ['items', 'params'],
   setup(props) {
     return () => {
-      const { items } = props
-
+      const exportRef = ref()
+      const { items, params } = props
       if (items?.length) {
-        return h(
-          'div',
-          {},
+        return h('div', {}, [
           items.map((button: any) => {
-            const elButton = h(ElButton, { ...button }, () => button.label)
+            const elButton = h(
+              ElButton,
+              {
+                ...button,
+                onClick: () => {
+                  if (button.exportProps) {
+                    const exportProps = {
+                      ...button.exportProps,
+                      otherParams: {
+                        ...button.exportProps.otherParams,
+                        ...params.search,
+                        ids: params.tableList.map((v: { id: string }) => v.id)
+                      }
+                    }
+                    exportRef.value.open(exportProps)
+                  } else {
+                    button.onClick && button.onClick(params)
+                  }
+                }
+              },
+              () => button.label
+            )
             if (button.directives && button.directives.length) {
               button.directives.forEach((d: any) => {
                 const directive = resolveDirective(d.label)
@@ -25,8 +45,9 @@ export default {
               })
             }
             return elButton
-          })
-        )
+          }),
+          h(CnExport, { ref: exportRef })
+        ])
       }
     }
   }

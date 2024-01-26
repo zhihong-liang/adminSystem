@@ -52,3 +52,9 @@ export const orderAudit = (data: Record<string, unknown>): Promise<Res> =>
 // 打回工单提交
 export const orderRepulse = (data: Record<string, unknown>): Promise<Res> =>
   axios.post('/api/work/workOrderBase/repulse', data)
+
+// 导出
+export const orderInfoExport = (params: Record<string, unknown>): Promise<Res> =>
+  axios.post("/api/work/workOrderBase/export", params, {
+    responseType: "blob",
+  });
