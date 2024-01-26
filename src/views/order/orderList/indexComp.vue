@@ -108,12 +108,12 @@ const toolBtn: any[] = [
     exportProps: {
       action: orderInfoExport,
       fileName: '工单列表',
-      dict: 'WORK_EXPORT_COLUMN',
+      dict: 'WORK_EXPORT_COLUMN'
       // options: [
       //   {label: '标签1', value: '1'},
       // ],
       // otherParams: {}
-    },
+    }
   }
 ]
 

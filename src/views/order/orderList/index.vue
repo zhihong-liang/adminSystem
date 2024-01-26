@@ -12,12 +12,13 @@
             >超时工单 {{ timeoutData?.timeOut }} 笔，即将超时工单
             {{ timeoutData?.soonTimeOut }} 笔</span
           >
-          <span class="tip_num_cond">查看<span>《服务标准》</span></span>
+          <span class="tip_num_cond" @click="messageRef?.open()">查看<span>《服务标准》</span></span>
         </div>
       </div>
     </template>
   </CnPage>
   <detail ref="detailRef"></detail>
+  <messageContext ref="messageRef" />
 </template>
 
 <script lang="ts" setup>
@@ -26,7 +27,9 @@ import { orderListPageAll, orderQueryWorkTimeout } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
+import messageContext from '../add/child/messageContext.vue'
 
+const messageRef = ref()
 const detailRef = ref()
 const timeoutData = ref()
 
