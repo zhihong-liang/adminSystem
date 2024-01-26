@@ -1,160 +1,187 @@
 <template>
   <CnPage v-bind="props">
     <template #codeSlot="{ row }">
-      <el-button link @click="handleOpen('Look')">{{ row.name }}</el-button>
+      <el-button link @click="handleOpen('Look', row)">{{ row.workOrderNumber }}</el-button>
     </template>
 
     <template #addition>
       <div class="tip">
-        <div class="tip_cond">查看<span style="color: var(--system-primary-color)">《服务标准》</span></div>
         <div class="tip_num">
           <span class="tip_num_title">工单超时</span>
-          <span>超时工单 5 笔，即将超时工单 5 笔</span>
+          <span
+            >超时工单 {{ timeoutData?.timeOut }} 笔，即将超时工单
+            {{ timeoutData?.soonTimeOut }} 笔</span
+          >
+          <span class="tip_num_cond">查看<span>《服务标准》</span></span>
         </div>
       </div>
     </template>
   </CnPage>
   <detail ref="detailRef"></detail>
-  <repulse ref="repulseRef"></repulse>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { getUserList } from '@/api/admin'
+import { orderListPageAll, orderQueryWorkTimeout } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
-import repulse from './child/repulse.vue'
+import useSearch from './hooks/useSearch'
 
 const detailRef = ref()
-const repulseRef = ref()
-
-const handleOpen = (type: string, all = false) => {
-  detailRef.value.open(type, all)
-}
-
-const handleRepuse = () => {
-  repulseRef.value.open()
-}
+const timeoutData = ref()
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: getUserList,
+  action: orderListPageAll,
   search: {
-    items: [
-      { label: '工单编号', prop: 'name', component: 'input' },
-      { label: '运维/巡检内容', prop: 'name', component: 'input' },
-      { label: '工单来源', prop: 'phone', component: 'select' },
-      { label: '工单类型', prop: 'phone', component: 'select' },
-      { label: '工单来源系统', prop: 'phone', component: 'select' },
-      { label: '创建单位', prop: 'phone', component: 'select' },
-      { label: '设备编号/设备接入单位设备编号', prop: 'phone', component: 'input' },
-      { label: '设备类型', prop: 'phone', component: 'select' },
-      { label: '运维人员', prop: 'phone', component: 'input' },
-      { label: '运维单位', prop: 'phone', component: 'select' },
-      { label: '生产厂商', prop: 'phone', component: 'select' },
-      { label: '行政区域', prop: 'phone', component: 'ad' },
-      { label: '工单状态', prop: 'phone', component: 'select' },
-      { label: '完成情况', prop: 'phone', component: 'select' },
-      { label: '客户评价', prop: 'phone', component: 'select' },
-      { label: '客户评价满意度', prop: 'phone', component: 'select' },
-      { label: '回访状态', prop: 'phone', component: 'select' },
-      {
-        label: '创建时间',
-        prop: 'phone',
-        component: 'datepicker',
-        props: { type: 'daterange', unlinkPanels: true }
-      },
-      {
-        label: '完成时间',
-        prop: 'phone',
-        component: 'datepicker',
-        props: { type: 'daterange', unlinkPanels: true }
-      }
-    ]
-  },
-  toolbar: {
-    items: [
-      { label: '补充', type: 'primary', onClick: () => handleOpen('Supply', true) },
-      { label: '分拨', type: 'primary', onClick: () => handleOpen('Allocation', true) },
-      { label: '派单', type: 'primary', onClick: () => handleOpen('Dispatch', true) },
-      { label: '转派', type: 'primary', onClick: () => handleOpen('Transfer', true) },
-      { label: '处理', type: 'primary', onClick: () => handleOpen('Handle', true) },
-      { label: '完成处理', type: 'primary', onClick: () => handleOpen('FinishDeal', true) },
-      { label: '退回工单', type: 'primary', onClick: () => handleOpen('Back', true) },
-      { label: '关闭工单', type: 'primary', onClick: () => handleOpen('Close', true) },
-      { label: '完成', type: 'primary', onClick: () => handleOpen('Finish', true) },
-      { label: '打回工单', type: 'primary', onClick: () => handleRepuse() },
-      { label: '导出', type: 'primary' },
-      { label: '导入', type: 'primary' }
-    ]
+    items: useSearch('All')
   },
   table: {
     columns: [
       { type: 'selection' },
-      { slot: 'codeSlot', label: '工单编号' },
-      { prop: 'name', label: '关联工单' },
-      { prop: 'name', label: '工单类型' },
-      { prop: 'name', label: '工单来源系统' },
-      { prop: 'name', label: '运维/巡检内容' },
-      { prop: 'name', label: '设备编号' },
-      { prop: 'name', label: '创建单位' },
-      { prop: 'name', label: '派单员' },
-      { prop: 'name', label: '运维人员' },
-      { prop: 'name', label: '创建时间' },
-      { prop: 'name', label: '完成时间' },
-      { prop: 'name', label: '工单耗时' },
-      { prop: 'status', label: '工单状态', dict: 'USER_STATUS' },
-      { prop: 'name', label: '客户评价' },
-      { prop: 'name', label: '客户评价满意度' },
-      { prop: 'name', label: '回访状态' },
-      { prop: 'name', label: '关闭原因' },
-      { prop: 'name', label: '备注' },
+      { slot: 'codeSlot', label: '工单编号', width: 140 },
+      { prop: 'workTypeIdText', label: '工单类型' },
+      { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS' },
+      { prop: 'orderSource', label: '工单来源', dict: 'ORDER_SOURCE' },
+      { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
+      { prop: 'devCode', label: '设备编号', width: 160 },
+      { prop: 'createUnitId', label: '创建人员单位' },
+      { prop: 'operationPersonName', label: '运维人员' },
+      { prop: 'orderApplyTime', label: '创建时间', width: 165 },
+      { prop: 'orderCloseTime', label: '完成时间' },
+      { prop: 'takeUpTime', label: '工单耗时' },
+      { prop: 'bpmNodeCode', label: '工单状态', dict: 'WORK_BPM_NODE_CODE' },
+      { prop: 'custom_evaluation', label: '客户评价' },
+      { prop: 'followUp', label: '回访情况' },
       {
         prop: 'action',
         label: '操作',
         width: 220,
         buttons: [
-          { label: '补充', type: 'primary', text: true, onClick: () => handleOpen('Supply') },
-          { label: '分拨', type: 'primary', text: true, onClick: () => handleOpen('Allocation') },
-          { label: '派单', type: 'primary', text: true, onClick: () => handleOpen('Dispatch') },
-          { label: '转派', type: 'primary', text: true, onClick: () => handleOpen('Transfer') },
-          { label: '处理', type: 'primary', text: true, onClick: () => handleOpen('Handle') },
+          {
+            label: '补充',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Supply', row, '95'),
+            visible: ({ row }) => row.bpmNodeCode === '1001'
+          },
+          {
+            label: '分拨',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Allocation', row, '2'),
+            visible: ({ row }) => row.bpmNodeCode === '1001'
+          },
+          {
+            label: '派单',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
+            visible: ({ row }) => row.bpmNodeCode === '1100'
+          },
+          {
+            label: '转派',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Transfer', row, '4'),
+            visible: ({ row }) => ['1200', '1300'].includes(row.bpmNodeCode)
+          },
+          {
+            label: '处理',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Handle', row, '6'),
+            visible: ({ row }) => row.bpmNodeCode === '1200'
+          },
           {
             label: '完成处理',
             type: 'primary',
             text: true,
-            onClick: () => handleOpen('FinishDeal')
+            onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
+            visible: ({ row }) => row.bpmNodeCode === '1300'
           },
-          { label: '退回工单', type: 'primary', text: true, onClick: () => handleOpen('Back') },
-          { label: '关闭工单', type: 'primary', text: true, onClick: () => handleOpen('Close') },
-          { label: '完成', type: 'primary', text: true, onClick: () => handleOpen('Finish') },
-          { label: '打回工单', type: 'primary', text: true, onClick: () => handleRepuse() },
-          { label: '评价', type: 'primary', text: true, onClick: () => handleOpen('Evaluate') },
-          { label: '回访', type: 'primary', text: true, onClick: () => handleOpen('Visit') }
+          {
+            label: '退回工单',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Back', row, '5'),
+            visible: ({ row }) => ['1100', '1200'].includes(row.bpmNodeCode)
+          },
+          {
+            label: '关闭工单',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Close', row, '0'),
+            visible: ({ row }) => ['1001', '1100', '1200'].includes(row.bpmNodeCode)
+          },
+          {
+            label: '完成',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Finish', row, '99'),
+            visible: ({ row }) => row.bpmNodeCode === '1400'
+          },
+          {
+            label: '评价',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
+            visible: ({ row }) => row.bpmNodeCode === '1500'
+          },
+          {
+            label: '回访',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Visit', row, '97'),
+            visible: ({ row }) => row.bpmNodeCode === '1500'
+          },
+          {
+            label: '打回工单',
+            type: 'primary',
+            text: true,
+            onClick: ({ row }) => handleOpen('Repulse', row, '98'),
+            visible: ({ row }) => row.bpmNodeCode === '1400'
+          }
         ]
       }
     ],
     data: [{}]
   }
 })
+
+const queryTimeout = () => {
+  orderQueryWorkTimeout(props.params).then((res) => {
+    if (res.code === '200') {
+      timeoutData.value = res.data
+    }
+  })
+}
+queryTimeout()
+
+const handleOpen = (type: string, data: any, workAuditType = '', all = false) => {
+  detailRef.value.open(type, data, workAuditType, all)
+}
 </script>
 
 <style lang="scss" scoped>
 .tip {
   margin-bottom: 10px;
-  &_cond {
-    text-align: right;
-    margin-bottom: 10px;
-  }
   &_num {
     border: 1px solid #e5e5e5;
     line-height: 56px;
     &_title {
       display: inline-block;
-      background:var(--system-primary-color);
+      background: var(--system-primary-color);
       color: #fff;
       padding: 0 20px;
       margin-right: 30px;
+    }
+    &_cond {
+      float: right;
+      span {
+        color: var(--system-primary-color);
+        cursor: pointer;
+      }
     }
   }
 }

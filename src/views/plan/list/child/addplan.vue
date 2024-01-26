@@ -24,6 +24,7 @@
           <el-col :span="7">
             <div v-if="isShowTree">
               <el-tree
+                :key="labelId"
                 :props="props"
                 :load="loadNode"
                 lazy
@@ -56,7 +57,7 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
-import CnPage from "@/components/cn-page/CnPage.vue";
+import CnTable from "@/components/cn-page/CnTable.vue";
 import SelectionItems from "./selectionItems.vue";
 import { type FromData } from "../../utils/type";
 import {
@@ -84,7 +85,7 @@ const selectTm = ref(true);
 const mattersMenuId = ref();
 const selectionItemsRef = ref();
 const selectData = ref()
-const emits = defineEmits(["onSubmit"]);
+const emits = defineEmits(["submit"]);
 
 const props = {
   label: "menuName",
@@ -169,10 +170,10 @@ const dialogProps: CnPage.DialogProps = reactive({
   },
 });
 
-const tableProps = reactive<CnPage.Props>({
+const tableProps = reactive<CnPage.TableProps>({
   columns: [
     { type: "selection" },
-    { label: "事项编号", slot: "matterCode" },
+    { label: "事项编号", prop: "matterCode" },
     { label: "事项名称", prop: "matterName" },
     { label: "事项别名", prop: "matterAlias" },
     { label: "事项进驻单位", prop: "entryUnitText" },
@@ -210,7 +211,7 @@ const loadNode = (node: any, resolve: (data: Tree[]) => void) => {
   }
 };
 const nodeClick = (node: any) => {
-  selectTm.value = false
+  selectTm.value = !node.mattersMenuId
   mattersMenuId.value = node.mattersMenuId
   const params = {
     programmeId: dialogProps.formProps!.model.id,
@@ -227,8 +228,17 @@ const nodeClick = (node: any) => {
     }
   })
 };
-const tabClick = (labelId: string) => {
-  fromData.labelName = labelId
+const tabClick = (id: string) => {
+  fromData.labelName = id
+  labelId.value = id
+  mattersMenuId.value = undefined
+  const item = themeList.value.find((v: { id: string; }) => v.id === id)
+  if (item) {
+    nodeClick({
+      themeId: item.themeId,
+      labelId: id
+    })
+  }
 }
 const open = async (data: any, _type: string) => {
   dialogRef.value.open();
@@ -269,6 +279,11 @@ const open = async (data: any, _type: string) => {
         labelId.value = data[0].id;
         // console.log("id", data[0].id);
         isShowTree.value = true;
+
+        nodeClick({
+          themeId: newData.themeId,
+          labelId: data[0].id,
+        })
       }
     });
   }
@@ -305,7 +320,6 @@ const deselect = () => {
     });
     return
   }
-  
 }
 const selectionItems = () => {
   // console.log(data);
@@ -321,11 +335,15 @@ function handleSubmit(action: "add" | "edit" | "select") {
   let params: any = {
     ...dialogProps.formProps!.model,
   };
-  emits("onSubmit");
+
   if (action === "add") {
-    return addMattersProgramme(params);
+    return addMattersProgramme(params).then(() => {
+      emits("submit");
+    });
   } else if (action === "edit") {
-    return putMattersProgramme(params);
+    return putMattersProgramme(params).then(() => {
+      emits("submit");
+    });
   } else if (action === "select") {
     dialogRef.value.close()
   }

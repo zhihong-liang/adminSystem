@@ -115,11 +115,11 @@ const props = reactive<CnPage.Props>({
       { label: "设备基本信息", component: "subtitle", span: 24 },
       { label: "设备编号", prop: "proDevCode", component: "input" },
       { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input" },
-      { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE", props: { multiple: true } },
+      { label: "设备类型", prop: "devTypeList", component: "select", dict: "DEV_TYPE", props: { multiple: true } },
       { label: "设备型号", prop: "status", component: "input" },
       {
         label: "硬件模块",
-        prop: "hardware",
+        prop: "hardwareList",
         component: "select",
         dict: "HARDWARE_MODULE",
         props: { multiple: true }
@@ -131,7 +131,7 @@ const props = reactive<CnPage.Props>({
         component: "select",
         dict: "DEV_ACCES_TYPE",
       },
-      { label: "政务程序版本号", prop: "procedureVersion", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
+      { label: "政务程序版本号", prop: "procedureVersionList", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
       { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { type: 'datetimerange' } },
       { label: "设备分组", prop: "group", component: "select" },
       { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
@@ -147,7 +147,7 @@ const props = reactive<CnPage.Props>({
       { label: "自助终端管理员", prop: "managePersonName", component: "select" },
       {
         label: "网络策略",
-        prop: "networkPolicy",
+        prop: "networkPolicyList",
         component: "select",
         dict: "NETWORD_POLICY",
         props: { multiple: true }
@@ -165,10 +165,6 @@ const props = reactive<CnPage.Props>({
       size,
       obj: {
         ...params,
-        devType: params.devType?.join(','),
-        // hardware: params.hardware?.join(','),
-        networkPolicy: params.networkPolicy?.join(','),
-        procedureVersion: params.procedureVersion?.join(','),
         installActivateStartTime,
         installActivateEndTime
       }
@@ -294,10 +290,10 @@ const props = reactive<CnPage.Props>({
       { type: "selection" },
       { label: "设备编号", slot: "proDevCode" },
       { label: "设备接入单位设备编号", prop: "unitDevCode" },
-      { label: "设备型号", prop: "status", dict: "devModelNo" },
+      { label: "设备型号", prop: "devModelNo" },
       { label: "行政区划", prop: "regionDetail" },
       { label: "详细地址", prop: "detailAddress" },
-      { label: "自助终端管理员联系方式", prop: "terminalManagePhone" },
+      { label: "自助终端管理员联系方式", prop: "managePersonContact" },
       { label: "安装激活时间", prop: "installActivateTime" },
       { label: "政务程序版本号", prop: "procedureVersion" },
       { label: "状态", prop: "status", dict: "DEV_STATUS" },
@@ -318,7 +314,7 @@ const props = reactive<CnPage.Props>({
                   res.data.devConf.type = "edit";
                   basicInfoData.value = res.data.baseInfo;
                   hardwareModuleData.value = res.data.baseInfo;
-                  deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite};
+                  deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
                   // deploymentSiteData.value = res.data.devDeploymentSite;
                   configInfoData.value = res.data.devConf;
                   deploymentSiteData.value.ip = res.data.baseInfo.ip
@@ -348,7 +344,7 @@ function viewDetail(row: any) {
       res.data.devConf.type = "view";
       basicInfoData.value = res.data.baseInfo;
       hardwareModuleData.value = res.data.baseInfo;
-      deploymentSiteData.value = res.data.devDeploymentSite;
+      deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
       configInfoData.value = res.data.devConf;
       dialoTitle.value = "设备详情";
       dialogRef.value?.open();

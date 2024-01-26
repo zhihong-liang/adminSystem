@@ -55,7 +55,6 @@
 <script lang="ts" setup>
 import { reactive, ref, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
-import { getUnitListUtils } from "../../utils/index";
 
 const timeSlotList = reactive([
   { checked: true, startTime: "09:00", endTime: "17:00" },
@@ -84,7 +83,6 @@ const props = defineProps({
 });
 
 const basisRef = ref();
-const groupList: any = ref([])
 const basisForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
@@ -200,7 +198,7 @@ const basisForm: any = reactive({
       label: "设备管理单位",
       prop: "devManageUnit",
       component: "select",
-      props: { options: groupList },
+      dict: "UNIT_LIST"
     },
     {
       label: "自助终端管理员",
@@ -221,7 +219,7 @@ const basisForm: any = reactive({
       label: "设备技术支撑单位",
       prop: "supportingUnit",
       component: "select",
-      props: { options: groupList },
+      dict: "UNIT_LIST"
     },
     {
       label: "运维人员",
@@ -259,9 +257,9 @@ defineExpose({ validateForm, getFormData });
 
 watchEffect(async () => {
   if (props.model) {
-    groupList.value = await getUnitListUtils().then(res => { return res})
-    props.model.networkPolicy = props.model.networkPolicy.split(",");
-    basisForm.model = props.model;
+    basisForm.model = { ...props.model, networkPolicy: props.model.networkPolicy.split(",") };
+    // 传的时候还是字符串，取的时候变成数字了
+    // if (typeof props.model.supportingUnit === 'number') basisForm.model.supportingUnit = String(props.model.supportingUnit)
     const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
     ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((v, i) => {
       const [startTime, endTime] = v.split(' - ')

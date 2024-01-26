@@ -14,6 +14,7 @@ export default {
         ElTable,
         {
           ...tableProps,
+          ref: 'tableRef',
           'onSelection-change': (selection) =>
             props.selectionChange && props.selectionChange(selection)
         },
@@ -47,8 +48,9 @@ export default {
                         ElButton,
                         {
                           ...button,
-                          size: 'small',
+                          text: true,
                           directives: null,
+                          style: "padding: 0",
                           onClick: (evt) => button.onClick && button.onClick(params, evt)
                         },
                         () => button.label
@@ -61,7 +63,7 @@ export default {
                           }
                         })
                       }
-                      return elButton
+                      return (!button.visible || button.visible(params)) && elButton
                     })
                   } else if (column.icons) {
                     return column.icons.map((icon) => {

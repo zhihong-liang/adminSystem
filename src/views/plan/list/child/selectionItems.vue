@@ -2,7 +2,7 @@
   <CnDialog v-bind="dialogProps" ref="dialogRef">
     <div class="wrap" v-loading="loading">
       <div class="table-left">
-        <CnTable max-height="700px" v-bind="tableProps"></CnTable>
+        <CnTable max-height="700px" v-bind="tableProps" ref="tableRef"></CnTable>
       </div>
       <div class="table-icon">
         <el-icon>
@@ -21,14 +21,15 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, computed } from "vue";
+import { reactive, ref } from "vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
-import CnPage from "@/components/cn-page/CnPage.vue";
+import CnTable from "@/components/cn-page/CnTable.vue";
 import {
   mattersProgrammeRelationListProgrammeMatters,
   mattersProgrammeRelationAddList,
 } from "@/api/matter";
-import { ElMessage } from "element-plus";
+import { ElMessage, type TableInstance } from "element-plus";
+
 const emits = defineEmits(["onHandleSubmit"]);
 const dialogRef = ref();
 const loading = ref(false);
@@ -38,7 +39,8 @@ const dialogProps: CnPage.DialogProps = reactive({
   width: 1200,
 });
 
-const tableProps = reactive<CnPage.Props>({
+const tableRef = ref()
+const tableProps = reactive<CnPage.TableProps>({
   columns: [
     { type: "selection" },
     { label: "事项编号", slot: "matterCode" },
@@ -49,11 +51,14 @@ const tableProps = reactive<CnPage.Props>({
     { label: "事项状态", prop: "matterStatus", dict: "MATTER_STATUS" },
   ],
   data: [],
-  onSelect: (selection: any) => {
+  onSelect: (selection) => {
     selectTableProps.data = selection;
   },
+  onSelectAll: (selection) => {
+    selectTableProps.data = selection
+  }
 });
-const selectTableProps = reactive<CnPage.Props>({
+const selectTableProps = reactive<CnPage.TableProps>({
   columns: [
     { label: "事项编号", slot: "matterCode" },
     { label: "事项名称", prop: "matterName" },
@@ -71,11 +76,16 @@ const selectTableProps = reactive<CnPage.Props>({
           type: "primary",
           text: true,
           onClick: ({ row }) => {
-            console.log(tableProps);
-            
-            // selectTableProps.data = selectTableProps.data.filter(
-            //   (item) => item.mattersId !== row.mattersId
-            // );
+            selectTableProps.data = selectTableProps.data.filter(
+              (item) => item.mattersId !== row.mattersId
+            );
+            const tableIns = tableRef.value?.$refs?.tableRef as TableInstance
+            if (!tableIns) return
+            const rows = tableIns.getSelectionRows() || []
+            const current = rows.find((v: { mattersId: string; }) => v.mattersId === row.mattersId)
+            if (current) {
+              tableIns.toggleRowSelection(current, false)
+            }
           },
         },
       ],
@@ -98,6 +108,7 @@ const open = (data: any) => {
     .finally(() => {
       loading.value = false;
     });
+  selectTableProps.data = []
 };
 
 const handleSubmit = () => {

@@ -14,15 +14,16 @@ export default defineConfig({
     vue(),
     vueJsx(),
     AutoImport({
-      resolvers: [ElementPlusResolver()],
+      resolvers: [ElementPlusResolver()]
     }),
     Components({
-      resolvers: [ElementPlusResolver()],
-    }),
+      resolvers: [ElementPlusResolver()]
+    })
   ],
-  base: "/selfHelp",
+
+  base: '/selfHelp',
   build: {
-    outDir: "selfHelp",
+    outDir: 'selfHelp'
   },
   resolve: {
     alias: {
@@ -32,6 +33,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/selfHelp/api': 'http://192.168.10.212/'
-    }
+    },
+    host: '0.0.0.0',
+    port: 3000,
+    open: true
   }
 })

@@ -79,8 +79,8 @@ interface Login {
 }
 export const login = (data: Login): Promise<Res> => axios.post('/api/auth/jwt/logon', data)
 
-export const getLogonStatus = (data: { userName: string }): Promise<Res> => axios.post('/api/auth/jwt/logonStatus', data)
-
+export const getLogonStatus = (data: { userName: string }): Promise<Res> =>
+  axios.post('/api/auth/jwt/logonStatus', data)
 
 /**
  * 获取字典接口
@@ -142,7 +142,7 @@ export interface UserInfo {
   unitLevel?: string
   unitName?: string
   unitType?: string
-  unitId?: string
+  unitId?: number
   updateTime?: string
   updateUser?: string
   userAuthType?: string
@@ -204,5 +204,5 @@ export const queryUserInfo = (id: number): Promise<Res<UserInfo>> =>
 
 export * from './sys'
 export * from './device'
-export * from "./front"
-export * from "./monitor"
+export * from './front'
+export * from './monitor'

@@ -3,12 +3,11 @@
     <template #paidan>
       <CnPage v-bind="pdPage" style="width: 100%" />
       <div class="chost">
-        <span>已选运维人员</span>
-        <div class="chost_tag">
-          <el-tag v-for="(item, index) in 9" :key="index" style="margin: 0 10px 10px 0"
-            >张三 13829773455</el-tag
-          >
-        </div>
+        <span v-if="choisePerson?.name"
+          >已选运维人员<el-tag class="chost_tag"
+            >{{ choisePerson?.name }} {{ choisePerson?.phone }}</el-tag
+          ></span
+        >
       </div>
     </template>
 
@@ -18,8 +17,8 @@
 
     <template #eveaSlot>
       <div style="margin-right: 30px">
-        <div>态度：<el-rate v-model="baseForm.model.attude" /></div>
-        <div>效率：<el-rate v-model="baseForm.model.ratio" /></div>
+        <div>态度：<el-rate v-model="baseForm.model.evaluationAttitude" /></div>
+        <div>效率：<el-rate v-model="baseForm.model.evaluationEfficiency" /></div>
       </div>
       <el-button>重新评分</el-button>
     </template>
@@ -30,135 +29,233 @@
 import CnForm from '@/components/cn-page/CnForm.vue'
 import { reactive, ref, inject, computed } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
+import { getUnitList, getUserList } from '@/api/admin'
+import { useLoginStore } from '@/stores'
 
-const titleType = ref(inject('titleType') as string)
+const { userInfo } = useLoginStore()
+
+const btnType = ref(inject('btnType') as string)
+const homeData = ref(inject('homeData') as Record<string, unknown>)
 
 const formRef = ref()
+const unitList = ref()
+const userList = ref()
+
+const choisePerson = ref()
 
 const allForm: any = reactive({
-  Supply: [{ label: '补充说明', prop: 'status', component: 'input', props: { type: 'textarea' } }],
+  Supply: [{ label: '补充说明', prop: 'remark', component: 'input', props: { type: 'textarea' } }],
   Allocation: [
-    { label: '运维单位', prop: 'yuwei', component: 'select', dict: 'USER_STATUS' },
-    { label: '运维人员', prop: 'status', component: 'select' },
-    { label: '手机号码', prop: 'status' }
+    {
+      label: '运维单位',
+      prop: 'operationUnitId',
+      component: 'select',
+      props: { options: computed(() => unitList.value), onChange: (val: string) => changeUnit(val) }
+    },
+    {
+      label: '运维人员',
+      prop: 'operationPersonId',
+      component: 'select',
+      props: {
+        options: computed(() => userList.value),
+        onChange: (val: string) => {
+          baseForm.model.operationPersonContact = userList.value.find(
+            (v: { id: string }) => val === v.id
+          ).telephone
+        }
+      }
+    },
+    { label: '手机号码', prop: 'operationPersonContact' }
   ],
   Dispatch: [{ component: 'slot', prop: 'paidan' }],
   Transfer: [
     { component: 'slot', prop: 'paidan' },
-    { label: '转单原因', component: 'input', prop: 'yyuan' }
+    { label: '转单原因', component: 'input', prop: 'remark' }
   ],
   Handle: [
-    { label: '运维人员姓名', prop: 'status' },
-    { label: '运维人员手机号码', prop: 'status' },
+    { label: '运维人员姓名', prop: 'operationPersonName' },
+    { label: '运维人员手机号码', prop: 'operationPersonContact' },
+    { component: 'slot', prop: 'handlSlot' },
     {
-      label: '预约上门服务时间',
-      prop: 'yytime',
+      label: '运维方式',
+      prop: 'repairType',
+      component: 'select',
+      dict: 'WORK_ORDER_REAIR_TYPE'
+    },
+    {
+      label: '到达现场',
+      prop: 'position',
+      component: 'input',
+      visible: () => baseForm.model?.repairType === '2'
+    },
+    {
+      label: '到达现场时间',
+      prop: 'positionTime',
       component: 'datepicker',
+      visible: () => baseForm.model?.repairType === '2',
       props: {
         type: 'datetime',
         format: 'YYYY-MM-DD HH:mm',
         dateFormat: 'MMM DD, YYYY',
         timeFormat: 'HH:mm'
       }
-    },
-    { component: 'slot', prop: 'handlSlot' },
-    {
-      label: '运维方式',
-      prop: 'opetype',
-      component: 'select',
-      props: {
-        options: [
-          { label: '电话运维', value: '1' },
-          { label: '现场运维', value: '2' }
-        ]
-      }
-    },
-    {
-      label: '到达现场',
-      prop: 'status',
-      component: 'select',
-      visible: () => baseForm.model?.opetype === '2'
-    },
-    {
-      label: '到达现场时间',
-      prop: 'status',
-      component: 'input',
-      visible: () => baseForm.model?.opetype === '2'
     }
   ],
   FinishDeal: [
-    { label: '运维人员姓名', prop: 'name' },
-    { label: '运维人员手机号码', prop: 'name' },
-    { label: '预约上门服务时间', prop: 'name' },
-    { label: '运维方式', prop: 'name' },
-    { label: '运维说明', prop: 'name', component: 'input', props: { type: 'textarea' } },
-    { label: '图片(上传签收单)', prop: 'name', component: 'input' }
+    { label: '运维人员姓名', prop: 'operationPersonName' },
+    { label: '运维人员手机号码', prop: 'operationPersonContact' },
+    { label: '运维方式', prop: 'repairType', dict: 'WORK_ORDER_REAIR_TYPE' },
+    { label: '运维说明', prop: 'remark', component: 'input', props: { type: 'textarea' } },
+    { label: '图片(上传签收单)', prop: 'handleFile', component: 'upload' }
   ],
   Back: [
-    { label: '退回原因', prop: 'name', component: 'select' },
+    { label: '退回原因', prop: 'dfThresult', component: 'select', dict: 'WORK_ORDER_REPULSE_TYPE' },
     { label: '备注', prop: 'name', component: 'input', props: { type: 'textarea' } }
   ],
   Close: [
-    { label: '关闭原因', prop: 'name', component: 'select' },
-    { label: '备注', prop: 'name', component: 'input', props: { type: 'textarea' } }
+    { label: '关闭原因', prop: 'dfGbresult', component: 'select', dict: 'WORK_ORDER_CLOSE_TYPE' },
+    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } }
   ],
   Finish: [
-    { label: '完成原因', prop: 'name', component: 'select' },
-    { label: '备注', prop: 'name', component: 'input', props: { type: 'textarea' } }
+    {
+      label: '完成原因',
+      prop: 'dfEcresult',
+      component: 'select',
+      dict: 'WORK_ORDER_END_TYPE'
+    },
+    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } }
   ],
   Evaluate: [
     { label: '评价', prop: 'eveaSlot', component: 'slot' },
-    { label: '处理结果', prop: 'name', component: 'radio', dict: 'USER_STATUS' },
-    { label: '评价内容', prop: 'name', component: 'input', props: { type: 'textarea' } }
+    { label: '处理结果', prop: 'dfClesult', component: 'radio', dict: 'WORK_ORDER_RESULT' },
+    { label: '评价内容', prop: 'remark', component: 'input', props: { type: 'textarea' } }
   ],
   Visit: [
-    { label: '是否满意', prop: 'name', component: 'radio', dict: 'USER_STATUS' },
-    { label: '回访记录', prop: 'name', component: 'input', props: { type: 'textarea' } }
+    { label: '是否满意', prop: 'followUp', component: 'radio', dict: 'WORK_ORDER_SATISFACTION' },
+    { label: '回访记录', prop: 'remark', component: 'input', props: { type: 'textarea' } }
+  ],
+  Repulse: [
+    { label: '打回原因', prop: 'dfResult', component: 'select', dict: 'WORK_ORDER_REPULSE' },
+    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } }
   ]
 } as Record<string, unknown>)
 
 const baseForm = reactive<CnPage.DialogProps>({
   model: {},
-  items: allForm[titleType.value],
+  items: allForm[btnType.value],
   labelWidth: 100,
   colSpan: 24,
   rules: {
-    yuwei: [{ required: true, message: '请选择运维单位' }],
+    operationUnitId: [{ required: true, message: '请选择运维单位' }],
+    operationPersonId: [{ required: true, message: '请选择运维人员' }],
+    dfThresult: [{ required: true, message: '请选择退回原因' }],
+    dfGbresult: [{ required: true, message: '请选择关闭原因' }],
+    dfEcresult: [{ required: true, message: '请选择完成原因' }],
+    dfClesult: [{ required: true, message: '请选择处理结果' }],
+    followUp: [{ required: true, message: '请选择是否满意' }],
+    dfResult: [{ required: true, message: '请选择打回原因' }],
+    repairType: [{ required: btnType.value === 'Handle', message: '请选择运维方式' }],
+    position: [{ required: true, message: '不能为空' }],
+    handleFile: [{ required: true, message: '请上传签收单' }],
     eveaSlot: [
       {
         required: true,
         validator: (rule: any, value: any, callback: any) => {
-          if (baseForm.model.attude && baseForm.model.ratio) {
+          if (baseForm.model.evaluationAttitude && baseForm.model.evaluationEfficiency) {
             callback()
           } else {
             callback(new Error('请为态度和效率打分'))
           }
         }
       }
+    ],
+    remark: [
+      {
+        required: ['Supply', 'Transfer', 'FinishDeal'].includes(btnType.value),
+        message: '不能为空'
+      }
     ]
   }
 })
 
+switch (btnType.value) {
+  case 'Handle':
+    baseForm.model.operationPersonName = homeData.value.operationPersonName
+    baseForm.model.operationPersonContact = homeData.value.operationPersonContact
+    break
+  case 'FinishDeal':
+    baseForm.model.operationPersonName = homeData.value.operationPersonName
+    baseForm.model.operationPersonContact = homeData.value.operationPersonContact
+    baseForm.model.repairType = homeData.value.repairType
+    break
+}
+
 defineExpose({ formRef: formRef, model: baseForm.model })
 
 const pdPage: CnPage.Props = reactive({
-  params: {},
-  action: () => Promise.reject(),
+  params: { status: '1', currentRoleId: '23', unitId: userInfo.unitId },
+  action: getUserList,
   search: {
     items: [
-      { label: '行政区域', prop: 'xz', component: 'ad', props: { props: { checkStrictly: true } } },
+      { label: '行政区划', prop: 'regionName', component: 'input' },
       { label: '运维人员', prop: 'name', component: 'input' }
     ]
   },
   table: {
     columns: [
-      { type: 'selection' },
-      { prop: 'ad', label: '行政区域' },
-      { prop: 'yunfei', label: '运维人员' },
+      { prop: 'regionName', label: '行政区域' },
+      { prop: 'name', label: '运维人员' },
       { prop: 'phone', label: '手机号码' }
-    ]
+    ],
+    highlightCurrentRow: true,
+    onCurrentChange: (data) => {
+      choisePerson.value = data
+      baseForm.model.operationPersonId = data.id
+      baseForm.model.operationPersonName = data.name
+      baseForm.model.operationPersonContact = data.phone
+    }
   }
 })
+
+// 查询运维单位
+const queryUnitList = () => {
+  if (btnType.value === 'Allocation') {
+    getUnitList({
+      page: 1,
+      size: 1000,
+      obj: {}
+    }).then((res) => {
+      if (res.code === '200') {
+        unitList.value = res.rows.map((v) => ({
+          label: v.fullName,
+          value: v.id
+        }))
+      }
+    })
+  }
+}
+queryUnitList()
+
+// 查询运维人员
+const changeUnit = (val: string) => {
+  getUserList({
+    page: 1,
+    size: 1000,
+    obj: {
+      status: '1',
+      unitId: val,
+      currentRoleId: '22'
+    }
+  }).then((res) => {
+    if (res.code === '200') {
+      userList.value = res.rows.map((v) => ({
+        label: v.name,
+        value: v.id,
+        ...v
+      }))
+    }
+  })
+}
 </script>
 
 <style lang="scss" scoped>
@@ -169,8 +266,7 @@ const pdPage: CnPage.Props = reactive({
   overflow: hidden;
   margin: 15px 0;
   &_tag {
-    width: 89%;
-    float: right;
+    margin-left: 15px;
   }
 }
 </style>

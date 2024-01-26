@@ -2,19 +2,19 @@
   <CnDialog :title="`新建${propData?.workTypeName}`" ref="dialogRef">
     <el-tabs v-model="activeName">
       <el-tab-pane label="基本信息" name="first">
-        <CnForm v-bind="baseForm"></CnForm>
+        <CnForm v-bind="baseForm" ref="baseRef"></CnForm>
       </el-tab-pane>
       <el-tab-pane label="工作信息" name="second">
-        <CnForm v-bind="wordForm">
+        <CnForm v-bind="wordForm" ref="wordRef">
           <template #deviceSlot>
             <CnDict
-              v-model="wordForm.model.devCode"
+              v-model="wordForm.model.dfdevCode"
               component="radio"
               :options="numRadio"
               @change=""
             ></CnDict>
             <CnDict
-              v-if="wordForm.model.devCode === '2'"
+              v-if="wordForm.model.dfdevCode === '2'"
               v-model="wordForm.model.select"
               multiple
               collapse-tags
@@ -46,13 +46,24 @@
 import { reactive, ref, computed } from 'vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import CnForm from '@/components/cn-page/CnForm.vue'
-import { getOrderType, orderAddOperat } from '@/api/order'
+import { ElMessage } from 'element-plus'
+import {
+  orderAddOperat,
+  orderAddConsumable,
+  orderAddInstallation,
+  orderAddUpgrade,
+  getOrderType
+} from '@/api/order'
 import { devBaseInfoListPage } from '@/api/device'
 import { useLoginStore } from '@/stores'
 
-console.log('useLoginStore', useLoginStore())
+const { userInfo } = useLoginStore()
+
 const dialogRef = ref()
-const propData = ref()
+const baseRef = ref()
+const wordRef = ref()
+
+const propData = ref({} as any)
 const activeName = ref('first')
 const orderList = ref([] as any)
 const numSelect = ref([] as any)
@@ -70,34 +81,68 @@ const baseForm = reactive({
       prop: 'workTypeId',
       component: 'select',
       props: {
-        options: computed(() => orderList.value)
+        options: computed(() => orderList.value),
+        disabled: true
       }
     },
     { label: '工单来源', prop: 'orderSource', component: 'select', dict: 'ORDER_SOURCE' },
-    { label: '提交人', prop: 'submitterName', component: 'input' },
-    { label: '提交人电话', prop: 'submitterPhone', component: 'input' },
+    { label: '提交人', prop: 'submitterName' },
+    { label: '提交人电话', prop: 'submitterPhone' },
     { label: '紧急程度', prop: 'urgencyLevel', component: 'select', dict: 'WORK_URGENCY_LEVEL' }
   ],
   labelWidth: 100,
   colSpan: 24,
-  rules: {}
+  rules: {
+    workTypeId: [{ required: true, message: '请选择工单类型' }],
+    orderSource: [{ required: true, message: '请选择工单来源' }],
+    submitterPhone: [{ required: true, message: '请输入提交人电话' }],
+    urgencyLevel: [{ required: true, message: '请选择紧急程度' }]
+  }
 })
 
 const wordForm = reactive({
   model: {} as any,
   items: [
-    { label: '设备编号', prop: 'deviceSlot', component: 'slot' },
+    {
+      label: '设备编号',
+      prop: 'deviceSlot',
+      component: 'slot',
+      visible: () => propData.value.id !== '3'
+    },
+    {
+      label: '安装设备数',
+      prop: 'installationCount',
+      component: 'input',
+      visible: () => propData.value.id === '3'
+    },
+    {
+      label: '行政区域',
+      prop: 'ad',
+      component: 'ad',
+      props: { props: { checkStrictly: true } },
+      visible: () => propData.value.id === '3'
+    },
     { label: '情况描述', prop: 'description', component: 'select', dict: 'WORK_DESCIPTION' },
     { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } },
     { label: '附件', prop: 'imagePath', component: 'upload' }
   ],
   labelWidth: 100,
   colSpan: 24,
-  rules: {}
+  rules: {
+    installationCount: [{ required: true, message: '请输入安装设备数' }],
+    // ad: [{ required: true, message: '请选择行政区域' }],
+    description: [{ required: true, message: '请选择情况描述' }]
+  }
 })
 
 const open = (data: any) => {
+  console.log('data', data)
+  baseForm.model = {}
+  wordForm.model = {}
   propData.value = data
+  baseForm.model.workTypeId = data.id
+  baseForm.model.submitterName = userInfo.name
+  baseForm.model.submitterPhone = userInfo.telephone
   queryOrderType()
   queryDevNum()
   dialogRef.value.open()
@@ -105,32 +150,71 @@ const open = (data: any) => {
 defineExpose({ open })
 
 const handleSubmit = () => {
-  let workOrderBaseList: any[] = []
-  const list = numSelect.value.filter((v: any) => v.id === wordForm.model.select1)
-  workOrderBaseList = list.map((v: any) => ({
-    address: v.regionDetail,
-    devId: v.id,
-    cityCode: v.cityCode,
-    districtCode: v.districtCode,
-    streetCode: v.streetCode,
-    villageCode: v.villageCode,
-    manufacturer: v.manufacturer,
-    provinceCode: v.provinceCode,
-    defId: propData.value.defId,
-    devType: propData.value.devType,
-    orderSourceOs: '1',
-    createUnitId: '',
-    createUnit: '',
-    ...baseForm.model,
-    ...wordForm.model,
-  }))
-  const params = {
-    ...baseForm.model,
-    ...wordForm.model,
-    workOrderBaseList: workOrderBaseList
+  const action: Record<string, any> = {
+    1: orderAddOperat, // 新增运维接口
+    2: orderAddConsumable, // 耗材
+    3: orderAddInstallation, // 安装
+    4: orderAddUpgrade // 升级
   }
-  orderAddOperat(params).then((res: any) => {
-    console.log('提交', res)
+
+  const valid1 = baseRef.value.formRef.validate()
+  const valid2 = wordRef.value.formRef.validate()
+  Promise.all([valid1, valid2]).then(() => {
+    let workOrderBaseList: any[] = []
+    let list = []
+    if (propData.value.id === '3') {
+      // 安装工单
+      workOrderBaseList.push({
+        defId: propData.value.defId,
+        orderSourceOs: '1',
+        createUnitId: userInfo.unitId,
+        createUnit: userInfo.unitName,
+        ...baseForm.model,
+        ...wordForm.model
+      })
+    } else {
+      if (wordForm.model.dfdevCode === '2') {
+        list = numSelect.value.filter((v: any) => wordForm.model.select.includes(v.id))
+      } else {
+        list = numSelect.value.filter((v: any) => v.id === wordForm.model.select1)
+      }
+
+      workOrderBaseList = list.map((v: any) => ({
+        address: v.regionDetail,
+        devId: v.id,
+        cityCode: v.cityCode,
+        districtCode: v.districtCode,
+        streetCode: v.streetCode,
+        villageCode: v.villageCode,
+        manufacturer: v.manufacturer,
+        provinceCode: v.provinceCode,
+        devType: v.devType,
+        devCode: v.proDevCode,
+        defId: propData.value.defId,
+        orderSourceOs: '1',
+        createUnitId: userInfo.unitId,
+        createUnit: userInfo.unitName,
+        ...baseForm.model,
+        ...wordForm.model
+      }))
+    }
+
+    const params = {
+      ...baseForm.model,
+      ...wordForm.model,
+      workOrderBaseList: workOrderBaseList
+    }
+
+    action[propData.value.id](params)
+      .then((res: any) => {
+        if (res.code === '200') {
+          dialogRef.value.close()
+          ElMessage.success(res.message)
+        }
+      })
+      .catch((arr) => {
+        console.log(arr)
+      })
   })
 }
 

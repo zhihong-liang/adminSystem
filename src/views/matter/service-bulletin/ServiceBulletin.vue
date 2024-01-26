@@ -29,6 +29,30 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
+      <!-- 信息展示期 -->
+      <template #startDate>
+        <div class="dateRange">
+          <el-date-picker
+            v-model="dialogProps.formProps!.model.startDate"
+            type="datetime"
+            placeholder="请选择开始时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
+            time-format="HH:mm"
+            :disabled-date="disabledStartDate"
+          />
+          <div>至</div>
+          <el-date-picker
+            v-model="dialogProps.formProps!.model.endDate"
+            type="datetime"
+            placeholder="请选择结束时间"
+            value-format="YYYY-MM-DD HH:mm:ss"
+            format="YYYY-MM-DD HH:mm"
+            time-format="HH:mm"
+            :disabled-date="disabledEndDate"
+          />
+        </div>
+      </template>
       <!-- 公告状态 -->
       <template #noticeStatus>
         <el-text type="default" v-if="noticeStatus === '3'">已下架</el-text>
@@ -148,6 +172,22 @@ const props = reactive<CnPage.Props>({
   }
 })
 
+// 日期禁用
+function disabledStartDate(date: Date) {
+  if (dialogProps.formProps?.model.endDate) {
+    const startDate = moment(date).valueOf()
+    const endData = moment(dialogProps.formProps.model.endDate, 'YYYY-MM-DD').valueOf()
+    return startDate >= endData
+  }
+}
+function disabledEndDate(date: Date) {
+  if (dialogProps.formProps?.model.startDate) {
+    const startDate = moment(dialogProps.formProps.model.startDate).valueOf()
+    const endData = moment(date).valueOf()
+    return endData <= startDate
+  }
+}
+
 // 弹窗确定按钮的点击
 function dialogSubmitSuccess() {
   props.refresh = new Date().getTime()
@@ -157,8 +197,8 @@ function dialogSubmitSuccess() {
 function addServiceNoticeAction() {
   const { userInfo } = JSON.parse(localStorage.getItem('user')!)
   const model = dialogProps.formProps?.model || {}
-  model.startDate = moment(model.date[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
-  model.endDate = moment(model.date[1], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
+  model.startDate = model.startDate
+  model.endDate = model.endDate
   model.pushAreaCode = model.pushAreaCode.join(',')
   model.deviceType = model.deviceType.join(',')
   model.createUser = userInfo.name
@@ -172,8 +212,8 @@ function addServiceNoticeAction() {
 // 编辑服务公告
 function editServiceNoticeAction() {
   const model = dialogProps.formProps?.model || {}
-  model.startDate = moment(model.date[0], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
-  model.endDate = moment(model.date[1], 'YYYY-MM-DD HH:mm:ss').format('YYYY-MM-DD HH:mm:00')
+  model.startDate = model.startDate
+  model.endDate = model.endDate
   model.pushAreaCode = model.pushAreaCode.join(',')
   model.deviceType = model.deviceType.join(',')
   let nodesInfo = cascaderRef.value?.getCheckedNodes(true)
@@ -203,7 +243,6 @@ function pushDownServiceNoticeAction() {
   }, 1000)
 }
 
-// 设置tollbar点击弹窗的配置
 async function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
@@ -211,11 +250,10 @@ async function showDialog(handle: ActionType, row?: any) {
     const model = handle === 'edit' ? { ...window.structuredClone(toRaw(row)) } : {}
     if (handle === 'edit') {
       // 编辑
-      model.date = [model.startDate, model.endDate]
       model.pushAreaCode = model.pushAreaCode.split(',')
       model.deviceType = model.deviceType.split(',')
     } else {
-      model.date = [moment().format('YYYY-MM-DD HH:mm:ss'), '']
+      model.startDate = moment().format('YYYY-MM-DD HH:mm:00')
     }
     const dialogConfig = getDialogConfig(handle)({
       handle,
@@ -274,5 +312,13 @@ async function showDialog(handle: ActionType, row?: any) {
   width: 100%;
   justify-content: center;
   display: flex;
+}
+
+.dateRange {
+  width: 100%;
+  display: flex;
+  :deep(.el-date-editor) {
+    flex: 1;
+  }
 }
 </style>

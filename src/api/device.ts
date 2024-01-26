@@ -256,3 +256,38 @@ export const queryEditDevLicense = (data: DevLicenseInfo): Promise<Res> =>
 // 导出设备许可信息列表
 export const queryExportDevLicense = (data: DevLicenseInfo): Promise<Res> =>
   axios.post('/api/device/devLicense/export', data, { responseType: 'blob' })
+
+/*
+ * 查询设备接入申请表列表
+ */
+interface DeviceAccessInfo {
+  id?: string
+  devAccessUnit?: string
+  auditStatus?: string
+}
+interface ManagePerson {
+  currentRoleId: string
+  status: string
+  name: string
+}
+// 查询事项信息列表
+export const getDevAccessApplyList = (data: ListReq<DeviceAccessInfo>): Promise<ListRes> =>
+  axios.post('/api/device/devAccessApply/listPage', data)
+// 查询自助终端管理员
+export const getManagePersonList = (data: ListReq<ManagePerson>): Promise<ListRes> =>
+  axios.post('/api/admin/user/list', data)
+// 新增设备接入申请表
+export const devAccessApply = (data: any): Promise<Res> =>
+  axios.post('/api/device/devAccessApply', data)
+// 撤回申请
+export const revokeDevApply = (ids: string, data: any): Promise<Res> =>
+  axios.post(`/api/device/devAccessApply/revoke/${ids}`, data)
+// 获取设备接入申请表详细信息
+export const devAccessApplyDetail = (id: string): Promise<Res> =>
+  axios.get(`/api/device/devAccessApply/${id}`)
+// 查询设备基本信息-记录列表（分页)
+export const devBaseInfoHisList = (data: any): Promise<Res> =>
+  axios.post(`/api/device/devBaseInfoHis/listPage`, data)
+// 获取设备接入流程信息
+export const getDevAccessApplyHis = (id: string): Promise<Res> =>
+  axios.get(`/api/device/devAccessApply/getHis/${id}`)

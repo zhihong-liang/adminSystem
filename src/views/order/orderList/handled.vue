@@ -7,6 +7,7 @@ import { reactive } from 'vue'
 import indexComp from './indexComp.vue'
 
 const data = reactive({
-  type: 'Handled'
+  type: 'Handled',
+  bpmNodeCode: '1400'
 })
 </script>

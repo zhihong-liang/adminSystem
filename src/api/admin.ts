@@ -148,6 +148,8 @@ export const getRoleList = (data: ListReq): Promise<ListRes> => axios.post('/api
 export const getRoleDetail = (id: number): Promise<Res> => axios.get('/api/admin/sysRole/get/' + id)
 // 新增编辑-获取用户详细信息
 export const getUserDetail = (id: number): Promise<Res> => axios.get('/api/admin/user/get/' + id)
+// 同步工作流
+export const getUserSync = (ids: string): Promise<Res> => axios.get('/api/admin/user/userSync/' + ids)
 
 
 // 查下菜单树
@@ -162,3 +164,14 @@ export const sysRoleGetId = (id: Record<string, unknown>): Promise<Res> => axios
 export const sysRoleEdit = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/sysRole/edit', data)
 // 切换角色 
 export const userRoleSwitch = (data: Record<string, unknown>): Promise<Res> => axios.put('/api/admin/user/roleSwitch', data)
+
+// 文案管理
+// 列表
+export const writeQueryList = (data: ListReq): Promise<ListRes> =>
+  axios.post('/api/admin/copywriting/list', data)
+// 修改提交
+export const writeEdit = (data: Record<string, unknown>): Promise<Res> =>
+  axios.put('/api/admin/copywriting/edit', data)
+// 启用-停用
+export const writeUpdateStatus = (data: Record<string, unknown>): Promise<Res> =>
+  axios.put('/api/admin/copywriting/updateStatus', data)

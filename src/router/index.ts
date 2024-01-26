@@ -159,6 +159,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { updateAuthButtions } = userStore
 
   if (to.path === '/login') {
+    refresh.value = true
     resetAll()
     next()
     return

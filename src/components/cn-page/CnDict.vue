@@ -21,7 +21,7 @@ const dictionary = useDictionary(props.dict)
 const label = ref()
 watchEffect(() => {
   if (!props.component) {
-    label.value = useDictionary(props.dict, props.modelValue, props.separator).value
+    label.value = props.modelValue ? useDictionary(props.dict, props.modelValue, props.separator).value : '--'
   }
 })
 

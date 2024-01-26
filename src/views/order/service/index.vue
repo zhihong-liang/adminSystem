@@ -14,48 +14,72 @@
 import CnPage from '@/components/cn-page/CnPage.vue'
 import { reactive, ref } from 'vue'
 import addEdit from './child/addEdit.vue'
+import { writeQueryList, writeUpdateStatus } from '@/api/admin'
+import useConfirm from '@/hooks/useConfirm'
 
 const props: CnPage.Props = reactive({
   params: {},
-  action: () => Promise.resolve(),
+  action: writeQueryList,
   search: {
     items: [
-      { label: '服务标准名称', prop: 'name', component: 'input' },
-      { label: '状态', prop: 'phone', component: 'select' }
-    ]
-  },
-  toolbar: {
-    items: [
-      {
-        label: '新增',
-        type: 'primary',
-        onClick: () => openDialog()
-      }
+      { label: '文案类型', prop: 'messageType', component: 'select', dict: 'MESSAGE_TYPE' },
+      { label: '状态', prop: 'status', component: 'select', dict: 'MESSAGE_STATUS' }
     ]
   },
   table: {
     columns: [
       { type: 'index', label: '序号', width: 60 },
-      { prop: 'name', label: '服务标准名称' },
-      { prop: 'status', label: '状态', dict: 'USER_STATUS' },
+      { label: '文案类型', prop: 'messageType', dict: 'MESSAGE_TYPE' },
+      { label: '编号', prop: 'messageCode' },
+      { label: '备注', prop: 'remark' },
+      { label: '状态', prop: 'status', dict: 'MESSAGE_STATUS' },
+      { label: '更新时间', prop: 'updateTime' },
       {
         prop: 'action',
         label: '操作',
         buttons: [
           {
-            label: '编辑',
-            type: 'primary',
-            text: true,
-            onClick: ({ row }) => openDialog('edit', '编辑')
+            label: '详情',
+            type: 'default',
+            onClick: ({ row }) => openDialog('look', row)
           },
           {
-            label: '删除',
-            type: 'danger',
-            text: true,
+            label: '编辑',
+            type: 'primary',
+            onClick: ({ row }) => openDialog('edit', row)
+          },
+          {
+            label: '启用',
+            type: 'primary',
+            visible: ({ row }) => row.status === '0',
             onClick: ({ row }) => {
-              console.log(1)
+              const opts = {
+                message: `确定要启用该文案？`,
+                title: '提示',
+                action: () => writeUpdateStatus({id: row.id,status:'1'}),
+                success: () => {
+                  props.refresh = new Date().getTime()
+                }
+              }
+              useConfirm(opts)
             }
-          }
+          },
+          {
+            label: '禁用',
+            type: 'primary',
+            visible: ({ row }) => row.status === '1',
+            onClick: ({ row }) => {
+              const opts = {
+                message: `确定要禁用该文案？`,
+                title: '提示',
+                action: () => writeUpdateStatus({id: row.id,status:'0'}),
+                success: () => {
+                  props.refresh = new Date().getTime()
+                }
+              }
+              useConfirm(opts)
+            }
+          },
         ]
       }
     ]
@@ -63,7 +87,7 @@ const props: CnPage.Props = reactive({
 })
 
 const serviceRef = ref()
-const openDialog = (type = 'add', title = '新增') => {
-  serviceRef.value.open(type, title)
+const openDialog = (type: string, row: any) => {
+  serviceRef.value.open(type, row)
 }
 </script>

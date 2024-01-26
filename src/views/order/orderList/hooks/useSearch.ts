@@ -1,37 +1,93 @@
-import { reactive } from "vue"
+import { reactive, computed, ref } from "vue"
+import { getOrderType } from '@/api/order'
+import { getUnitList } from '@/api/admin'
 
 export default function useSearch(type: string) {
+  const orderList = ref()
+  const unitList = ref()
+
+  getOrderType({
+    page: 1,
+    size: 1000,
+    obj: {}
+  }).then((res) => {
+    if (res.code === '200') {
+      orderList.value = res.rows.map((v) => ({
+        label: v.workTypeName,
+        value: v.id
+      }))
+    }
+  })
+
+  getUnitList({
+    page: 1,
+    size: 1000,
+    obj: {}
+  }).then((res) => {
+    if (res.code === '200') {
+      unitList.value = res.rows.map((v) => ({
+        label: v.fullName,
+        value: v.id
+      }))
+    }
+  })
+
   const items = reactive([
-    { label: '工单编号', prop: 'name', component: 'input' },
-    { label: '运维/巡检内容', prop: 'name', component: 'input' },
-    { label: '工单来源', prop: 'phone', component: 'select' },
-    { label: '工单类型', prop: 'phone', component: 'select' },
-    { label: '工单来源系统', prop: 'phone', component: 'select' },
-    { label: '创建单位', prop: 'phone', component: 'select' },
-    { label: '设备编号/设备接入单位设备编号', prop: 'phone', component: 'input' },
-    { label: '设备类型', prop: 'phone', component: 'select' },
-    { label: '运维人员', prop: 'phone', component: 'input', show: ['NotHandle', 'InHandle', 'Handled', 'Finished', 'Closed'] },
-    { label: '运维单位', prop: 'phone', component: 'select' },
-    { label: '生产厂商', prop: 'phone', component: 'select', show: ['Dispatch', 'NotHandle', 'InHandle', 'Handled', 'Finished', 'Closed'] },
-    { label: '行政区域', prop: 'phone', component: 'ad' },
-    { label: '工单状态', prop: 'phone', component: 'select', show: ['Finished', 'Closed'] },
-    { label: '完成情况', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
-    { label: '客户评价', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
-    { label: '客户评价满意度', prop: 'phone', component: 'select', show: ['Handled', 'Finished'] },
-    { label: '回访状态', prop: 'phone', component: 'select', show: ['Finished'] },
+    { label: '工单编号', prop: 'workOrderNumber', component: 'input' },
+    { label: '情况描述', prop: 'description', component: 'input' },
+    {
+      label: '工单类型',
+      prop: 'workTypeId',
+      component: 'select',
+      props: { options: computed(() => orderList.value) }
+    },
+    { label: '工单来源', prop: 'orderSource', component: 'select', dict: 'ORDER_SOURCE' },
+    {
+      label: '工单来源系统',
+      prop: 'orderSourceOs',
+      component: 'select',
+      dict: 'ORDER_SOURCE_OS'
+    },
+    { label: '创建单位', prop: 'createUnitId', component: 'select' },
+    { label: '设备编号', prop: 'devCode', component: 'input' },
+    { label: '设备类型', prop: 'devType', component: 'select', dict: 'DEV_TYPE' },
+    { label: '运维人员', prop: 'operationPersonName', component: 'input', show: ['All','History'] },
+    {
+      label: '运维单位',
+      prop: 'operationUnit',
+      component: 'select',
+      props: { options: computed(() => unitList.value) },
+      show: ['All','History','Closed']
+    },
+    {
+      label: '生产厂商',
+      prop: 'manufacturer',
+      component: 'select',
+      props: { options: computed(() => unitList.value) }
+    },
+    { label: '设备区域', prop: 'ad', component: 'ad', props: { props: { checkStrictly: true } } },
+    { label: '工单状态', prop: 'bpmNodeCode', component: 'select', dict: 'WORK_BPM_NODE_CODE', show: ['All']},
+    {
+      label: '客户评价',
+      prop: 'custom_evaluation',
+      component: 'select',
+      dict: 'WORK_CUSTOM_EVALUATION',
+      show: ['All','InHandle','Handled','History']
+    },
+    { label: '回访情况', prop: 'followUp', component: 'select', dict: 'WORK_FOLLOW_UP', show: ['All','InHandle','Handled','History'] },
     {
       label: '创建时间',
-      prop: 'phone',
+      prop: 'orderApplyTime',
       component: 'datepicker',
       props: { type: 'daterange', unlinkPanels: true }
     },
     {
       label: '完成时间',
-      prop: 'phone',
+      prop: 'orderCloseTime',
       component: 'datepicker',
       props: { type: 'daterange', unlinkPanels: true },
-      show: ['Finished', 'Closed']
-    },
+      show: ['All','Handled','History','Closed']
+    }
   ] as any[])
 
   const itme = items.filter((v) => !v.show || v.show.includes(type))

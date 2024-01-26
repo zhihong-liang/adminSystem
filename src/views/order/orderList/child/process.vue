@@ -1,43 +1,61 @@
 <template>
   <el-timeline class="line">
-    <el-timeline-item v-for="(item, index) in 3" :key="index">
+    <el-timeline-item v-for="(item, index) in list" :key="index">
       <div class="line_left">
-        <div>张三</div>
-        <div>广东创能科技股份有限公司</div>
+        <div>{{ item.handleUser }}</div>
+        <div>{{ item.handleDept }}</div>
       </div>
-      <div class="line_right">
-        <div class="line_right_tl">回访</div>
-        <div>态度：<el-rate v-model="value" disabled /></div>
-        <div>处理结果：已完成</div>
-        <div>评价：服务周到热情，结果好</div>
-        <div>
-          <el-image
-            v-for="(items, indexs) in srcList"
-            style="width: 100px; height: 100px; margin-right: 10px"
-            :src="items"
-            :key="indexs"
-            :zoom-rate="1.2"
-            :max-scale="7"
-            :min-scale="0.2"
-            :preview-src-list="[items]"
-            :initial-index="0"
-            fit="cover"
-          />
-        </div>
-      </div>
+      <el-row class="line_right">
+        <el-col :span="18">
+          <div class="line_right_tl">
+            {{ useDictionary('WORK_AUDIT_TYPE', item.workAuditType) }}
+          </div>
+          <div
+            v-if="['3', '4', '97', '99'].includes(item.workAuditType)"
+            style="white-space: pre-line"
+          >
+            {{ item.remark }}
+          </div>
+          <div v-if="item.workAuditType === '96'">
+            <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
+            <div>效率：<el-rate v-model="item.evaluationEfficiency" disabled /></div>
+            <div>处理结果：{{ item.handleOpion }}</div>
+            <div>评价：{{ item.remark }}</div>
+          </div>
+          <div v-if="item.workAuditType === '99' && item.handleFile">
+            <CnImage :modelValue="item.handleFile" />
+          </div>
+        </el-col>
+        <el-col :span="6" v-if="item.handleTime">
+          <div>{{ moment(item.handleTime).format('YYYY-MM-DD') }}</div>
+          <div>{{ moment(item.handleTime).format('HH:mm:ss') }}</div>
+        </el-col>
+      </el-row>
     </el-timeline-item>
   </el-timeline>
 </template>
 
 <script lang="ts" setup>
 import { ref } from 'vue'
+import { orderProcess } from '@/api/order'
+import useDictionary from '@/hooks/useDictionary'
+import moment from 'moment'
+import CnImage from '@/components/cn-page/CnImage.vue'
 
-const value = ref(5)
-const srcList = [
-  'https://fuss10.elemecdn.com/a/3f/3302e58f9a181d2509f3dc0fa68b0jpeg.jpeg',
-  'https://fuss10.elemecdn.com/1/34/19aa98b1fcb2781c4fba33d850549jpeg.jpeg',
-  'https://fuss10.elemecdn.com/0/6f/e35ff375812e6b0020b6b4e8f9583jpeg.jpeg'
-]
+const props = defineProps({
+  id: {
+    type: String,
+    default: ''
+  }
+})
+
+const list = ref()
+
+orderProcess(props.id).then((res) => {
+  if (res.code === '200') {
+    list.value = res.data
+  }
+})
 </script>
 
 <style lang="scss" scoped>
