@@ -37,6 +37,10 @@ export const orderBaseListPage = (data: ListReq): Promise<ListRes> =>
 export const orderHistoryList = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/work/workOrderBase/listPage3', data)
 
+// 查询关闭工单列表
+export const orderCloseList = (data: ListReq): Promise<ListRes> =>
+  axios.post('/api/work/workOrderBase/listPage4', data)
+
 // 查询基本信息和工单信息
 export const orderBaseDetail = (id: string): Promise<Res> =>
   axios.get('/api/work/workOrderBase/' + id)

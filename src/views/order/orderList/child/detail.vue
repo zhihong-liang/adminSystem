@@ -23,7 +23,13 @@
 
     <template #footer>
       <el-button @click="dialogRef?.close()">{{ hdType === 'Look' ? '关闭' : '取消' }}</el-button>
-      <el-button v-if="hdType !== 'Look'" type="primary" @click="handleSubmit()">提交</el-button>
+      <el-button
+        v-if="hdType !== 'Look'"
+        type="primary"
+        :loading="submitting"
+        @click="handleSubmit()"
+        >提交</el-button
+      >
     </template>
   </CnDialog>
 </template>
@@ -80,10 +86,12 @@ const dialogProps = reactive<CnPage.DialogProps>({
   title: '查看'
 })
 
+const submitting = ref(false)
 const baseData = ref()
 const workAuditType = ref()
 
 const open = (type: string, data: any, AuditType: string, batch: boolean) => {
+  activeName.value = 'first'
   homeData.value = data
   hdType.value = type
   workAuditType.value = AuditType
@@ -124,6 +132,7 @@ const handleSubmit = () => {
       }
       delete params.id, delete params.workOrderNumber
 
+      submitting.value = true
       orderRepulse(params)
         .then((res) => {
           if (res.code === '200') {
@@ -134,6 +143,9 @@ const handleSubmit = () => {
         })
         .catch((arr) => {
           console.log(arr)
+        })
+        .finally(() => {
+          submitting.value = false
         })
     } else {
       const params = {
@@ -198,6 +210,7 @@ const handleSubmit = () => {
           break
       }
 
+      submitting.value = true
       orderAudit(params)
         .then((res) => {
           if (res.code === '200') {
@@ -208,6 +221,9 @@ const handleSubmit = () => {
         })
         .catch((arr) => {
           console.log(arr)
+        })
+        .finally(() => {
+          submitting.value = false
         })
     }
   })

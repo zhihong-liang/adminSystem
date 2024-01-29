@@ -12,12 +12,21 @@
             >超时工单 {{ timeoutData?.timeOut }} 笔，即将超时工单
             {{ timeoutData?.soonTimeOut }} 笔</span
           >
-          <span class="tip_num_cond" @click="messageRef?.open()">查看<span>《服务标准》</span></span>
+          <span class="tip_num_cond" @click="messageRef?.open()"
+            >查看<span>《服务标准》</span></span
+          >
         </div>
       </div>
     </template>
   </CnPage>
-  <detail ref="detailRef"></detail>
+  <detail
+    ref="detailRef"
+    @success="
+      () => {
+        props.refresh = Date.now()
+      }
+    "
+  ></detail>
   <messageContext ref="messageRef" />
 </template>
 
@@ -39,6 +48,24 @@ const props: CnPage.Props = reactive({
   search: {
     items: useSearch('All')
   },
+  transformRequest(params, page, size) {
+    const [orderApplyStartTime, orderApplyEndTime] = params?.orderApplyTime || []
+    const [orderCloseStartTime, orderCloseEndTime] = params?.orderCloseTime || []
+    const obj: any = {
+      ...params,
+      orderApplyStartTime,
+      orderApplyEndTime,
+      orderCloseStartTime,
+      orderCloseEndTime
+    }
+    delete obj.orderApplyTime
+    delete obj.orderCloseTime
+    return {
+      page,
+      size,
+      obj
+    }
+  },
   table: {
     columns: [
       { type: 'selection' },
@@ -54,8 +81,8 @@ const props: CnPage.Props = reactive({
       { prop: 'orderCloseTime', label: '完成时间' },
       { prop: 'takeUpTime', label: '工单耗时' },
       { prop: 'bpmNodeCode', label: '工单状态', dict: 'WORK_BPM_NODE_CODE' },
-      { prop: 'custom_evaluation', label: '客户评价' },
-      { prop: 'followUp', label: '回访情况' },
+      { prop: 'customEvaluation', label: '客户评价', dict: 'WORK_CUSTOM_EVALUATION' },
+      { prop: 'followUp', label: '回访情况', dict: 'WORK_FOLLOW_UP' },
       {
         prop: 'action',
         label: '操作',
@@ -129,14 +156,14 @@ const props: CnPage.Props = reactive({
             type: 'primary',
             text: true,
             onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
-            visible: ({ row }) => row.bpmNodeCode === '1500'
+            visible: ({ row }) => row.bpmNodeCode === '1500' && !row.customEvaluation
           },
           {
             label: '回访',
             type: 'primary',
             text: true,
             onClick: ({ row }) => handleOpen('Visit', row, '97'),
-            visible: ({ row }) => row.bpmNodeCode === '1500'
+            visible: ({ row }) => row.bpmNodeCode === '1500' && !row.followUp
           },
           {
             label: '打回工单',

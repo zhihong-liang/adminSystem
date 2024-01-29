@@ -14,7 +14,7 @@
   <messageContext ref="messageRef" />
 </template>
 <script lang="ts" setup>
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import addOrder from './child/addOrder.vue'
 import { getOrderType } from '@/api/order'
 import messageContext from './child/messageContext.vue'

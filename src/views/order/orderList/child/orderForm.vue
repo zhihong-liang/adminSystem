@@ -20,7 +20,6 @@
         <div>态度：<el-rate v-model="baseForm.model.evaluationAttitude" /></div>
         <div>效率：<el-rate v-model="baseForm.model.evaluationEfficiency" /></div>
       </div>
-      <el-button>重新评分</el-button>
     </template>
   </CnForm>
 </template>
@@ -238,6 +237,7 @@ queryUnitList()
 
 // 查询运维人员
 const changeUnit = (val: string) => {
+  baseForm.model.operationUnit = unitList.value.find((v: {value: string}) => val === v.value).label
   getUserList({
     page: 1,
     size: 1000,

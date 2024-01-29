@@ -215,6 +215,8 @@ const handleSubmit = () => {
       .catch((arr) => {
         console.log(arr)
       })
+  }).catch((err) => {
+    console.log('err', err)
   })
 }
 

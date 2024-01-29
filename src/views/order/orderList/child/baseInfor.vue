@@ -22,8 +22,8 @@ const baseForm = reactive({
     { label: '工单来源', prop: 'orderSource', dict: 'ORDER_SOURCE' },
     { label: '提交人姓名', prop: 'submitterName' },
     { label: '提交人手机号码', prop: 'submitterPhone' },
-    { label: '派单员姓名', prop: 'xxx' },
-    { label: '派单员手机号码', prop: 'xxx' }
+    { label: '派单员姓名', prop: 'dispatcher' },
+    { label: '派单员手机号码', prop: 'dispatcherPhone' }
   ],
   labelWidth: 100,
   colSpan: 24,
