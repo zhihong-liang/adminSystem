@@ -222,7 +222,7 @@ const queryUnitList = () => {
     getUnitList({
       page: 1,
       size: 1000,
-      obj: {}
+      obj: { unitType: '2' }
     }).then((res) => {
       if (res.code === '200') {
         unitList.value = res.rows.map((v) => ({
@@ -237,7 +237,12 @@ queryUnitList()
 
 // 查询运维人员
 const changeUnit = (val: string) => {
-  baseForm.model.operationUnit = unitList.value.find((v: {value: string}) => val === v.value).label
+  baseForm.model.operationPersonId = ''
+  baseForm.model.operationPersonContact = ''
+
+  baseForm.model.operationUnit = unitList.value.find(
+    (v: { value: string }) => val === v.value
+  ).label
   getUserList({
     page: 1,
     size: 1000,

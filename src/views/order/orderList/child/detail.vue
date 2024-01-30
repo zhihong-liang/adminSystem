@@ -107,8 +107,8 @@ const queryDetail = (id: string) => {
     .then((res) => {
       if (res.code === '200') {
         baseData.value = {
+          ...res.data,
           ...res.data.detail,
-          ...res.data
         }
       }
     })
@@ -140,9 +140,6 @@ const handleSubmit = () => {
             ElMessage.success(res.message)
             emits('success')
           }
-        })
-        .catch((arr) => {
-          console.log(arr)
         })
         .finally(() => {
           submitting.value = false
@@ -218,9 +215,6 @@ const handleSubmit = () => {
             ElMessage.success(res.message)
             emits('success')
           }
-        })
-        .catch((arr) => {
-          console.log(arr)
         })
         .finally(() => {
           submitting.value = false

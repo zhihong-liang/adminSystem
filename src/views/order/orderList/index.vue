@@ -75,7 +75,7 @@ const props: CnPage.Props = reactive({
       { prop: 'orderSource', label: '工单来源', dict: 'ORDER_SOURCE' },
       { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
       { prop: 'devCode', label: '设备编号', width: 160 },
-      { prop: 'createUnitId', label: '创建人员单位' },
+      { prop: 'createUnit', label: '创建人员单位', width: 160 },
       { prop: 'operationPersonName', label: '运维人员' },
       { prop: 'orderApplyTime', label: '创建时间', width: 165 },
       { prop: 'orderCloseTime', label: '完成时间' },

@@ -217,7 +217,7 @@ const columns: any[] = [
   { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS' },
   { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
   { prop: 'devCode', label: '设备编号', width: 160 },
-  { prop: 'createUnitId', label: '创建单位' },
+  { prop: 'createUnit', label: '创建单位', width: 160 },
   { prop: 'dispatcher', label: '派单员', show: ['Closed'] },
   {
     prop: 'operationPersonName',
