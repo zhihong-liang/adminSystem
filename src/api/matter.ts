@@ -86,6 +86,9 @@ export const editMatterLabel = (data: MatterLabel): Promise<Res> =>
 // 删除事项标签
 export const removeMatterLabel = (ids: string): Promise<Res> =>
   axios.delete(`/api/matters/label/remove/${ids}`)
+// 停用-启用
+export const enableMatterLabel = (data: any): Promise<Res> =>
+  axios.put('/api/matters/label/enable', data)
 
 /**
  * 服务公告管理

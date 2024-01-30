@@ -1,6 +1,21 @@
 <template>
   <div>
     <CnPage v-bind="props">
+      <template #action="{ row }">
+        <div class="btns">
+          <el-button type="text" @click="showDialog('edit', row)">编辑</el-button>
+          <el-button
+            v-if="row.status === '1'"
+            type="text"
+            @click="enableMatterLabelAction('deactivate', row)"
+            >停用</el-button
+          >
+          <el-button v-else type="text" @click="enableMatterLabelAction('enable', row)"
+            >启用</el-button
+          >
+          <el-button type="text" @click="showDialog('delete', row)">删除</el-button>
+        </div>
+      </template>
       <template #lableName="{ row }">
         <el-button type="text" @click="showDialog('detail', row)">{{ row.lableName }}</el-button>
       </template>
@@ -69,7 +84,8 @@ import {
   getMatterLabelList,
   addMatterLabel,
   removeMatterLabel,
-  editMatterLabel
+  editMatterLabel,
+  enableMatterLabel
 } from '@/api/matter'
 
 const handleType = ref<ActionType>()
@@ -147,6 +163,18 @@ async function removeManyMatterLabelAction() {
   ElMessage.success('操作成功')
 }
 
+// 停用-启用
+async function enableMatterLabelAction(handle: ActionType, row: any) {
+  try {
+    row.status = handle === 'enable' ? '1' : '0'
+    await enableMatterLabel(row)
+    props.refresh = new Date().getTime()
+    ElMessage.success('操作成功')
+  } catch (err: any) {
+    ElMessage.error(err)
+  }
+}
+
 // 显示添加/删除/标签弹窗
 function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
@@ -204,7 +232,6 @@ function showDialog(handle: ActionType, row?: any) {
 }
 .btns {
   width: 100%;
-  justify-content: center;
   display: flex;
 }
 </style>
