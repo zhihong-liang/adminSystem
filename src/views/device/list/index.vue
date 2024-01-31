@@ -57,6 +57,7 @@ import {
   getDevBaseInfo,
   devBaseInfoExport,
   devBaseInfo,
+  devGroupList,
 } from "@/api/device";
 const activeName = ref("1");
 const selectionIds = ref([]);
@@ -133,7 +134,25 @@ const props = reactive<CnPage.Props>({
       },
       { label: "政务程序版本号", prop: "procedureVersionList", component: "select", dict: 'DEV_VERSION', props: { multiple: true } },
       { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { type: 'datetimerange' } },
-      { label: "设备分组", prop: "group", component: "select" },
+      {
+        label: "设备分组",
+        prop: "groupId",
+        component: "cascader",
+        props: {
+          props: {
+            emitPath: false,
+            label: 'groupName',
+            value: 'id',
+            checkStrictly: true,
+            lazy: true,
+            lazyLoad: (node, resolve) => {
+              devGroupList({ parentId: node.data?.id || 0 }).then(res => {
+                resolve(res.data.map((v: any) => ({ ...v, leaf: !v.open })))
+              })
+            }
+          }
+        }
+      },
       { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS" },
       { label: "部署场所", component: "subtitle", span: 24 },
       { label: "行政区划", prop: "ad", component: "ad", props: { props: { checkStrictly: true } } },
@@ -311,12 +330,13 @@ const props = reactive<CnPage.Props>({
                 if (res.code === "200") {
                   res.data.baseInfo.type = "edit";
                   res.data.devDeploymentSite.type = "edit";
-                  res.data.devConf.type = "edit";
                   basicInfoData.value = res.data.baseInfo;
                   hardwareModuleData.value = res.data.baseInfo;
                   deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
                   // deploymentSiteData.value = res.data.devDeploymentSite;
-                  configInfoData.value = res.data.devConf;
+                  const devConf = res.data.devConf || {}
+                  devConf.type = "edit";
+                  configInfoData.value = devConf;
                   deploymentSiteData.value.ip = res.data.baseInfo.ip
                   deploymentSiteData.value.mac = res.data.baseInfo.mac
                   dialoTitle.value = "编辑设备信息";
@@ -341,11 +361,12 @@ function viewDetail(row: any) {
     if (res.code === "200") {
       res.data.baseInfo.type = "view";
       res.data.devDeploymentSite.type = "view";
-      res.data.devConf.type = "view";
       basicInfoData.value = res.data.baseInfo;
       hardwareModuleData.value = res.data.baseInfo;
       deploymentSiteData.value = { ...res.data.devUnitInFo, ...res.data.devDeploymentSite };
-      configInfoData.value = res.data.devConf;
+      const devConf = res.data.devConf || {}
+      devConf.type = "view";
+      configInfoData.value = devConf;
       dialoTitle.value = "设备详情";
       dialogRef.value?.open();
     }

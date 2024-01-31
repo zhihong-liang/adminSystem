@@ -262,7 +262,7 @@ watchEffect(async () => {
     // if (typeof props.model.supportingUnit === 'number') basisForm.model.supportingUnit = String(props.model.supportingUnit)
     const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
     ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((v, i) => {
-      const [startTime, endTime] = v.split(' - ')
+      const [startTime, endTime] = (v || '').split(' - ')
       timeSlotList[i].checked = !!startTime
       timeSlotList[i].startTime = startTime
       timeSlotList[i].endTime = endTime
