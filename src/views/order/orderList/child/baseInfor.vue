@@ -1,10 +1,20 @@
 <template>
   <CnForm v-bind="baseForm" />
+  <div
+    class="nodeTag"
+    :class="{
+      tagBlue: Number(props.data.bpmNodeCode) > 1100 && Number(props.data.bpmNodeCode) <= 1300,
+      tagGreen: Number(props.data.bpmNodeCode) > 1300
+    }"
+  >
+    {{ bpmNodeCode }}
+  </div>
 </template>
 
 <script lang="ts" setup>
 import CnForm from '@/components/cn-page/CnForm.vue'
 import { reactive } from 'vue'
+import useDictionary from '@/hooks/useDictionary'
 
 const props = defineProps({
   data: {
@@ -12,6 +22,8 @@ const props = defineProps({
     default: () => ({})
   }
 })
+
+const bpmNodeCode = useDictionary('WORK_BPM_NODE_CODE', props.data.bpmNodeCode).value
 
 const baseForm = reactive({
   model: props.data,
@@ -30,3 +42,27 @@ const baseForm = reactive({
   rules: {}
 })
 </script>
+
+<style lang="scss" scoped>
+.nodeTag {
+  position: absolute;
+  right: 15%;
+  top: 20%;
+  border: 1px solid #f59a23;
+  border-radius: 50%;
+  width: 130px;
+  text-align: center;
+  line-height: 130px;
+  font-size: 22px;
+  font-weight: bold;
+  color: #f59a23;
+}
+.tagBlue {
+  color: #02a7f0;
+  border: 1px solid #02a7f0;
+}
+.tagGreen {
+  color: #02d77d;
+  border: 1px solid #02d77d;
+}
+</style>
