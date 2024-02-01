@@ -21,8 +21,12 @@
               (props.data.workTypeId === '1' || props.data.workTypeId === '2')
             "
           >{{ item.remark }}</div>
+
+          <div v-if="item.workAuditType === '8'">描述：{{ item.remark }}</div>
+          <div v-if="item.workAuditType === '97'">回访记录：{{ item.remark }}</div>
+
           <div
-            v-if="['3', '4', '97', '8'].includes(item.workAuditType)"
+            v-if="['3', '4'].includes(item.workAuditType)"
             style="white-space: pre-line"
           >
             {{ item.remark }}
@@ -30,8 +34,8 @@
           <div v-if="item.workAuditType === '96'">
             <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
             <div>效率：<el-rate v-model="item.evaluationEfficiency" disabled /></div>
-            <div>处理结果：{{ item.handleOpion }}</div>
-            <div>评价：{{ item.remark }}</div>
+            <div>{{ item.remark.split('\n')[0] }}</div>
+            <div style="white-space: pre-line">评价：{{ remarkFilter(item.remark) }}</div>
           </div>
           <div v-if="item.workAuditType === '8' && item.handleFile">
             <CnImage :modelValue="item.handleFile" />
@@ -67,6 +71,13 @@ orderProcess(props.data.id).then((res) => {
     list.value = res.data
   }
 })
+
+const remarkFilter = (str: string) => {
+  if (!str) return '--'
+  const [, ...result] = str.split('\n')
+  return result.join('\n')
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -95,5 +106,9 @@ orderProcess(props.data.id).then((res) => {
     font-weight: bold;
     margin-bottom: 10px;
   }
+}
+
+:deep(.el-timeline-item__node) {
+  background-color: #006eff;
 }
 </style>
