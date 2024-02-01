@@ -1,4 +1,8 @@
 <template>
+  <div class="htime">
+    <div class="htime_time">共耗时：<span>{{props.data.takeUpTime}}</span></div>
+    <div>耗时计算规则：从创建工单到完成处理，计算工单耗时时长，精确到分钟</div>
+  </div>
   <el-timeline class="line">
     <el-timeline-item v-for="(item, index) in list" :key="index">
       <div class="line_left">
@@ -10,8 +14,15 @@
           <div class="line_right_tl">
             {{ useDictionary('WORK_AUDIT_TYPE', item.workAuditType) }}
           </div>
+          <!-- 运维、耗材工单的运维方式 -->
           <div
-            v-if="['3', '4', '97', '99'].includes(item.workAuditType)"
+            v-if="
+              item.workAuditType === '6' &&
+              (props.data.workTypeId === '1' || props.data.workTypeId === '2')
+            "
+          >{{ item.remark }}</div>
+          <div
+            v-if="['3', '4', '97', '8'].includes(item.workAuditType)"
             style="white-space: pre-line"
           >
             {{ item.remark }}
@@ -22,7 +33,7 @@
             <div>处理结果：{{ item.handleOpion }}</div>
             <div>评价：{{ item.remark }}</div>
           </div>
-          <div v-if="item.workAuditType === '99' && item.handleFile">
+          <div v-if="item.workAuditType === '8' && item.handleFile">
             <CnImage :modelValue="item.handleFile" />
           </div>
         </el-col>
@@ -43,15 +54,15 @@ import moment from 'moment'
 import CnImage from '@/components/cn-page/CnImage.vue'
 
 const props = defineProps({
-  id: {
-    type: String,
-    default: ''
+  data: {
+    type: Object,
+    default: () => ({})
   }
 })
 
 const list = ref()
 
-orderProcess(props.id).then((res) => {
+orderProcess(props.data.id).then((res) => {
   if (res.code === '200') {
     list.value = res.data
   }
@@ -63,7 +74,7 @@ orderProcess(props.id).then((res) => {
   padding-left: 30%;
   &_left {
     position: absolute;
-    left: -38%;
+    left: -237px;
     width: 220px;
     text-align: right;
     line-height: 26px;
@@ -74,6 +85,15 @@ orderProcess(props.id).then((res) => {
       font-weight: bold;
       font-size: 16px;
     }
+  }
+}
+
+.htime {
+  margin: 0 0 30px 30px;
+  &_time {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
   }
 }
 </style>

@@ -1,8 +1,38 @@
 import axios from 'axios'
 import type { ListReq, ListRes, Res } from '.'
 
+export interface typeItem {
+  id: string
+  imgUrl?: string
+  workTypeName: string
+  defId: string
+}
+export interface dictTs {
+  value: string
+  label: string
+}
+
+export interface orderItemTs {
+  id: string
+  workOrderNumber: string
+  workTypeIdText: string
+  orderSourceOs: string
+  orderSource: string
+  description: string
+  devCode: string
+  createUnit: string
+  operationPersonName: string
+  orderApplyTime: string
+  orderCloseTime: string
+  takeUpTime: string
+  bpmNodeCode: string
+  customEvaluation: string
+  followUp: string
+  remark: string
+}
+
 // 查询工单类型
-export const getOrderType = (data: ListReq): Promise<ListRes> =>
+export const getOrderType = (data: ListReq): Promise<ListRes<typeItem>> =>
   axios.post('/api/work/workOrderType/listPage', data)
 
 // 新增运维工单
@@ -22,7 +52,7 @@ export const orderAddUpgrade = (data: Record<string, unknown>): Promise<Res> =>
   axios.post('/api/work/workOrderUpgrade', data)
 
 // 查询工单一览
-export const orderListPageAll = (data: ListReq): Promise<ListRes> =>
+export const orderListPageAll = (data: ListReq): Promise<ListRes<orderItemTs>> =>
   axios.post('/api/work/workOrderBase/listPage2', data)
 
 // 查询超时数量

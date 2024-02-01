@@ -2,41 +2,45 @@ import { reactive, computed, ref } from "vue"
 import { getOrderType } from '@/api/order'
 import { getUnitList } from '@/api/admin'
 
+interface zdTs {
+  label: string
+  value: string
+}
+const unitList = ref<zdTs[]>([])
+const orderList = ref<zdTs[]>([])
+const operationList = ref<zdTs[]>([])
+
+getOrderType({
+  page: 1,
+  size: 1000,
+  obj: {}
+}).then((res) => {
+  if (res.code === '200') {
+    orderList.value = res.rows.map((v) => ({
+      label: v.workTypeName,
+      value: v.id
+    }))
+  }
+})
+
+getUnitList({
+  page: 1,
+  size: 1000,
+  obj: {}
+}).then((res) => {
+  if (res.code === '200') {
+    unitList.value = res.rows.map((v) => ({
+      label: v.fullName,
+      value: v.id
+    }))
+    operationList.value = res.rows.filter((v) => v.unitType === '2').map((v) => ({
+      label: v.fullName,
+      value: v.id
+    }))
+  }
+})
+
 export default function useSearch(type: string) {
-  const orderList = ref()
-  const unitList = ref()
-  const operationList = ref()
-
-  getOrderType({
-    page: 1,
-    size: 1000,
-    obj: {}
-  }).then((res) => {
-    if (res.code === '200') {
-      orderList.value = res.rows.map((v) => ({
-        label: v.workTypeName,
-        value: v.id
-      }))
-    }
-  })
-
-  getUnitList({
-    page: 1,
-    size: 1000,
-    obj: {}
-  }).then((res) => {
-    if (res.code === '200') {
-      unitList.value = res.rows.map((v) => ({
-        label: v.fullName,
-        value: v.id
-      }))
-      operationList.value = res.rows.filter((v) => v.unitType === '2').map((v) => ({
-        label: v.fullName,
-        value: v.id
-      }))
-    }
-  })
-
   const items = reactive([
     { label: '工单编号', prop: 'workOrderNumber', component: 'input' },
     { label: '情况描述', prop: 'description', component: 'select', dict: 'WORK_DESCIPTION' },
@@ -90,7 +94,7 @@ export default function useSearch(type: string) {
       label: '完成时间',
       prop: 'orderCloseTime',
       component: 'datepicker',
-      props: { type: 'datetimerange', unlinkPanels: true , valueFormat: 'YYYY-MM-DD HH:mm',format: 'YYYY-MM-DD HH:mm', timeFormat: 'HH:mm'},
+      props: { type: 'datetimerange', unlinkPanels: true, valueFormat: 'YYYY-MM-DD HH:mm', format: 'YYYY-MM-DD HH:mm', timeFormat: 'HH:mm' },
       show: ['All', 'Handled', 'History', 'Closed']
     }
   ] as any[])

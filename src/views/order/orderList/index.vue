@@ -92,6 +92,7 @@ const props: CnPage.Props = reactive({
             label: '补充',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'bc' }],
             onClick: ({ row }) => handleOpen('Supply', row, '95'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
           },
@@ -99,6 +100,7 @@ const props: CnPage.Props = reactive({
             label: '分拨',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'fb' }],
             onClick: ({ row }) => handleOpen('Allocation', row, '2'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
           },
@@ -106,6 +108,7 @@ const props: CnPage.Props = reactive({
             label: '派单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'pd' }],
             onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
             visible: ({ row }) => row.bpmNodeCode === '1100'
           },
@@ -113,6 +116,7 @@ const props: CnPage.Props = reactive({
             label: '转派',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'zp' }],
             onClick: ({ row }) => handleOpen('Transfer', row, '4'),
             visible: ({ row }) => ['1200', '1300'].includes(row.bpmNodeCode)
           },
@@ -120,6 +124,7 @@ const props: CnPage.Props = reactive({
             label: '处理',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'cl' }],
             onClick: ({ row }) => handleOpen('Handle', row, '6'),
             visible: ({ row }) => row.bpmNodeCode === '1200'
           },
@@ -127,6 +132,7 @@ const props: CnPage.Props = reactive({
             label: '完成处理',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'wccl' }],
             onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
             visible: ({ row }) => row.bpmNodeCode === '1300'
           },
@@ -134,6 +140,7 @@ const props: CnPage.Props = reactive({
             label: '退回工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'thgd' }],
             onClick: ({ row }) => handleOpen('Back', row, '5'),
             visible: ({ row }) => ['1100', '1200'].includes(row.bpmNodeCode)
           },
@@ -141,6 +148,7 @@ const props: CnPage.Props = reactive({
             label: '关闭工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'gbgd' }],
             onClick: ({ row }) => handleOpen('Close', row, '0'),
             visible: ({ row }) => ['1001', '1100', '1200'].includes(row.bpmNodeCode)
           },
@@ -148,6 +156,7 @@ const props: CnPage.Props = reactive({
             label: '完成',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'wc' }],
             onClick: ({ row }) => handleOpen('Finish', row, '99'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
           },
@@ -155,6 +164,7 @@ const props: CnPage.Props = reactive({
             label: '评价',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'pj' }],
             onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
             visible: ({ row }) => row.bpmNodeCode === '1500' && !row.customEvaluation
           },
@@ -162,6 +172,7 @@ const props: CnPage.Props = reactive({
             label: '回访',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'hf' }],
             onClick: ({ row }) => handleOpen('Visit', row, '97'),
             visible: ({ row }) => row.bpmNodeCode === '1500' && !row.followUp
           },
@@ -169,6 +180,7 @@ const props: CnPage.Props = reactive({
             label: '打回工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'dhgd' }],
             onClick: ({ row }) => handleOpen('Repulse', row, '98'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
           }

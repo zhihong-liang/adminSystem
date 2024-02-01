@@ -196,7 +196,7 @@ const pdPage: CnPage.Props = reactive({
   action: getUserList,
   search: {
     items: [
-      { label: '行政区划', prop: 'regionName', component: 'input' },
+      // { label: '行政区划', prop: 'regionName', component: 'input' },
       { label: '运维人员', prop: 'name', component: 'input' }
     ]
   },

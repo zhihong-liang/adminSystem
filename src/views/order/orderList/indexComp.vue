@@ -15,8 +15,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref, type PropType, } from 'vue'
-import type { Res } from '@/api'
+import { reactive, ref, type PropType } from 'vue'
 import { orderBaseListPage, orderInfoExport } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
@@ -34,7 +33,7 @@ const props = defineProps({
   },
   // 接口
   action: {
-    type: Function as PropType<() => Promise<Res<any>>>,
+    type: Function as PropType<any>,
     default: orderBaseListPage
   }
 })
@@ -234,7 +233,12 @@ const columns: any[] = [
     show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle']
   },
   { prop: 'bpmNodeCode', label: '状态', dict: 'WORK_BPM_NODE_CODE' },
-  { prop: 'customEvaluation', label: '客户评价', dict: 'WORK_CUSTOM_EVALUATION', show: ['Handled', 'History'] },
+  {
+    prop: 'customEvaluation',
+    label: '客户评价',
+    dict: 'WORK_CUSTOM_EVALUATION',
+    show: ['Handled', 'History']
+  },
   { prop: 'followUp', label: '回访情况', dict: 'WORK_FOLLOW_UP', show: ['Handled', 'History'] },
   { prop: 'reason', label: '关闭原因', show: ['Closed'] },
   { prop: 'remark', label: '备注', show: ['Closed'] },

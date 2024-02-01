@@ -58,11 +58,30 @@ import {
   orderAddConsumable,
   orderAddInstallation,
   orderAddUpgrade,
-  getOrderType
+  getOrderType,
+  type typeItem,
+  type dictTs
 } from '@/api/order'
 import { devBaseInfoListPage } from '@/api/device'
 import { useLoginStore } from '@/stores'
 import { isNumber } from '@/utils/pattern'
+
+interface baseTs {
+  workTypeId: string
+  orderSource: string
+  submitterName?: string
+  submitterPhone?: string
+  urgencyLevel: string
+}
+interface wordTs {
+  installationCount: string
+  description: string
+  remark: string
+  imagePath: string
+  dfdevCode: string
+  select: string
+  select1: string
+}
 
 const { userInfo } = useLoginStore()
 
@@ -70,9 +89,9 @@ const dialogRef = ref()
 const baseRef = ref()
 const wordRef = ref()
 
-const propData = ref({} as any)
+const propData = ref({} as typeItem)
 const activeName = ref('first')
-const orderList = ref([] as any)
+const orderList = ref<dictTs[]>([])
 const numSelect = ref([] as any)
 const submitting = ref(false)
 
@@ -82,7 +101,7 @@ const numRadio = ref([
 ])
 
 const baseForm = reactive({
-  model: {},
+  model: {} as baseTs,
   items: [
     {
       label: '工单类型',
@@ -109,7 +128,7 @@ const baseForm = reactive({
 })
 
 const wordForm = reactive({
-  model: {} as any,
+  model: {} as wordTs,
   items: [
     {
       label: '设备编号',
@@ -146,10 +165,10 @@ const wordForm = reactive({
   }
 })
 
-const open = (data: any) => {
+const open = (data: typeItem) => {
   activeName.value = 'first'
-  baseForm.model = {}
-  wordForm.model = {}
+  baseForm.model = {} as baseTs
+  wordForm.model = {} as wordTs
   propData.value = data
   baseForm.model.workTypeId = data.id
   baseForm.model.submitterName = userInfo.name

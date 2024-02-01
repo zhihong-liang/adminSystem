@@ -9,7 +9,7 @@
         <order-infor :data="baseData" />
       </el-tab-pane>
       <el-tab-pane label="工单流程" name="third">
-        <process :id="homeData.id" />
+        <process :data="homeData" />
       </el-tab-pane>
     </el-tabs>
 
@@ -41,7 +41,7 @@ import baseInfor from './baseInfor.vue'
 import orderInfor from './orderInfor.vue'
 import process from './process.vue'
 import orderForm from './orderForm.vue'
-import { orderBaseDetail, orderAudit, orderRepulse } from '@/api/order'
+import { orderBaseDetail, orderAudit, orderRepulse, type orderItemTs  } from '@/api/order'
 import { useLoginStore } from '@/stores'
 import { ElMessage } from 'element-plus'
 import useDictionary from '@/hooks/useDictionary'
@@ -90,7 +90,7 @@ const submitting = ref(false)
 const baseData = ref()
 const workAuditType = ref()
 
-const open = (type: string, data: any, AuditType: string, batch: boolean) => {
+const open = (type: string, data: orderItemTs , AuditType: string, batch: boolean) => {
   activeName.value = 'first'
   homeData.value = data
   hdType.value = type

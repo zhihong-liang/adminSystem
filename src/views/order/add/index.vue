@@ -16,14 +16,14 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import addOrder from './child/addOrder.vue'
-import { getOrderType } from '@/api/order'
+import { getOrderType, type typeItem } from '@/api/order'
 import messageContext from './child/messageContext.vue'
 
 const messageRef = ref()
 const orderRef = ref()
-const list = ref([] as any)
+const list = ref<typeItem[]>([])
 
-const openDialog = (data: any) => {
+const openDialog = (data: typeItem) => {
   orderRef.value.open(data)
 }
 
