@@ -34,8 +34,10 @@
           <div v-if="item.workAuditType === '96'">
             <div>态度：<el-rate v-model="item.evaluationAttitude" disabled /></div>
             <div>效率：<el-rate v-model="item.evaluationEfficiency" disabled /></div>
+          </div>
+          <div v-if="['0', '96'].includes(item.workAuditType)">
             <div>{{ item.remark.split('\n')[0] }}</div>
-            <div style="white-space: pre-line">评价：{{ remarkFilter(item.remark) }}</div>
+            <div style="white-space: pre-line">{{item.workAuditType === '96' ? '评价：': '备注：'}}{{ remarkFilter(item.remark) }}</div>
           </div>
           <div v-if="item.workAuditType === '8' && item.handleFile">
             <CnImage :modelValue="item.handleFile" />
