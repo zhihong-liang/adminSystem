@@ -26,7 +26,7 @@
           <div v-if="item.workAuditType === '97'">回访记录：{{ item.remark }}</div>
 
           <div
-            v-if="['3', '4'].includes(item.workAuditType)"
+            v-if="['3', '4', '95'].includes(item.workAuditType)"
             style="white-space: pre-line"
           >
             {{ item.remark }}
