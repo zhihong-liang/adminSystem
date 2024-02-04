@@ -3,3 +3,6 @@ export const mobile = /^1[3-9]\d{9}$/;
 
 // 固定+移动
 export const phone = /^\d{3}-?\d{8}$|^\d{4}-\d{7}$|^1[3-9]\d{9}$/;
+
+// 正整数
+export const isNumber = /^[1-9]\d*$/

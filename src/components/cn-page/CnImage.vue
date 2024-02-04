@@ -11,11 +11,12 @@
     :initial-index="0"
     fit="cover"
   />
+  <span v-if="!$attrs.modelValue">--</span>
 </template>
 
 <script lang="ts" setup>
 function setList(val: unknown) {
-  if (val === undefined || val === null || val === '') return '[]'
+  if (val === undefined || val === null || val === '') return []
   if (typeof val === 'string') return val.split(',')
   return val
 }

@@ -5,10 +5,14 @@
     :headers="{ Authorization: getToken() }"
     :data="(rawFile: UploadRawFile) => ({ path: rawFile.name })"
     :key="key"
+    accept=".png,.jpeg,.jpg"
+    :limit="limit"
+    :class="{ limitClass: fileList.length === limit }"
     list-type="picture-card"
     :on-preview="handlePictureCardPreview"
     :on-remove="handleRemove"
     :on-success="handleSuccess"
+    :before-upload="handleBeforeUpload"
   >
     <el-icon><Plus /></el-icon>
   </el-upload>
@@ -22,10 +26,11 @@
 import { ref, computed } from 'vue'
 import { Plus } from '@element-plus/icons-vue'
 import { getToken } from '@/utils/auth'
+import { ElMessage } from 'element-plus'
 
 import type { UploadProps, UploadRawFile, UploadFile, UploadFiles } from 'element-plus'
 
-const props = defineProps(['modelValue'])
+const props = defineProps(['modelValue', 'limit'])
 const emit = defineEmits(['update:modelValue'])
 
 const key = computed(() => fileList.value.map((v) => v.url).toString())
@@ -65,4 +70,21 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
   dialogImageUrl.value = uploadFile.url!
   dialogVisible.value = true
 }
+
+const handleBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    ElMessage.error('请上传jpg/jpeg/png格式的文件')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 5) {
+    ElMessage.error('文件大小不能超过5MB!')
+    return false
+  }
+  return true
+}
 </script>
+
+<style lang="scss" scoped>
+.limitClass :deep(.el-upload) {
+  display: none;
+}
+</style>

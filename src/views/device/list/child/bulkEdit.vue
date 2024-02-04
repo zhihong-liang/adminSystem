@@ -59,55 +59,7 @@
           <h3>设备营业时间</h3>
         </template>
         <template #timeSlot>
-          <el-form :model="bulkForm" label-width="120px">
-            <div v-for="(item, index) in bulkForm.timeSlotList" class="time-slotlit">
-              <el-row :gutter="20">
-                <el-col :span="21">
-                  <el-form-item :label="'时间段' + (index + 1)">
-                    <el-checkbox
-                      v-model="item.checked"
-                      :label="timeList[index].lable"
-                      size="large"
-                    />
-                    <span> &nbsp;&nbsp;&nbsp; </span>
-                    <el-time-select
-                      v-model="item.startTime"
-                      :max-time="item.endTime"
-                      class="mr-4"
-                      placeholder="开始时间"
-                      start="00:00"
-                      step="00:15"
-                      end="23:45"
-                      style="width: 40%"
-                    />
-                    <el-time-select
-                      v-model="item.endTime"
-                      :min-time="item.startTime"
-                      placeholder="结束时间"
-                      start="00:00"
-                      step="00:15"
-                      end="23:45"
-                      style="width: 40%"
-                    />
-                    <div class="demo-time-range"></div>
-                  </el-form-item>
-                </el-col>
-                <el-col :span="3">
-                  <div class="time-det">
-                    <el-button
-                      type="danger"
-                      :icon="Delete"
-                      circle
-                      @click="deleteTime(index)"
-                    />
-                  </div>
-                </el-col>
-              </el-row>
-            </div>
-            <el-form-item>
-              <el-button type="primary" :icon="Plus" @click="addTime">时间段</el-button>
-            </el-form-item>
-          </el-form>
+          <BusinessHours v-model="businessHoursWeek" />
         </template>
         <template #configInfo>
           <h3>配置信息</h3>
@@ -134,21 +86,19 @@
   </CnDialog>
 </template>
 <script lang="ts" setup>
-import { reactive, ref, onMounted } from "vue";
+import { reactive, ref, onMounted, watch } from "vue";
 import CnTable from "@/components/cn-page/CnTable.vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 import { Plus, Delete } from "@element-plus/icons-vue";
-import { devGroupListUtils, getUnitListUtils, mattersProgrammeListPageUtils } from "../../utils/index";
-
+import { mattersProgrammeListPageUtils } from "../../utils/index";
+import BusinessHours from "./BusinessHours.vue";
 
 const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
 import {
   devBaseInfoList,
-  getUnitList,
   devGroupList,
   devBaseInfoEditList,
-  mattersProgrammeListPage,
 } from "@/api/device";
 import { ElMessage } from "element-plus";
 const step1 = ref(1);
@@ -158,25 +108,15 @@ const bulkForm: any = reactive({
 });
 const bulkEditFromRef = ref();
 const stpeThreeBulkEditFromRef = ref();
-const supList: any = ref([]);
-const gupList: any = ref([]);
 const matList: any = ref([]);
 const venueInfoOptions: any = ref([]);
 const dialoTitle = ref("批量编辑");
 const emits = defineEmits(["onSubmit"]);
 const propsTableLength = ref(0);
-const timeList = reactive([
-  { lable: "周一", value: 0 },
-  { lable: "周二", value: 1 },
-  { lable: "周三", value: 2 },
-  { lable: "周四", value: 3 },
-  { lable: "周五", value: 4 },
-  { lable: "周六", value: 5 },
-  { lable: "周日", value: 6 },
-]);
+
+const businessHoursWeek = ref<Record<string, string>>({})
+
 onMounted(async () => {
-  supList.value = await getUnitListUtils().then(res => { return res})
-  gupList.value = await devGroupListUtils().then(res => { return res})
   matList.value = await mattersProgrammeListPageUtils().then(res => { return res})
 });
 const dialogProps = reactive<CnPage.DialogProps>({
@@ -217,7 +157,7 @@ const bulkEditFrom = reactive({
       dict: "DEV_SITE_TYPE",
       props: { multiple: true },
     },
-    { label: "硬件模块", prop: "hardware", component: "select", dict: "HARDWARE_MODULE" },
+    { label: "硬件模块", prop: "hardwareList", component: "select", dict: "HARDWARE_MODULE", props: { multiple: true } },
     {
       label: "网络策略",
       prop: "networkPolicyList",
@@ -233,7 +173,25 @@ const bulkEditFrom = reactive({
       dict: 'DEV_VERSION',
       props: { multiple: true }
     },
-    { label: "设备分组", prop: "groupId", component: "select" },
+    {
+      label: "设备分组",
+      prop: "groupId",
+      component: "cascader",
+      props: {
+        props: {
+          emitPath: false,
+          label: 'groupName',
+          value: 'id',
+          checkStrictly: true,
+          lazy: true,
+          lazyLoad: (node, resolve) => {
+            devGroupList({ parentId: node.data?.id || 0 }).then(res => {
+              resolve(res.data.map((v: any) => ({ ...v, leaf: !v.open })))
+            })
+          }
+        }
+      }
+    },
   ],
 });
 const stpeTowBulkEditFrom: any = reactive({
@@ -267,7 +225,7 @@ const stpeTowBulkEditFrom: any = reactive({
     },
     { prop: "networkInfo", component: "slot", span: 24 },
     {
-      prop: "networdPolicy",
+      prop: "networkPolicy",
       component: "checkbox",
       props: {
         options: [{ label: "网络策略", value: 0 }],
@@ -321,7 +279,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       prop: "devManageUnit",
       component: "select",
       span: 24,
-      props: { options: supList },
+      dict: 'UNIT_LIST',
       visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
     },
     {
@@ -329,7 +287,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       prop: "supportingUnit",
       component: "select",
       span: 24,
-      props: { options: supList },
+      dict: 'UNIT_LIST',
       visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
     },
     {
@@ -423,9 +381,8 @@ const stpeThreeBulkEditFrom: any = reactive({
     {
       label: "自助终端管理员",
       prop: "managePersonName",
-      component: "select",
+      component: "input",
       span: 24,
-      dict: "DEV_USAGE",
       visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
     },
     {
@@ -446,7 +403,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       prop: "timeSlot",
       component: "slot",
       span: 24,
-      visible: () => stpeThreeBulkEditFrom.model?.businessHours === "自定义",
+      visible: () => stpeThreeBulkEditFrom.model?.businessHours === "3",
     },
     {
       label: "定时开关机",
@@ -460,15 +417,15 @@ const stpeThreeBulkEditFrom: any = reactive({
       prop: "networkInfo",
       component: "slot",
       span: 24,
-      visible: () => stpeTowBulkEditFrom.model?.networdPolicy.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.networkPolicy.length > 0,
     },
     {
       label: "网络策略",
-      prop: "networdPolicy",
+      prop: "networkPolicy",
       component: "checkbox",
       dict: "NETWORD_POLICY",
       span: 24,
-      visible: () => stpeTowBulkEditFrom.model?.networdPolicy.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.networkPolicy.length > 0,
     },
     {
       prop: "configInfo",
@@ -479,9 +436,21 @@ const stpeThreeBulkEditFrom: any = reactive({
     {
       label: "设备分组",
       prop: "groupId",
-      component: "select",
       span: 24,
-      props: { options: gupList },
+      component: "cascader",
+      props: {
+        props: {
+          emitPath: false,
+          label: 'groupName',
+          value: 'id',
+          lazy: true,
+          lazyLoad: (node, resolve) => {
+            devGroupList({ parentId: node.data?.id || 0 }).then(res => {
+              resolve(res.data.map((v: any) => ({ ...v, leaf: !v.open })))
+            })
+          }
+        }
+      },
       visible: () => false,
     },
     {
@@ -548,7 +517,7 @@ const nextStep = () => {
     if (
       towData.deviceInfo.length < 1 &&
       towData.venueInfo.length < 1 &&
-      towData.networdPolicy.length < 1 &&
+      towData.networkPolicy.length < 1 &&
       towData.configInfo.length < 1
     ) {
       ElMessage({
@@ -599,16 +568,14 @@ const determine = () => {
     console.log(params.hardware.join(","));
     params.hardware = params.hardware.join(",");
   }
-  if (params.networdPolicy) {
-    console.log(params.networdPolicy.join(","));
-    params.networdPolicy = params.networdPolicy.join(",");
+  if (params.networkPolicy) {
+    console.log(params.networkPolicy.join(","));
+    params.networkPolicy = params.networkPolicy.join(",");
   }
-  if (params.businessHours === "自定义") {
-    bulkForm.timeSlotList.map((item: any, index: number) => {
-      if (item.checked) {
-        params[`businessHours${index + 1}`] = `${item.startTime}-${item.endTime}`;
-      }
-    });
+  if (params.businessHours === "3") {
+    for (let key in businessHoursWeek.value) {
+      params[key] = businessHoursWeek.value[key]
+    }
   }
   devBaseInfoEditList(params).then((res) => {
     if (res.code === "200") {

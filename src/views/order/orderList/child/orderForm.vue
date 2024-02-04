@@ -20,7 +20,6 @@
         <div>态度：<el-rate v-model="baseForm.model.evaluationAttitude" /></div>
         <div>效率：<el-rate v-model="baseForm.model.evaluationEfficiency" /></div>
       </div>
-      <el-button>重新评分</el-button>
     </template>
   </CnForm>
 </template>
@@ -197,7 +196,7 @@ const pdPage: CnPage.Props = reactive({
   action: getUserList,
   search: {
     items: [
-      { label: '行政区划', prop: 'regionName', component: 'input' },
+      // { label: '行政区划', prop: 'regionName', component: 'input' },
       { label: '运维人员', prop: 'name', component: 'input' }
     ]
   },
@@ -223,7 +222,7 @@ const queryUnitList = () => {
     getUnitList({
       page: 1,
       size: 1000,
-      obj: {}
+      obj: { unitType: '2' }
     }).then((res) => {
       if (res.code === '200') {
         unitList.value = res.rows.map((v) => ({
@@ -238,6 +237,12 @@ queryUnitList()
 
 // 查询运维人员
 const changeUnit = (val: string) => {
+  baseForm.model.operationPersonId = ''
+  baseForm.model.operationPersonContact = ''
+
+  baseForm.model.operationUnit = unitList.value.find(
+    (v: { value: string }) => val === v.value
+  ).label
   getUserList({
     page: 1,
     size: 1000,

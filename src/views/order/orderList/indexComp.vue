@@ -15,8 +15,8 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, ref } from 'vue'
-import { orderBaseListPage, orderHistoryList } from '@/api/order'
+import { reactive, ref, type PropType } from 'vue'
+import { orderBaseListPage, orderInfoExport } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
@@ -30,6 +30,11 @@ const props = defineProps({
   bpmNodeCode: {
     type: String,
     default: ''
+  },
+  // 接口
+  action: {
+    type: Function as PropType<any>,
+    default: orderBaseListPage
   }
 })
 
@@ -104,7 +109,16 @@ const toolBtn: any[] = [
   {
     label: '导出',
     type: 'primary',
-    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History']
+    show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History'],
+    exportProps: {
+      action: orderInfoExport,
+      fileName: '工单列表',
+      dict: 'WORK_EXPORT_COLUMN'
+      // options: [
+      //   {label: '标签1', value: '1'},
+      // ],
+      // otherParams: {}
+    }
   }
 ]
 
@@ -172,20 +186,20 @@ const tableBtn: any[] = [
     onClick: ({ row }) => handleOpen('Finish', row, '99'),
     show: ['Handled']
   },
-  {
-    label: '评价',
-    type: 'primary',
-    text: true,
-    onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
-    show: ['Handled']
-  },
-  {
-    label: '回访',
-    type: 'primary',
-    text: true,
-    onClick: ({ row }) => handleOpen('Visit', row, '97'),
-    show: ['Handled']
-  },
+  // {
+  //   label: '评价',
+  //   type: 'primary',
+  //   text: true,
+  //   onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
+  //   show: ['Handled']
+  // },
+  // {
+  //   label: '回访',
+  //   type: 'primary',
+  //   text: true,
+  //   onClick: ({ row }) => handleOpen('Visit', row, '97'),
+  //   show: ['Handled']
+  // },
   {
     label: '打回工单',
     type: 'primary',
@@ -202,8 +216,8 @@ const columns: any[] = [
   { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS' },
   { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
   { prop: 'devCode', label: '设备编号', width: 160 },
-  { prop: 'createUnitId', label: '创建单位' },
-  { prop: 'xxx', label: '派单员', show: ['Closed'] },
+  { prop: 'createUnit', label: '创建单位', width: 160 },
+  { prop: 'dispatcher', label: '派单员', show: ['Closed'] },
   {
     prop: 'operationPersonName',
     label: '运维人员',
@@ -219,10 +233,15 @@ const columns: any[] = [
     show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle']
   },
   { prop: 'bpmNodeCode', label: '状态', dict: 'WORK_BPM_NODE_CODE' },
-  { prop: 'custom_evaluation', label: '客户评价', show: ['Handled', 'History'] },
-  { prop: 'followUp', label: '回访情况', show: ['Handled', 'History'] },
-  { prop: 'xxx', label: '关闭原因', show: ['Closed'] },
-  { prop: 'xxx', label: '备注', show: ['Closed'] },
+  {
+    prop: 'customEvaluation',
+    label: '客户评价',
+    dict: 'WORK_CUSTOM_EVALUATION',
+    show: ['Handled', 'History']
+  },
+  { prop: 'followUp', label: '回访情况', dict: 'WORK_FOLLOW_UP', show: ['Handled', 'History'] },
+  { prop: 'reason', label: '关闭原因', show: ['Closed'] },
+  { prop: 'remark', label: '备注', show: ['Closed'] },
   {
     prop: 'action',
     label: '操作',
@@ -237,9 +256,27 @@ const pages: CnPage.Props = reactive({
     props.type === 'History'
       ? { bpmNodeCodeList: ['1500', '1550'] }
       : { bpmNodeCode: props.bpmNodeCode },
-  action: props.type === 'History' ? orderHistoryList : orderBaseListPage,
+  action: props.action,
   search: {
     items: useSearch(props.type)
+  },
+  transformRequest(params, page, size) {
+    const [orderApplyStartTime, orderApplyEndTime] = params?.orderApplyTime || []
+    const [orderCloseStartTime, orderCloseEndTime] = params?.orderCloseTime || []
+    const obj: any = {
+      ...params,
+      orderApplyStartTime,
+      orderApplyEndTime,
+      orderCloseStartTime,
+      orderCloseEndTime
+    }
+    delete obj.orderApplyTime
+    delete obj.orderCloseTime
+    return {
+      page,
+      size,
+      obj
+    }
   },
   toolbar: {
     items: toolBtn.filter((v) => !v.show || v.show?.includes(props.type))

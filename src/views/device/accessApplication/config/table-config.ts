@@ -9,7 +9,7 @@ export default function getTableConfig(): CnPage.TableProps {
       { label: '设备数', prop: 'devNum' },
       { label: '申请人', prop: 'applyPerson' },
       { label: '申请时间', prop: 'applyTime', sortable: true },
-      { label: '状态', prop: 'auditCurrentStep', dict: 'DEV_APPLY_NODE' },
+      { label: '状态', prop: 'auditCurrentStep', dict: 'DEV_ACCESS_NODE' },
       { label: '审核时间', prop: 'auditEndTime' },
       {
         label: '操作',

@@ -51,6 +51,7 @@ watchEffect(() => {
     // 选择框支持多选，且非独占一行，默认折叠标签
     if (item.component === 'select' && item.props?.multiple && (item.span === undefined ? props.colSpan !== 24 : item.span !== 24)) {
       item.props.collapseTags = item.props.collapseTags === undefined ? true : item.props.collapseTags
+      item.props.collapseTagsTooltip = item.props.collapseTagsTooltip === undefined ? true : item.props.collapseTagsTooltip
     }
 
     // 设置组件的双向绑定
@@ -140,7 +141,10 @@ defineExpose({ formRef })
 :deep(.el-input-number),
 :deep(.el-date-editor),
 :deep(.el-date-editor .el-input__wrapper) {
-  width: 100% !important;
+  width: 100%;
+}
+:deep(.el-date-editor.el-input) {
+  --el-date-editor-width: 100%;
 }
 :deep(.el-date-editor .el-input__wrapper) {
   box-sizing: border-box;

@@ -273,7 +273,7 @@ declare namespace CnPage {
     component: 'cascader'
     props?: {
       [key: string]: any
-      options: ElCascaderOption[]
+      options?: ElCascaderOption[]
       props?: ElCascaderProps
     }
   }

@@ -17,7 +17,7 @@ const orderForm = reactive({
   model: props.data,
   items: [
     { label: '设备编号', prop: 'devCode' },
-    { label: '设备接入单位设备编号', prop: 'xxx' },
+    { label: '设备接入单位设备编号', prop: 'unitDevCode' },
     { label: '设备地址', prop: 'address' },
     { label: '设备类型', prop: 'devType', dict: 'DEV_TYPE' },
     { label: '自助终端管理员', prop: 'managePersonName' },

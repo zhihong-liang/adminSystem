@@ -9,7 +9,7 @@
         <order-infor :data="baseData" />
       </el-tab-pane>
       <el-tab-pane label="工单流程" name="third">
-        <process :id="homeData.id" />
+        <process :data="homeData" />
       </el-tab-pane>
     </el-tabs>
 
@@ -23,7 +23,13 @@
 
     <template #footer>
       <el-button @click="dialogRef?.close()">{{ hdType === 'Look' ? '关闭' : '取消' }}</el-button>
-      <el-button v-if="hdType !== 'Look'" type="primary" @click="handleSubmit()">提交</el-button>
+      <el-button
+        v-if="hdType !== 'Look'"
+        type="primary"
+        :loading="submitting"
+        @click="handleSubmit()"
+        >提交</el-button
+      >
     </template>
   </CnDialog>
 </template>
@@ -35,7 +41,7 @@ import baseInfor from './baseInfor.vue'
 import orderInfor from './orderInfor.vue'
 import process from './process.vue'
 import orderForm from './orderForm.vue'
-import { orderBaseDetail, orderAudit, orderRepulse } from '@/api/order'
+import { orderBaseDetail, orderAudit, orderRepulse, type orderItemTs  } from '@/api/order'
 import { useLoginStore } from '@/stores'
 import { ElMessage } from 'element-plus'
 import useDictionary from '@/hooks/useDictionary'
@@ -80,10 +86,12 @@ const dialogProps = reactive<CnPage.DialogProps>({
   title: '查看'
 })
 
+const submitting = ref(false)
 const baseData = ref()
 const workAuditType = ref()
 
-const open = (type: string, data: any, AuditType: string, batch: boolean) => {
+const open = (type: string, data: orderItemTs , AuditType: string, batch: boolean) => {
+  activeName.value = 'first'
   homeData.value = data
   hdType.value = type
   workAuditType.value = AuditType
@@ -99,8 +107,8 @@ const queryDetail = (id: string) => {
     .then((res) => {
       if (res.code === '200') {
         baseData.value = {
+          ...res.data,
           ...res.data.detail,
-          ...res.data
         }
       }
     })
@@ -124,6 +132,7 @@ const handleSubmit = () => {
       }
       delete params.id, delete params.workOrderNumber
 
+      submitting.value = true
       orderRepulse(params)
         .then((res) => {
           if (res.code === '200') {
@@ -132,8 +141,8 @@ const handleSubmit = () => {
             emits('success')
           }
         })
-        .catch((arr) => {
-          console.log(arr)
+        .finally(() => {
+          submitting.value = false
         })
     } else {
       const params = {
@@ -198,6 +207,7 @@ const handleSubmit = () => {
           break
       }
 
+      submitting.value = true
       orderAudit(params)
         .then((res) => {
           if (res.code === '200') {
@@ -206,8 +216,8 @@ const handleSubmit = () => {
             emits('success')
           }
         })
-        .catch((arr) => {
-          console.log(arr)
+        .finally(() => {
+          submitting.value = false
         })
     }
   })

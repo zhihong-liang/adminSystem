@@ -62,9 +62,9 @@ const props: CnPage.Props = reactive({
       // { type: 'selection' },
       { type: 'index', label: '序号', width: 60 },
       { prop: 'userNo', label: '用户编号' },
-      { prop: 'name', label: '用户名称' },
-      { prop: 'phone', label: '登录手机号' },
-      { prop: 'unitName', label: '单位名称' },
+      { prop: 'name', label: '用户名称', width: 130 },
+      { prop: 'phone', label: '登录手机号', width: 130},
+      { prop: 'unitName', label: '单位名称', width: 200 },
       { prop: 'unitLevel', label: '单位层级', dict: 'UNIT_LEVEL' },
       { prop: 'unitType', label: '类型', minWidth: 100 },
       { prop: 'postName', label: '岗位' },
@@ -74,6 +74,7 @@ const props: CnPage.Props = reactive({
       {
         prop: 'action',
         label: '操作',
+        minWidth: 175,
         buttons: [
           {
             label: '查看',

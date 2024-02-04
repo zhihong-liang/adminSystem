@@ -12,12 +12,22 @@
             >超时工单 {{ timeoutData?.timeOut }} 笔，即将超时工单
             {{ timeoutData?.soonTimeOut }} 笔</span
           >
-          <span class="tip_num_cond">查看<span>《服务标准》</span></span>
+          <span class="tip_num_cond" @click="messageRef?.open()"
+            >查看<span>《服务标准》</span></span
+          >
         </div>
       </div>
     </template>
   </CnPage>
-  <detail ref="detailRef"></detail>
+  <detail
+    ref="detailRef"
+    @success="
+      () => {
+        props.refresh = Date.now()
+      }
+    "
+  ></detail>
+  <messageContext ref="messageRef" />
 </template>
 
 <script lang="ts" setup>
@@ -26,7 +36,9 @@ import { orderListPageAll, orderQueryWorkTimeout } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
+import messageContext from '../add/child/messageContext.vue'
 
+const messageRef = ref()
 const detailRef = ref()
 const timeoutData = ref()
 
@@ -35,6 +47,24 @@ const props: CnPage.Props = reactive({
   action: orderListPageAll,
   search: {
     items: useSearch('All')
+  },
+  transformRequest(params, page, size) {
+    const [orderApplyStartTime, orderApplyEndTime] = params?.orderApplyTime || []
+    const [orderCloseStartTime, orderCloseEndTime] = params?.orderCloseTime || []
+    const obj: any = {
+      ...params,
+      orderApplyStartTime,
+      orderApplyEndTime,
+      orderCloseStartTime,
+      orderCloseEndTime
+    }
+    delete obj.orderApplyTime
+    delete obj.orderCloseTime
+    return {
+      page,
+      size,
+      obj
+    }
   },
   table: {
     columns: [
@@ -45,14 +75,14 @@ const props: CnPage.Props = reactive({
       { prop: 'orderSource', label: '工单来源', dict: 'ORDER_SOURCE' },
       { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
       { prop: 'devCode', label: '设备编号', width: 160 },
-      { prop: 'createUnitId', label: '创建人员单位' },
+      { prop: 'createUnit', label: '创建人员单位', width: 160 },
       { prop: 'operationPersonName', label: '运维人员' },
       { prop: 'orderApplyTime', label: '创建时间', width: 165 },
       { prop: 'orderCloseTime', label: '完成时间' },
       { prop: 'takeUpTime', label: '工单耗时' },
       { prop: 'bpmNodeCode', label: '工单状态', dict: 'WORK_BPM_NODE_CODE' },
-      { prop: 'custom_evaluation', label: '客户评价' },
-      { prop: 'followUp', label: '回访情况' },
+      { prop: 'customEvaluation', label: '客户评价', dict: 'WORK_CUSTOM_EVALUATION' },
+      { prop: 'followUp', label: '回访情况', dict: 'WORK_FOLLOW_UP' },
       {
         prop: 'action',
         label: '操作',
@@ -62,6 +92,7 @@ const props: CnPage.Props = reactive({
             label: '补充',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'bc' }],
             onClick: ({ row }) => handleOpen('Supply', row, '95'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
           },
@@ -69,6 +100,7 @@ const props: CnPage.Props = reactive({
             label: '分拨',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'fb' }],
             onClick: ({ row }) => handleOpen('Allocation', row, '2'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
           },
@@ -76,6 +108,7 @@ const props: CnPage.Props = reactive({
             label: '派单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'pd' }],
             onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
             visible: ({ row }) => row.bpmNodeCode === '1100'
           },
@@ -83,6 +116,7 @@ const props: CnPage.Props = reactive({
             label: '转派',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'zp' }],
             onClick: ({ row }) => handleOpen('Transfer', row, '4'),
             visible: ({ row }) => ['1200', '1300'].includes(row.bpmNodeCode)
           },
@@ -90,6 +124,7 @@ const props: CnPage.Props = reactive({
             label: '处理',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'cl' }],
             onClick: ({ row }) => handleOpen('Handle', row, '6'),
             visible: ({ row }) => row.bpmNodeCode === '1200'
           },
@@ -97,6 +132,7 @@ const props: CnPage.Props = reactive({
             label: '完成处理',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'wccl' }],
             onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
             visible: ({ row }) => row.bpmNodeCode === '1300'
           },
@@ -104,6 +140,7 @@ const props: CnPage.Props = reactive({
             label: '退回工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'thgd' }],
             onClick: ({ row }) => handleOpen('Back', row, '5'),
             visible: ({ row }) => ['1100', '1200'].includes(row.bpmNodeCode)
           },
@@ -111,6 +148,7 @@ const props: CnPage.Props = reactive({
             label: '关闭工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'gbgd' }],
             onClick: ({ row }) => handleOpen('Close', row, '0'),
             visible: ({ row }) => ['1001', '1100', '1200'].includes(row.bpmNodeCode)
           },
@@ -118,6 +156,7 @@ const props: CnPage.Props = reactive({
             label: '完成',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'wc' }],
             onClick: ({ row }) => handleOpen('Finish', row, '99'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
           },
@@ -125,20 +164,23 @@ const props: CnPage.Props = reactive({
             label: '评价',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'pj' }],
             onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
-            visible: ({ row }) => row.bpmNodeCode === '1500'
+            visible: ({ row }) => row.bpmNodeCode === '1500' && !row.customEvaluation
           },
           {
             label: '回访',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'hf' }],
             onClick: ({ row }) => handleOpen('Visit', row, '97'),
-            visible: ({ row }) => row.bpmNodeCode === '1500'
+            visible: ({ row }) => row.bpmNodeCode === '1500' && !row.followUp
           },
           {
             label: '打回工单',
             type: 'primary',
             text: true,
+            directives: [{ label: 'permission', value: 'dhgd' }],
             onClick: ({ row }) => handleOpen('Repulse', row, '98'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
           }

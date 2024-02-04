@@ -28,11 +28,13 @@ export const getDevBaseInfo = (ids: string): Promise<ListRes> =>
 export const getUnitList = (data: ListReq): Promise<ListRes> =>
   axios.post(admin + `/unit/list`, data)
 // 设备分组列表
-export const devGroupList = (data: ListReq): Promise<ListRes> =>
+export const devGroupList = (data: any): Promise<Res> =>
   axios.post(device + `/devGroup/list`, data)
 // 设备分组列表
 export const mattersProgrammeListPage = (data: ListReq): Promise<ListRes> =>
   axios.post('/api/matters/mattersProgramme/listPage', data)
+// 设备分组树
+export const devGroupTree = (): Promise<Res> => axios.get(device + '/devGroup/tree')
 // 批量修改
 export const devBaseInfoEditList = (data: any): Promise<ListRes> =>
   axios.put(device + `/devBaseInfo/editList`, data)

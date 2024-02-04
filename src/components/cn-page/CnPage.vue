@@ -17,9 +17,9 @@
         <slot :name="item.prop" />
       </template>
     </CnSearch>
-    <CnToolbar v-bind="toolbar" />
+    <CnToolbar v-bind="toolbar" :params="paramsAll" />
     <slot name="addition"></slot>
-    <CnTable v-bind="table" :data="data">
+    <CnTable v-bind="table" :data="data" ref="tableRef">
       <template
         v-for="(column, index) in table?.columns.filter(
           (item: CnPage.TableColumnProps) => item.slot
@@ -35,7 +35,7 @@
 </template>
 
 <script lang="ts" setup>
-import { computed, onBeforeMount, ref, watch } from 'vue'
+import { computed, onBeforeMount, ref, watch, reactive, watchEffect } from 'vue'
 import type { ListRes } from '@/api'
 import CnSearch from './CnSearch.vue'
 import CnToolbar from './CnToolbar.vue'
@@ -62,6 +62,16 @@ const showPagination = computed(() => props.pagination !== false)
 const page = ref(1)
 const size = ref(10)
 const total = ref(0)
+
+const tableRef = ref()
+const paramsAll = reactive({
+  search: {},
+  tableList: []
+})
+paramsAll.search = computed(() => props.params).value
+watchEffect(() => {
+  paramsAll.tableList = tableRef.value?.$refs?.tableRef.getSelectionRows() || []
+})
 
 onBeforeMount(async () => {
   await props.init

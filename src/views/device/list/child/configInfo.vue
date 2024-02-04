@@ -11,8 +11,8 @@ import { reactive, ref, watchEffect, computed } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
 import CnPage from "@/components/cn-page/CnPage.vue";
 // import CnTable from "@/components/cn-page/CnTable.vue";
-import { mattersProgrammeRelationList } from "@/api/device";
-import { devGroupListUtils, mattersProgrammeListPageUtils } from "../../utils/index";
+import { devGroupTree, mattersProgrammeRelationList } from "@/api/device";
+import { mattersProgrammeListPageUtils } from "../../utils/index";
 const props = defineProps({
   model: {
     type: Object,
@@ -21,8 +21,7 @@ const props = defineProps({
 });
 const basisRef = ref();
 const mattersList: any = ref([]);
-const gupList: any = ref([]);
-const configForm: any = reactive({
+const configForm: CnPage.FormProps = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
@@ -35,9 +34,31 @@ const configForm: any = reactive({
     {
       label: "设备分组",
       prop: "groupId",
-      component: "select",
+      component: "cascader",
       span: 24,
-      props: { options: gupList },
+      props: {
+        props: {
+          emitPath: false,
+          label: 'groupName',
+          value: 'id',
+          lazy: true,
+          lazyLoad: (node, resolve) => {
+            if (node.data?.id) return
+            devGroupTree().then(res => {
+              function _trans(list: any[]) {
+                return list.map(v => {
+                  const data = { ...v, leaf: !v.open }
+                  if (data.children) {
+                    data.children = _trans(data.children)
+                  }
+                  return data
+                })
+              }
+              resolve(_trans(res.data))
+            })
+          }
+        }
+      }
     },
     {
       label: "方案名称",
@@ -110,9 +131,6 @@ watchEffect(async () => {
   if (props.model) {
     configForm.model = props.model;
     mattersList.value = await mattersProgrammeListPageUtils().then((res) => {
-      return res;
-    });
-    gupList.value = await devGroupListUtils().then((res) => {
       return res;
     });
     mattersList.value.map((item: any) => {
