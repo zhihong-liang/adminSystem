@@ -95,7 +95,7 @@ const dialogProps: CnPage.DialogProps = reactive({
     labelWidth: '100',
     labelPosition: 'right'
   },
-  action: () => querAddDevGroup(dialogProps?.formProps!.model)
+  action: handleDialogAction
 })
 
 const _resolve = ref()
@@ -163,6 +163,14 @@ function handleTableResolve(pid: number | undefined, callback: Function): void {
   queryDevGroupList({ parentId: pid }).then((res: any) => {
     callback(res.data)
   })
+}
+
+function handleDialogAction() {
+  const params = {
+    ...dialogProps?.formProps!.model,
+    parentId: dialogProps.formProps?.model.parentId.join(',')
+  }
+  return querAddDevGroup(params)
 }
 
 function TableLoad(

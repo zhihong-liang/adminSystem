@@ -222,7 +222,7 @@ function handleSubmit(action: 'add' | 'edit') {
 // 编辑
 function handleEdit({ row }: any) {
   dialogRef.value?.open()
-  dialogProps.formProps!.model = row
+  dialogProps.formProps!.model = {...row}
   dialogProps.action = () => {
     return new Promise((resolve, reject) =>
       handleSubmit('edit')
