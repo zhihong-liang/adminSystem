@@ -77,7 +77,7 @@ const DEFAULT_ITEMS: any = [
     label: '状态',
     prop: 'status',
     component: 'select',
-    dict: 'DEV_AUTH_STATUS'
+    dict: 'START_STOP'
   }
 ]
 
