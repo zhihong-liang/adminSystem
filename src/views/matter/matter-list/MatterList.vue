@@ -141,6 +141,9 @@ const hardwareModuleOptions = ref<any[]>()
 // 网络策略options
 const networdPolicyOptions = ref<any[]>()
 
+// 事项标签列表
+const matterLabelList = ref<any[]>()
+
 // 当前搜索出的单位列表
 const unitListOptions = ref<any[]>()
 
@@ -269,6 +272,11 @@ onMounted(async () => {
     value: i.id,
     label: i.businessDeptName
   }))
+  const matterLabelListRes = await getMatterLabelList({ page: 1, size: 1000, obj: {} })
+  matterLabelList.value = matterLabelListRes.rows.map((item: any) => ({
+    label: item.lableName,
+    value: item.id
+  }))
 })
 
 const props = reactive<CnPage.Props>({
@@ -388,7 +396,8 @@ function editMatterAction() {
     payWay: model.payWay.join(','),
     payStatus: model.payWay.length ? '1' : '0',
     sysCoverage: model.sysCoverage.join(','),
-    entryUnit: ''
+    entryUnit: '',
+    lableName: matterLabelList.value?.find((v) => v.value === model.lableId).label
   }
   obj.entryUnit = unitListOptions.value!.find((v) => v.label === model.entryUnit).value
   return editMatter({ ...model, ...obj })
@@ -481,8 +490,7 @@ async function showDialogByAddOrLabel(handle: ActionType) {
   } else if (handle === 'label' || handle === 'delLabel') {
     if (!tableSelection.value || !tableSelection.value.length)
       return ElMessage.warning('请先勾选事项')
-    const result = await getMatterLabelList({ page: 1, size: 1000, obj: {} })
-    const options = result.rows.map((item: any) => ({ label: item.lableName, value: item.id }))
+
     const matterNameList = tableSelection.value.map((item) => item.matterName)
     const dialogConfig = getDialogConfig(handle)({
       dialogSubmitSuccess: dialogSubmitSuccess,
@@ -490,7 +498,7 @@ async function showDialogByAddOrLabel(handle: ActionType) {
         matterName: matterNameList.join('、')
       },
       optionsMap: {
-        label: options
+        label: computed(() => matterLabelList.value)
       }
     })
     for (const key of Object.keys(dialogConfig)) {
@@ -552,8 +560,12 @@ async function showDialogByEdit(handle: ActionType, row: any, firstOpen: boolean
         sysCoverage: computed(() => sysCoverageOptions.value),
         identityAuthItem: computed(() => identityAuthItemOptions.value),
         payWay: computed(() => payWayOptions.value),
-        businessUnit: computed(() => businessUnitOptions.value)
+        businessUnit: computed(() => businessUnitOptions.value),
+        hardwareModuleOptions: computed(() => hardwareModuleOptions.value),
+        networdPolicyOptions: computed(() => networdPolicyOptions.value),
+        label: computed(() => matterLabelList.value)
       },
+      visible: { payWay: payTypeVisible, identityAuthItem: authenticationTypeVisible },
       activeName: activeName.value,
       model: model,
       onClose: handleDialogClose

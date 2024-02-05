@@ -12,7 +12,7 @@ export function getDialogConfig(actionType: ActionType) {
 
 // 新建/编辑标签
 export function getAddOrEditActionDialogConfig(params: getDialogConfigParams): CnPage.DialogProps {
-  const { dialogSubmitSuccess, model } = params
+  const { dialogSubmitSuccess, model, onClose } = params
   return {
     title: model ? '编辑标签' : '新建标签',
     formProps: {
@@ -21,14 +21,16 @@ export function getAddOrEditActionDialogConfig(params: getDialogConfigParams): C
       requireAsteriskPosition: 'right',
       items: [
         { label: '标签名称', prop: 'lableName', component: 'input' },
-        { label: '备注', prop: 'remark', component: 'input' }
+        { label: '备注', prop: 'remark', component: 'input' },
+        { label: '图标', prop: 'lableIcon', component: 'slot' }
       ],
       labelWidth: 120,
       rules: {
         lableName: [{ required: true, message: '请输入标签名称' }]
       }
     },
-    onSuccess: dialogSubmitSuccess
+    onSuccess: dialogSubmitSuccess,
+    onClose
   }
 }
 
@@ -60,7 +62,7 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
         { label: '标签名称', prop: 'lableName' },
         { label: '状态', prop: 'status' },
         { label: '备注', prop: 'remark' },
-        { label: '图标', prop: 'lableIcon' },
+        { label: '图标', prop: 'showLableIcon', component: 'slot' },
         { label: '使用事项数', prop: 'mattersCount' },
         { label: '创建人', prop: 'createUser' },
         { label: '创建时间', prop: 'createTime' }
