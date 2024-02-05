@@ -21,6 +21,10 @@
         <div>效率：<el-rate v-model="baseForm.model.evaluationEfficiency" /></div>
       </div>
     </template>
+
+    <template #amap>
+      <Amap @success="handleAddress" />
+    </template>
   </CnForm>
 </template>
 
@@ -30,6 +34,7 @@ import { reactive, ref, inject, computed } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import { getUnitList, getUserList } from '@/api/admin'
 import { useLoginStore } from '@/stores'
+import Amap from './amap.vue'
 
 const { userInfo } = useLoginStore()
 
@@ -79,12 +84,17 @@ const allForm: any = reactive({
       label: '运维方式',
       prop: 'repairType',
       component: 'select',
-      dict: 'WORK_ORDER_REAIR_TYPE'
+      dict: 'WORK_ORDER_REAIR_TYPE',
+      props: {
+        onChange: () => {
+          baseForm.model.position = ''
+        }
+      }
     },
     {
       label: '到达现场',
-      prop: 'position',
-      component: 'input',
+      prop: 'amap',
+      component: 'slot',
       visible: () => baseForm.model?.repairType === '2'
     },
     {
@@ -154,8 +164,19 @@ const baseForm = reactive<CnPage.DialogProps>({
     followUp: [{ required: true, message: '请选择是否满意' }],
     dfResult: [{ required: true, message: '请选择打回原因' }],
     repairType: [{ required: btnType.value === 'Handle', message: '请选择运维方式' }],
-    position: [{ required: true, message: '不能为空' }],
     handleFile: [{ required: true, message: '请上传签收单' }],
+    amap: [
+      {
+        required: true,
+        validator: (rule: any, value: any, callback: any) => {
+          if (!baseForm.model.position) {
+            callback(new Error('不能为空'))
+          } else {
+            callback()
+          }
+        }
+      }
+    ],
     eveaSlot: [
       {
         required: true,
@@ -260,6 +281,10 @@ const changeUnit = (val: string) => {
       }))
     }
   })
+}
+
+const handleAddress = (data: any) => {
+  baseForm.model.position = data.address
 }
 </script>
 
