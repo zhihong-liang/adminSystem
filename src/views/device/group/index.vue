@@ -26,6 +26,7 @@ import type { Resolve } from 'element-plus/lib/components/cascader-panel/index.j
 
 const cascaderProps = {
   checkStrictly: true,
+  emitPath: false,
   lazy: true,
   lazyLoad(node: any, resolve: Resolve) {
     const params = {
@@ -37,7 +38,8 @@ const cascaderProps = {
       nodes = res.data.map((item: DeviceInfo) => ({
         value: item.id,
         label: item.groupName,
-        leaf: !item.open
+        leaf: item.open === false,
+        disabled: item.parentId && !item.open
       }))
 
       return resolve(nodes)
@@ -159,16 +161,16 @@ const props: CnPage.Props = reactive({
   transformResponse: (res) => ({ rows: res.data, total: 0 })
 })
 
-function handleTableResolve(pid: number | undefined, callback: Function): void {
+function handleTableResolve(pid: number | undefined, resolve: Function): void {
   queryDevGroupList({ parentId: pid }).then((res: any) => {
-    callback(res.data)
+    resolve(res.data)
   })
 }
 
 function handleDialogAction() {
   const params = {
     ...dialogProps?.formProps!.model,
-    parentId: dialogProps.formProps?.model.parentId.join(',')
+    parentId: dialogProps.formProps?.model?.parentId
   }
   return querAddDevGroup(params)
 }
@@ -188,7 +190,11 @@ function handleDeleteGroup({ row }: any) {
     title: '删除',
     action: () => queryDeleteDevGroup(row.id || ''),
     success: () => {
-      props.refresh = new Date().getTime()
+      if (!row.parentId) {
+        props.refresh = new Date().getTime()
+      } else {
+        handleTableResolve(row.parentId, _resolve.value)
+      }
     }
   }
   useConfirm(opts)

@@ -28,11 +28,10 @@
       <el-button type="primary" @click="handleScreen">确定</el-button>
     </template>
   </CnDialog>
-  <!-- <div v-if="roleDia"></div> -->
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watchEffect } from 'vue'
 import { ElAvatar } from 'element-plus'
 import { useUserStore, useHomeStore, useLoginStore } from '@/stores'
 import { useRouter } from 'vue-router'
@@ -40,18 +39,22 @@ import { clearToken } from '@/utils/auth'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 import { getRoleList, userRoleSwitch, getSysMenuTree } from '@/api/admin'
 import { ElMessage } from 'element-plus'
+import { resetRouteRefresh } from '@/router/index'
 
 const roleList: any = ref([])
-const [router, store, menuList, loginInfo] = [
+const [router, store, homeStore, loginInfo] = [
   useRouter(),
   useUserStore(),
   useHomeStore(),
   useLoginStore()
 ]
-const roleIdList = loginInfo.$state.userInfo?.roleIdList || []
-const useRoleIdList = loginInfo.$state.userInfo?.useRoleIdList || []
 
-const currentRoleId = loginInfo.$state.userInfo?.currentRoleId
+const { resetAll } = homeStore
+
+const roleIdList = loginInfo.$state.userInfo?.roleIdList || []
+// const useRoleIdList = loginInfo.$state.userInfo?.useRoleIdList || []
+
+const currentRoleId = computed(() => loginInfo.userInfo?.currentRoleId)
 
 const userId = loginInfo.$state.userInfo?.userId
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
@@ -61,9 +64,7 @@ const avatarImage = computed(() => store.userInfo.headImage)
 const dialogProps = reactive<CnPage.DialogProps>({
   title: '角色切换',
   formProps: {
-    model: {
-      currentRoleId: currentRoleId
-    },
+    model: {},
     colSpan: 12,
     items: [
       {
@@ -83,40 +84,29 @@ function handleLogOut() {
   clearToken()
   store.updateUserInfo({})
   loginInfo.getLoginInfo({})
+  router.removeRoute('layout') // 删除路由
   router.push('/login')
 }
+
 function switchRoles() {
+  dialogProps!.formProps!.model.currentRoleId = currentRoleId.value
+
   const params = {
     obj: {},
     page: 1,
     size: 999
   }
   getRoleList(params).then((res: any) => {
-    console.log('res: ', res)
     if (res.code === '200') {
-      roleList.value = []
-      console.log('useRoleIdList: ', useRoleIdList)
-      res.rows.map((item: any) => {
-        item.label = item.name
-        item.value = item.id
-
-        // if (!roleIdList.includes(item.id)) {
-        //   item.disabled = true
-        // }
-
-        for (let index = 0; index < roleIdList.length; index++) {
-          const element = roleIdList[index]
-          if (item.id === element) {
-            roleList.value.push(item)
-          }
-        }
-      })
+      roleList.value = res.rows
+        .map((b: any) => ({ ...b, label: b.name, value: b.id }))
+        .filter((v: any) => roleIdList.find((id) => id === v.id))
       dialogRef.value?.open()
     }
   })
 }
 function handleScreen() {
-  if (currentRoleId === dialogProps.formProps!.model.currentRoleId) {
+  if (currentRoleId.value === dialogProps.formProps!.model.currentRoleId) {
     ElMessage({
       type: 'error',
       message: '您选择的角色为当前登录角色'
@@ -127,24 +117,19 @@ function handleScreen() {
       currentRoleId: dialogProps.formProps!.model.currentRoleId
     }
     userRoleSwitch(params).then((res: any) => {
-      console.log('res: ', res)
       if (res.code === '200') {
         ElMessage({
           type: 'success',
           message: res.message
         })
-
-        getSysMenuTree({
-          currentRoleId: dialogProps.formProps!.model.currentRoleId
-        }).then((tree) => {
-          menuList.updateMenuList(tree.data)
-        })
         loginInfo.getLoginInfo(res.data)
-        router.push('/system/usercenter')
+
+        resetRouteRefresh() // 重置路由判断条件
+        resetAll() // 把菜单清空，路由跳转时会自动调请求菜单的接口
+        router.removeRoute('layout') // 删除上一个角色的动态路由
+        router.push('/system/usercenter') // 跳转路由就会触发动态路由
+
         dialogRef.value?.close()
-        setTimeout(() => {
-          location.reload()
-        }, 100)
       }
     })
   }

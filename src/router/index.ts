@@ -15,6 +15,7 @@ import { getToken } from '@/utils/auth'
 import whileList from './whiteList'
 import { differenceBy } from 'lodash-es'
 
+import BaseLayout from '@/layout/index.vue'
 import type { BreadcrumbItem, Menu } from '@/layout/type'
 
 let whiteRoutes: any = []
@@ -92,6 +93,7 @@ export const dymanicAddRoute = (menuList: Menu[], modules: any) => {
     ...formatMenus(whiteRoutes, modules) // 白名单转换为路由
     // TODO 添加404
   ]
+
   addRoutes('/', _children)
 }
 
@@ -106,6 +108,17 @@ function findNodeByPath(routes: RouteRecordRaw[], path: string) {
 }
 
 export const addRoutes = (parentPath: string, routes: RouteRecordRaw[]) => {
+  const LayoutRoute: any = {
+    path: '/',
+    name: 'layout',
+    component: BaseLayout,
+    redirect: '/system/usercenter'
+  }
+
+  const layoutExit = router.hasRoute('layout')
+
+  if (!layoutExit) router.addRoute(LayoutRoute)
+
   if (!parentPath) {
     routes.forEach((r) => router.addRoute('layout', r))
     return
@@ -151,6 +164,10 @@ function searchParentNode(id?: number): BreadcrumbItem[] {
 
 const refresh = ref(true)
 
+export const resetRouteRefresh = () => {
+  refresh.value = true
+}
+
 const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: NavigationGuardNext) => {
   const [home, userStore] = [useHomeStore(), useUserStore()]
 
@@ -159,7 +176,7 @@ const handleRouterBeforeEach = async (to: RouteLocationNormalized, next: Navigat
   const { updateAuthButtions } = userStore
 
   if (to.path === '/login') {
-    refresh.value = true
+    resetRouteRefresh()
     resetAll()
     next()
     return

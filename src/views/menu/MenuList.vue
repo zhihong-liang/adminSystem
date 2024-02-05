@@ -1,12 +1,16 @@
 <template>
   <CnPage v-bind="props"></CnPage>
-  <CnDialog v-bind="dialogProps" ref="dialogRef" @success="queryMenuList">
+  <CnDialog v-bind="dialogProps" ref="dialogRef">
     <template #icon>
       <el-input v-model="dialogProps.formProps!.model.icon" disabled>
         <template #append>
           <el-button @click="() => IconDialogRef?.open()">选择</el-button>
         </template>
       </el-input>
+    </template>
+    <template #footer>
+      <el-button @click="handleCancel">取消</el-button>
+      <el-button type="primary" :loading="dialogLoading" @click="handleSubmit">提交</el-button>
     </template>
   </CnDialog>
   <IconDialog v-model:value="dialogProps.formProps!.model.icon" ref="IconDialogRef" />
@@ -125,14 +129,9 @@ const props: CnPage.Props = reactive({
         label: '新增',
         type: 'primary',
         onClick: () => {
+          step.value = 'add'
           dialogRef.value?.open()
           dialogProps.formProps!.model = {}
-          dialogProps.action = () =>
-            new Promise((resolve, reject) =>
-              handleSubmit('add')
-                .then((res) => resolve(res))
-                .catch(() => reject())
-            )
         }
       }
     ]
@@ -176,6 +175,7 @@ const props: CnPage.Props = reactive({
 })
 
 const step = ref('') // 有两个状态：add 或 delete
+const dialogLoading = ref(false)
 
 function handleTransformResp(res: Res) {
   const { code, data } = res
@@ -193,12 +193,14 @@ function handleTransformResp(res: Res) {
   return { code, total: 0, rows: data }
 }
 
-function handleSubmit(action: 'add' | 'edit') {
+function handleSubmit() {
+  dialogLoading.value = true
+
   let params: Menu = {
     ...dialogProps.formProps!.model
   }
 
-  if (action === 'add') {
+  if (step.value === 'add') {
     params = Object.assign({}, params, {
       createTime: moment().format('YYYY-MM-DD HH:mm:ss')
       // createUser: 'ceshi'
@@ -209,27 +211,33 @@ function handleSubmit(action: 'add' | 'edit') {
     } else {
       params.parentId = 0
     }
+
+    addMenu(params)
+      .then(() => {
+        dialogRef.value?.close()
+        props.refresh = new Date().getTime()
+      })
+      .finally(() => (dialogLoading.value = false))
   } else {
     params = Object.assign({}, params, {
       updateTime: moment().format('YYYY-MM-DD HH:mm:ss')
       // updateUser: 'ceshi'
     })
-  }
 
-  return action === 'add' ? addMenu(params) : editMenu(params)
+    editMenu(params)
+      .then(() => {
+        dialogRef.value?.close()
+        props.refresh = new Date().getTime()
+      })
+      .finally(() => (dialogLoading.value = false))
+  }
 }
 
 // 编辑
 function handleEdit({ row }: any) {
+  step.value = 'edit'
   dialogRef.value?.open()
-  dialogProps.formProps!.model = {...row}
-  dialogProps.action = () => {
-    return new Promise((resolve, reject) =>
-      handleSubmit('edit')
-        .then((res) => resolve(res))
-        .catch(() => reject())
-    )
-  }
+  dialogProps.formProps!.model = { ...row }
 }
 
 function handleRemove({ row }: any) {
@@ -247,8 +255,7 @@ function handleRemove({ row }: any) {
   useConfirm(opts)
 }
 
-function queryMenuList() {
-  step.value = 'add'
-  props.refresh = new Date().getTime()
+function handleCancel() {
+  dialogRef.value?.close()
 }
 </script>
