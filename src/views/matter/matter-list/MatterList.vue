@@ -461,7 +461,7 @@ function infoLabelAction() {
   const mattersIds = tableSelection.value!.map((item) => item.id)
   const { label } = model
   return infoLabel({
-    labelId: label,
+    lableId: label,
     mattersIds
   })
 }
@@ -471,7 +471,7 @@ async function delLabelAction() {
   const mattersIds = tableSelection.value!.map((item) => item.id)
   try {
     const result = await removeLabel({
-      labelId: null,
+      lableId: null,
       mattersIds
     })
     props.refresh = new Date().getTime()
