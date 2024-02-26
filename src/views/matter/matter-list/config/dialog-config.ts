@@ -327,9 +327,26 @@ export function getEditActionDialogConfig(
     { label: '访问路径', prop: 'accessPath', component: 'input', span: 12 },
     { label: '搜索关键词', prop: 'searchKeywords', component: 'input', span: 24 },
     {
+      label: '标签',
+      prop: 'lableId',
+      component: 'select',
+      span: 24,
+      props: {
+        options: optionsMap!.label
+      }
+    },
+    {
       label: '身份认证方式',
+      prop: 'checkAllIdentityAuthItem',
+      visible: visible?.['identityAuthItem'],
+      component: 'slot',
+      span: 24
+    },
+    {
+      label: '',
       prop: 'identityAuthItem',
       component: 'checkbox',
+      visible: visible?.['identityAuthItem'],
       props: {
         options: optionsMap!.identityAuthItem
       },
@@ -337,6 +354,12 @@ export function getEditActionDialogConfig(
     },
     {
       label: '涉及支付方式',
+      prop: 'checkAllPayWay',
+      component: 'slot',
+      span: 24
+    },
+    {
+      label: '',
       prop: 'payWay',
       component: 'checkbox',
       props: {
@@ -344,18 +367,36 @@ export function getEditActionDialogConfig(
       },
       span: 24
     },
+
     {
       label: '硬件模块',
+      prop: 'checkAllHardwareModule',
+      component: 'slot',
+      span: 24
+    },
+    {
+      label: '',
       prop: 'hardwareModule',
       component: 'checkbox',
-      dict: 'HARDWARE_MODULE',
+      props: {
+        options: optionsMap!.hardwareModuleOptions
+      },
       span: 24
     },
     {
       label: '网络策略',
+      prop: 'checkAllNetwordPolicy',
+      component: 'slot',
+      span: 24
+    },
+    {
+      label: '',
       prop: 'networdPolicy',
       component: 'checkbox',
-      dict: 'NETWORD_POLICY'
+      props: {
+        options: optionsMap!.networdPolicyOptions
+      },
+      span: 24
     }
   ]
   return {
@@ -451,6 +492,11 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
     { label: '中文编码', prop: 'cnCode', span: 12 },
     { label: '访问路径', prop: 'accessPath', span: 12 },
     { label: '搜索关键词', prop: 'searchKeywords', span: 24 },
+    {
+      label: '标签',
+      prop: 'lableName',
+      span: 24
+    },
     {
       label: '身份认证方式',
       prop: 'identityAuthItem',

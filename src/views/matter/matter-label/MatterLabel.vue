@@ -24,9 +24,42 @@
       </template>
     </CnPage>
     <CnDialog ref="dialogRef" v-bind="dialogProps">
-      <!-- 新建标签 -->
-      <template #footer v-if="handleType === 'add' || handleType === 'edit'">
-        <div class="btns">
+      <template #deleteTitle v-if="handleType === 'delete'">
+        <div class="deleteTitle">
+          确定删除 "<span class="labelName"> {{ labelName }} </span>" 标签
+        </div>
+      </template>
+      <!-- 上传图标 -->
+      <template #lableIcon>
+        <el-upload
+          class="uploader"
+          ref="uploadRef"
+          action="/selfHelp/api/file/infra/file/upload"
+          :file-list="fileList"
+          :data="setUploadData"
+          :headers="{ Authorization: getToken() }"
+          :before-upload="handleBeforeUpload"
+          :on-success="handleUploadSuccess"
+          :before-remove="handleUploadRemove"
+          :show-file-list="false"
+        >
+          <img v-if="imageUrl" :src="imageUrl" class="avatar" />
+          <el-icon v-else class="uploader-icon"><Plus /></el-icon>
+        </el-upload>
+      </template>
+      <!-- 显示图标 -->
+      <template #showLableIcon>
+        <img
+          v-if="dialogProps.formProps?.model.lableIcon"
+          :src="dialogProps.formProps?.model.lableIcon"
+          class="avatar"
+        />
+        <div v-else>--</div>
+      </template>
+
+      <template #footer>
+        <!-- 新建标签 -->
+        <div class="btns" v-if="handleType === 'add' || handleType === 'edit'">
           <el-button
             type="primary"
             size="large"
@@ -34,33 +67,17 @@
             >确定</el-button
           >
         </div>
-      </template>
-      <!-- 删除单个标签 -->
-      <template #deleteTitle v-if="handleType === 'delete'">
-        <div class="deleteTitle">
-          确定删除 "<span class="labelName"> {{ labelName }} </span>" 标签
-        </div>
-      </template>
-      <template #footer v-if="handleType === 'delete'">
-        <div class="btns">
+        <!-- 删除单个标签 -->
+        <div class="btns" v-if="handleType === 'delete'">
           <el-button type="primary" size="large" @click="removeMatterLabelAction">删除</el-button>
         </div>
-      </template>
-      <!-- 删除多个标签 -->
-      <template #deleteTitle v-if="handleType === 'manyDelete'">
-        <div class="deleteTitle">
-          确定删除 "<span class="labelName"> {{ (labelName as any[]).join('，') }} </span>" 标签
-        </div>
-      </template>
-      <template #footer v-if="handleType === 'manyDelete'">
-        <div class="btns">
+        <!-- 删除多个标签 -->
+        <div class="btns" v-if="handleType === 'manyDelete'">
           <el-button type="primary" size="large" @click="removeManyMatterLabelAction"
             >删除</el-button
           >
         </div>
-      </template>
-      <template #footer v-if="handleType === 'detail'">
-        <div class="btns"></div>
+        <div class="btns" v-if="handleType === 'detail'"></div>
       </template>
     </CnDialog>
   </div>
@@ -68,7 +85,8 @@
 
 <script lang="ts" setup>
 import { reactive, ref, toRaw } from 'vue'
-import { ElMessage } from 'element-plus'
+import { ElMessage, ElUpload } from 'element-plus'
+import type { UploadProps, UploadFile, UploadFiles, UploadUserFile } from 'element-plus'
 
 import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
@@ -77,6 +95,8 @@ import searchConfig from './config/search-config'
 import getTableConfig from './config/table-config'
 import getTollbarConifg from './config/tollbar-config'
 import { getDialogConfig } from './config/dialog-config'
+
+import { getToken } from '@/utils/auth'
 
 import type { ActionType } from './config/type'
 
@@ -95,6 +115,10 @@ const labelName = ref<string | any[]>('')
 const labelIds = ref<string | any[]>('')
 
 const tableSelection = ref<any[]>()
+
+const fileList = ref<UploadUserFile[]>([])
+const uploadRef = ref<InstanceType<typeof ElUpload>>()
+const imageUrl = ref('')
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({})
@@ -125,6 +149,51 @@ function selectionChange(selection: any[]) {
   tableSelection.value = selection
 }
 
+// 弹窗关闭
+function handleDialogClose() {
+  dialogProps.formProps!.model.lableIcon = ''
+  imageUrl.value = ''
+  fileList.value = []
+}
+
+// 上传参数
+function setUploadData(rawFile: any) {
+  return {
+    path: rawFile.name
+  }
+}
+
+// 上传文件
+async function handleBeforeUpload(rawFile: any) {
+  const { size, type } = rawFile
+  if (size / 1024 / 1024 > 5) {
+    ElMessage.warning('文件大小不能超过5MB')
+    return false
+  }
+  if (type === 'image/jpeg' || type === 'image/png') {
+    return true
+  } else {
+    ElMessage.warning('材料需JPG/PNG格式')
+    return false
+  }
+}
+
+function handleUploadRemove(uploadFile: UploadFile, uploadFiles: UploadFiles): any {
+  dialogProps.formProps!.model.lableIcon = ''
+  imageUrl.value = ''
+}
+
+// 上传成功
+const handleUploadSuccess: UploadProps['onSuccess'] = (response, uploadFile) => {
+  if (response.code === '200') {
+    dialogProps.formProps!.model.lableIcon = response.data
+    imageUrl.value = URL.createObjectURL(uploadFile.raw!)
+  } else {
+    uploadRef.value?.clearFiles()
+    ElMessage.error(response.message)
+  }
+}
+
 // 新建标签
 async function addMatterLabelAction() {
   const model = dialogProps.formProps?.model || {}
@@ -134,6 +203,7 @@ async function addMatterLabelAction() {
   dialogRef.value?.close()
   props.refresh = new Date().getTime()
   ElMessage.success('操作成功')
+  imageUrl.value = ''
 }
 
 // 修改标签
@@ -180,7 +250,15 @@ function showDialog(handle: ActionType, row?: any) {
   handleType.value = handle
   if (handle === 'add' || handle === 'edit') {
     const model = handle === 'edit' ? window.structuredClone(toRaw(row)) : undefined
-    const dialogConfig = getDialogConfig(handle)({ dialogSubmitSuccess, model })
+    if (handle === 'edit' && model.lableIcon) {
+      fileList.value.push({ url: model.lableIcon, status: 'success', name: model.lableName })
+      imageUrl.value = model.lableIcon
+    }
+    const dialogConfig = getDialogConfig(handle)({
+      dialogSubmitSuccess,
+      model,
+      onClose: handleDialogClose
+    })
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]
     }
@@ -192,7 +270,7 @@ function showDialog(handle: ActionType, row?: any) {
       labelName.value = model.lableName
       labelIds.value = model.id
     } else {
-      if (!tableSelection.value?.length) return
+      if (!tableSelection.value?.length) return ElMessage.warning('请选择需要删除的标签')
       // 存在使用事项数，无法删除
       const hasMattersCountList = tableSelection.value.filter((item) => item.mattersCount)
       if (hasMattersCountList.length) {
@@ -211,7 +289,9 @@ function showDialog(handle: ActionType, row?: any) {
     const obj = {
       status: model.status === '1' ? '有效' : '无效'
     }
-    const dialogConfig = getDialogConfig(handle)({ model: { ...model, ...obj } })
+    const dialogConfig = getDialogConfig(handle)({
+      model: { ...model, ...obj }
+    })
     for (const key of Object.keys(dialogConfig)) {
       dialogProps[key] = dialogConfig[key]
     }
@@ -233,5 +313,35 @@ function showDialog(handle: ActionType, row?: any) {
 .btns {
   width: 100%;
   display: flex;
+  /* justify-content: center; */
+}
+</style>
+
+<style>
+.uploader .el-upload {
+  border: 1px dashed var(--el-border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: var(--el-transition-duration-fast);
+}
+
+.uploader .el-upload:hover {
+  border-color: var(--el-color-primary);
+}
+
+.el-icon.uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  text-align: center;
+}
+
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
 }
 </style>

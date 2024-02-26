@@ -5,6 +5,7 @@
         v-model="item.checked"
         :label="item.label"
         size="large"
+        @change="handleChange"
       />
       <el-time-select
         v-model="item.startTime"
@@ -31,7 +32,7 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive, type PropType, watch } from 'vue';
+import { reactive, type PropType, watch, onMounted } from 'vue';
 
 interface Props {
   businessHours1?: string
@@ -46,14 +47,16 @@ interface Props {
 const props = defineProps({
   modelValue: Object as PropType<Props>
 })
-watch(() => props.modelValue, (val) => {
-  const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = val || {}
-  ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((hours, index) => {
-    const [startTime, endTime] = (hours || '').split(' - ')
-    timeOptions[index].checked = !!startTime
-    timeOptions[index].startTime = startTime
-    timeOptions[index].endTime = endTime
-  })
+onMounted(() => {
+  if (props.modelValue) {
+    Array(7).fill('').forEach((_v, i) => {
+      const businessHours = props.modelValue?.[`businessHours${i+1}` as keyof Props] || ''
+      const [startTime, endTime] = businessHours.split(' - ')
+      timeOptions[i].checked = !!startTime
+      timeOptions[i].startTime = startTime
+      timeOptions[i].endTime = endTime
+    })
+  }
 })
 
 const emits = defineEmits(['update:model-value'])
@@ -70,7 +73,7 @@ const timeOptions = reactive([
 function handleChange() {
   const hours = timeOptions.reduce((acc, cur, index) => {
     const key = `businessHours${index + 1}` as keyof Props
-    acc[key] = [cur.startTime, cur.endTime].filter(Boolean).join(' - ')
+    acc[key] = cur.checked ? [cur.startTime, cur.endTime].filter(Boolean).join(' - ') : ''
     return acc
   }, {} as Props)
   emits('update:model-value', hours)

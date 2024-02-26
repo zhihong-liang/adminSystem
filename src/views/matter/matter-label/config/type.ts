@@ -10,4 +10,5 @@ export type ActionType =
 export interface getDialogConfigParams {
   dialogSubmitSuccess?: () => void
   model?: Record<string, any>
+  onClose?: () => void
 }

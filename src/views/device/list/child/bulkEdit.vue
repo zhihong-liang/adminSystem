@@ -93,14 +93,15 @@ import CnForm from "@/components/cn-page/CnForm.vue";
 import { Plus, Delete } from "@element-plus/icons-vue";
 import { mattersProgrammeListPageUtils } from "../../utils/index";
 import BusinessHours from "./BusinessHours.vue";
-
-const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
 import {
   devBaseInfoList,
   devGroupList,
   devBaseInfoEditList,
 } from "@/api/device";
 import { ElMessage } from "element-plus";
+import { getUserList, type UserTs } from "@/api/admin";
+
+const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
 const step1 = ref(1);
 const loading = ref(false);
 const bulkForm: any = reactive({
@@ -114,10 +115,11 @@ const dialoTitle = ref("批量编辑");
 const emits = defineEmits(["onSubmit"]);
 const propsTableLength = ref(0);
 
-const businessHoursWeek = ref<Record<string, string>>({})
+const businessHoursWeek = ref<Record<string, string>>()
 
 onMounted(async () => {
   matList.value = await mattersProgrammeListPageUtils().then(res => { return res})
+  open();
 });
 const dialogProps = reactive<CnPage.DialogProps>({
   title: dialoTitle.value, // "设备详情",
@@ -248,6 +250,7 @@ const stpeTowBulkEditFrom: any = reactive({
   ],
 });
 
+const managePersonOptions = ref<UserTs[]>([])
 const stpeThreeBulkEditFrom: any = reactive({
   labelWidth: 120,
   colSpan: 8,
@@ -381,7 +384,23 @@ const stpeThreeBulkEditFrom: any = reactive({
     {
       label: "自助终端管理员",
       prop: "managePersonName",
-      component: "input",
+      component: "select",
+      props: {
+        options: managePersonOptions,
+        filterable: true,
+        remote: true,
+        remoteMethod: (query: string) => {
+          if (query) {
+            getUserList({ page: 1, size: 10, obj: { name: query } }).then(res => {
+              managePersonOptions.value = res.rows.map(v => ({ ...v, label: v.name, value: v.id }))
+            })
+          }
+        },
+        // onChange: (val: number) => {
+        //   const person = managePersonOptions.value.find(v => v.id === val) || { phone: undefined }
+        //   stpeThreeBulkEditFrom.model.managePersonContact = person.phone
+        // }
+      },
       span: 24,
       visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
     },
@@ -565,11 +584,9 @@ const determine = () => {
     ...stpeThreeBulkEditFrom.model,
   };
   if (params.hardware) {
-    console.log(params.hardware.join(","));
     params.hardware = params.hardware.join(",");
   }
   if (params.networkPolicy) {
-    console.log(params.networkPolicy.join(","));
     params.networkPolicy = params.networkPolicy.join(",");
   }
   if (params.businessHours === "3") {
@@ -577,6 +594,15 @@ const determine = () => {
       params[key] = businessHoursWeek.value[key]
     }
   }
+
+  if (params.managePersonName) {
+    const managePerson = managePersonOptions.value.find(v => v.id === params.managePersonName)
+    if (managePerson) {
+      params.managePersonName = managePerson.name
+      params.managePersonContact = managePerson.phone
+    }
+  }
+
   devBaseInfoEditList(params).then((res) => {
     if (res.code === "200") {
       bulkEditRef.value?.close();

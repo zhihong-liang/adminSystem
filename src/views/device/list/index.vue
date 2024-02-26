@@ -35,7 +35,7 @@
       <el-button type="primary" @click="importFun">确定</el-button>
     </template>
   </CnDialog>
-  <BulkEdit ref="bulkEditRef" @onSubmit="() => { props.refresh = new Date().getTime() }"></BulkEdit>
+  <BulkEdit v-if="bulkEditVisible" ref="bulkEditRef" @onSubmit="() => { props.refresh = new Date().getTime() }" @closed="() => (bulkEditVisible = false)"></BulkEdit>
 </template>
 <script lang="ts" setup>
 import { reactive, ref, onMounted } from "vue";
@@ -65,6 +65,7 @@ const exportRef = ref();
 
 const dialogRef = ref<InstanceType<typeof CnDialog>>();
 const bulkEditRef = ref<InstanceType<typeof CnDialog>>();
+const bulkEditVisible = ref(false)
 
 const basicInfoData = ref();
 const hardwareModuleData = ref();
@@ -195,7 +196,8 @@ const props = reactive<CnPage.Props>({
         label: "批量编辑",
         type: "primary",
         onClick: () => {
-          bulkEditRef.value?.open();
+          // bulkEditRef.value?.open();
+          bulkEditVisible.value = true;
           // dialogProps.action = () => handleSubmit('view')
         },
       },

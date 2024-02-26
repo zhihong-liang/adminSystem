@@ -18,62 +18,17 @@
       <h3>管理单位、技术支持单位</h3>
     </template>
     <template #businessHours>
-      <el-form :model="basisForm.model">
-        <div v-for="(item, index) in timeSlotList" class="time-slotlit">
-          <el-form-item>
-            <el-checkbox
-              v-model="item.checked"
-              :label="timeList[index].lable"
-              size="large"
-            />
-            <span> &nbsp;&nbsp;&nbsp; </span>
-            <el-time-select
-              v-model="item.startTime"
-              :max-time="item.endTime"
-              class="mr-4"
-              placeholder="开始时间"
-              start="00:00"
-              step="00:15"
-              end="23:45"
-              style="width: 43%"
-            />
-            <el-time-select
-              v-model="item.endTime"
-              :min-time="item.startTime"
-              placeholder="结束时间"
-              start="00:00"
-              step="00:15"
-              end="23:45"
-              style="width: 43%"
-            />
-          </el-form-item>
-        </div>
-      </el-form>
+      <BusinessHours v-model="businessHoursWeek" />
     </template>
   </CnForm>
 </template>
 <script lang="ts" setup>
 import { reactive, ref, watchEffect } from "vue";
 import CnForm from "@/components/cn-page/CnForm.vue";
+import { getUserList, type UserTs } from "@/api/admin";
+import BusinessHours from "./BusinessHours.vue";
 
-const timeSlotList = reactive([
-  { checked: true, startTime: "09:00", endTime: "17:00" },
-  { checked: true, startTime: "09:00", endTime: "17:00" },
-  { checked: true, startTime: "09:00", endTime: "17:00" },
-  { checked: true, startTime: "09:00", endTime: "17:00" },
-  { checked: true, startTime: "09:00", endTime: "17:00" },
-  { checked: "", startTime: "", endTime: "" },
-  { checked: "", startTime: "", endTime: "" }
-]);
-const timeList = reactive([
-  { lable: "周一", value: 0 },
-  { lable: "周二", value: 1 },
-  { lable: "周三", value: 2 },
-  { lable: "周四", value: 3 },
-  { lable: "周五", value: 4 },
-  { lable: "周六", value: 5 },
-  { lable: "周日", value: 6 },
-]);
+const businessHoursWeek = ref<Record<string, string>>()
 
 const props = defineProps({
   model: {
@@ -83,6 +38,7 @@ const props = defineProps({
 });
 
 const basisRef = ref();
+const managePersonOptions = ref<UserTs[]>([]);
 const basisForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
@@ -100,8 +56,8 @@ const basisForm: any = reactive({
     businessHours: [{ required: true, message: "请选择营业时间" }],
     timerOnOff: [{ required: true, message: "请选择是否定时开关机" }],
     devManageUnit: [{ required: true, message: "请选择设备管理单位" }],
-    managePersonName: [{ required: true, message: "请输入自助终端管理员" }],
-    managePersonContact: [{ required: true, message: "请输入自助终端管理员" }],
+    managePersonName: [{ required: true, message: "请选择自助终端管理员" }],
+    // managePersonContact: [{ required: true, message: "请输入自助终端管理员" }],
     manufacturer: [{ required: true, message: "请输入生产厂商" }],
     supportingUnit: [{ required: true, message: "请输入设备技术支撑单位" }],
     operationPersonName: [{ required: true, message: "请输入运维人员" }],
@@ -203,17 +159,33 @@ const basisForm: any = reactive({
     {
       label: "自助终端管理员",
       prop: "managePersonName",
-      component: "input",
+      component: "select",
+      props: {
+        options: managePersonOptions,
+        filterable: true,
+        remote: true,
+        remoteMethod: (query: string) => {
+          if (query) {
+            getUserList({ page: 1, size: 10, obj: { name: query } }).then(res => {
+              managePersonOptions.value = res.rows.map(v => ({ ...v, label: v.name, value: v.id }))
+            })
+          }
+        },
+        onChange: (val: number) => {
+          const person = managePersonOptions.value.find(v => v.id === val) || { phone: undefined }
+          basisForm.model.managePersonContact = person.phone
+        }
+      }
     },
     {
       label: "自助终端管理员联系方式",
       prop: "managePersonContact",
-      component: "input",
     },
     {
       label: "生产厂商",
       prop: "manufacturer",
-      component: "input",
+      component: "select",
+      dict: "UNIT_LIST"
     },
     {
       label: "设备技术支撑单位",
@@ -244,13 +216,11 @@ const validateForm = () => {
   });
 };
 const getFormData = () => {
-  const businessHours = timeSlotList.reduce((acc, cur, index) => {
-    acc[`businessHours${index + 1}`] = [cur.startTime, cur.endTime].filter(Boolean).join(' - ');
-    return acc
-  }, {} as Record<string, string>)
+  const managePerson = managePersonOptions.value.find(v => v.id === basisForm.model.managePersonName)
   return {
     ...basisForm.model,
-    ...businessHours
+    ...businessHoursWeek.value,
+    managePersonName: managePerson?.name
   }
 }
 defineExpose({ validateForm, getFormData });
@@ -260,13 +230,19 @@ watchEffect(async () => {
     basisForm.model = { ...props.model, networkPolicy: props.model.networkPolicy.split(",") };
     // 传的时候还是字符串，取的时候变成数字了
     // if (typeof props.model.supportingUnit === 'number') basisForm.model.supportingUnit = String(props.model.supportingUnit)
-    const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
-    ;[businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7].forEach((v, i) => {
-      const [startTime, endTime] = (v || '').split(' - ')
-      timeSlotList[i].checked = !!startTime
-      timeSlotList[i].startTime = startTime
-      timeSlotList[i].endTime = endTime
-    })
+
+    if (!businessHoursWeek.value) {
+      const { businessHours1, businessHours2, businessHours3, businessHours4, businessHours5, businessHours6, businessHours7 } = props.model
+      businessHoursWeek.value = {
+        businessHours1,
+        businessHours2,
+        businessHours3,
+        businessHours4,
+        businessHours5,
+        businessHours6,
+        businessHours7,
+      }
+    }
   }
 });
 </script>
