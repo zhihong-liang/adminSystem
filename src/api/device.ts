@@ -124,8 +124,12 @@ export const queryDevGroupList = (data: {
 }): Promise<Res<DeviceInfo[]>> => axios.post('/api/device/devGroup/list', data)
 
 // 新增设备组
-export const querAddDevGroup = (data: DeviceInfo): Promise<Res> =>
-  axios.post('/api/device/devGroup', data)
+export const querAddDevGroup = (data: DeviceInfo, method: string = 'post'): Promise<Res> => {
+  if (method === 'put') {
+    return axios.put('/api/device/devGroup', data)
+  }
+  return axios.post('/api/device/devGroup', data)
+}
 
 // 删除设备组
 export const queryDeleteDevGroup = (ids: string): Promise<Res> =>

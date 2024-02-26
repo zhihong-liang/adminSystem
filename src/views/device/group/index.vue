@@ -3,7 +3,7 @@
   <CnDialog
     v-bind="dialogProps"
     ref="dialogRef"
-    @success="() => (props.refresh = new Date().getTime())"
+    @success="handleDialogSuccess"
     @close="() => (dialogProps.formProps!.model = {})"
   >
   </CnDialog>
@@ -83,6 +83,8 @@ const DEFAULT_ITEMS: any = [
   }
 ]
 
+const action = ref('add') // add / edit
+
 const dialogRef = ref()
 const dialogProps: CnPage.DialogProps = reactive({
   title: '新建',
@@ -116,6 +118,7 @@ const props: CnPage.Props = reactive({
         label: '新增',
         type: 'primary',
         onClick: () => {
+          action.value = 'add'
           dialogProps.formProps!.items = DEFAULT_ITEMS.filter((i: any) => i.prop !== 'status')
           dialogRef.value.open()
         }
@@ -136,11 +139,7 @@ const props: CnPage.Props = reactive({
             label: '编辑',
             type: 'primary',
             text: true,
-            onClick: ({ row }) => {
-              dialogProps.formProps!.items = DEFAULT_ITEMS
-              dialogProps.formProps!.model = row
-              dialogRef.value.open()
-            }
+            onClick: handleEdit
           },
           {
             label: '删除',
@@ -167,12 +166,26 @@ function handleTableResolve(pid: number | undefined, resolve: Function): void {
   })
 }
 
+function handleDialogSuccess() {
+  handleTableResolve(dialogProps.formProps?.model.prevParentId, _resolve.value)
+}
+
+function handleEdit({ row }: any) {
+  const prevParentId = row.parentId
+  action.value = 'edit'
+  dialogProps.formProps!.items = DEFAULT_ITEMS
+  dialogProps.formProps!.model = Object.assign({}, row, { prevParentId })
+  dialogRef.value.open()
+}
+
 function handleDialogAction() {
   const params = {
-    ...dialogProps?.formProps!.model,
-    parentId: dialogProps.formProps?.model?.parentId
+    ...dialogProps?.formProps!.model
   }
-  return querAddDevGroup(params)
+
+  if (params.prevParentId) delete params.prevParentId
+
+  return querAddDevGroup(params, action.value === 'add' ? 'post' : 'put')
 }
 
 function TableLoad(

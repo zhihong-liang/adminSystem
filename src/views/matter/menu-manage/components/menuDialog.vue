@@ -1,7 +1,7 @@
 <template>
   <CnDialog v-bind="dialogProps" ref="dialogRef" @success="handleSuccess">
     <template #menuIcon>
-      <UploadPic v-model:value="dialogProps.formProps!.model.menuIcon" />
+      <UploadPic v-model:value="dialogProps.formProps!.model.menuIcon" :limit="1" />
     </template>
     <template #parentId>
       <el-cascader
@@ -12,7 +12,6 @@
       />
     </template>
   </CnDialog>
-  <IconDialog v-model:value="dialogProps.formProps!.model.menuIcon" ref="IconDialogRef" />
 </template>
 
 <script setup lang="ts">
@@ -20,7 +19,8 @@ import { reactive, ref } from 'vue'
 import { queryMatterMenulist_No, addMatterMenu, editMatterMenu } from '@/api/matter'
 import { DEFAILT_ITEM } from '../config/data'
 
-import IconDialog from '@/components/cn-page/CnIconsDialog.vue'
+// import UploadPic from '@/components/cn-page/CnUpload.vue'
+
 import UploadPic from './uploadPic.vue'
 
 import type { Resolve } from 'element-plus'
@@ -29,7 +29,6 @@ import type { MatterMenuResponse } from '../config/type'
 const emits = defineEmits(['success'])
 
 const model = ref('') // add(新增)、edit(编辑)、copy(复制)模式
-const IconDialogRef = ref()
 const dialogProps: CnPage.DialogProps = reactive({
   title: '',
   formProps: {
