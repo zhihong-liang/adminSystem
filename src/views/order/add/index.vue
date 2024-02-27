@@ -1,11 +1,17 @@
 <template>
-  <div>查看<span @click="messageRef?.open()" style="color: var(--system-primary-color);cursor: pointer">《服务标准》</span></div>
+  <div>
+    查看<span
+      @click="messageRef?.open()"
+      style="color: var(--system-primary-color); cursor: pointer"
+      >《服务标准》</span
+    >
+  </div>
   <el-row :gutter="20">
     <el-col :span="24" style="font-size: 22px">请选择工单类型</el-col>
     <el-col :span="8" v-for="(item, index) in list" :key="item.id">
       <el-card class="card" @click="openDialog(item)">
-        <img class="card-img" :src="item.imgUrl" alt="粤智助开放平台" />
-        <span>{{item.workTypeName}}</span>
+        <img class="card-img" :src="item.imgUrl" alt="自助政务服务平台" />
+        <span>{{ item.workTypeName }}</span>
       </el-card>
     </el-col>
   </el-row>

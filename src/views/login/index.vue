@@ -17,7 +17,7 @@
             :wrapper-col-style="{ flex: 1 }"
           >
             <h3 class="login-form-title">
-              <img class="logo" src="/public/favicon.ico" /><span>自助政务服务平台</span>
+              <img class="logo" src="../../assets/images/logo.png" /><span>自助政务服务平台</span>
             </h3>
             <el-form-item prop="username">
               <el-input v-model="form.username" placeholder="账号" clearable>

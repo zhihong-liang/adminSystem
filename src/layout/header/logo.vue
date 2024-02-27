@@ -1,8 +1,8 @@
 <template>
   <router-link to="/home">
     <div class="logo-root ofh">
-      <img src="@/assets/images/logo.png" alt="粤智助开放平台" />
-      <h1 class="title">粤智助开放平台</h1>
+      <img src="@/assets/images/logo.png" alt="自助政务服务平台" />
+      <h1 class="title">自助政务服务平台</h1>
     </div>
   </router-link>
 </template>
