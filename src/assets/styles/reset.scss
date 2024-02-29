@@ -4,18 +4,118 @@ ul li {
 
 a {
     text-decoration: none;
-    color:#333
+    color: #333
 }
 
-#app >.baseLayout >.el-container {
+#app>.baseLayout>.el-container {
     .el-header {
         padding: 0px;
     }
+
     .el-aside {
         transition: width 0.3s;
     }
+
     .el-main {
         display: flex;
         padding: 0px;
     }
+}
+
+:root {
+    --el-color-primary: #006EFD;
+    --el-color-success: #09C666;
+    --el-color-warning: #FF9A2D;
+    --el-color-warning: #FF9A2D;
+    --el-color-danger: #FF5E5E;
+}
+
+
+
+.el-message--success {
+    --el-message-bg-color: #fff;
+    --el-message-border-color: #dcdfe6;
+    --el-message-text-color: #000;
+    font-weight: bold;
+
+    .el-message-icon--success {
+        color: var(--el-color-success);
+    }
+
+}
+
+.el-message--warning {
+    --el-message-bg-color: #fff;
+    --el-message-border-color: #dcdfe6;
+    --el-message-text-color: #000;
+    font-weight: bold;
+
+    .el-message-icon--warning {
+        color: var(--el-color-warning);
+    }
+
+}
+
+.el-message--info {
+    --el-message-bg-color: #fff;
+    --el-message-border-color: #dcdfe6;
+    --el-message-text-color: #000;
+    font-weight: bold;
+
+    .el-message-icon--info {
+        color: var(--el-color-info);
+    }
+
+}
+
+.el-message--error {
+    --el-message-bg-color: #fff;
+    --el-message-border-color: #dcdfe6;
+    --el-message-text-color: #000;
+    font-weight: bold;
+
+    .el-message-icon--error {
+        color: var(--el-color-error);
+    }
+
+}
+
+
+.el-tabs__nav-scroll {
+    display: flex;
+    justify-content: center;
+
+
+}
+
+.el-tabs--card>.el-tabs__header .el-tabs__item.is-active {
+    background: #fff;
+    color: #000;
+
+}
+
+.el-tabs--card>.el-tabs__header .el-tabs__item {
+    background: var(--el-color-primary);
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    color: #fff;
+    margin: 0 5px;
+}
+
+.el-tabs--card>.el-tabs__header .el-tabs__nav {
+    border: none !important;
+}
+
+.el-tabs--card>.el-tabs__header {
+    border: none !important;
+}
+
+.el-dialog__header {
+    text-align: center;
+
+}
+
+.el-dialog__title {
+    font-size: 15px;
+    font-weight: bold;
 }

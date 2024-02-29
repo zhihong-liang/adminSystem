@@ -1,6 +1,6 @@
 <template>
-  <CnDialog :title="`新建${propData?.workTypeName}`" ref="dialogRef">
-    <el-tabs v-model="activeName">
+  <CnDialog type="tabs" :title="`新建${propData?.workTypeName}`" ref="dialogRef">
+    <el-tabs v-model="activeName" type="card">
       <el-tab-pane label="基本信息" name="first">
         <CnForm v-bind="baseForm" ref="baseRef"></CnForm>
       </el-tab-pane>

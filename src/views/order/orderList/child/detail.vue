@@ -1,6 +1,6 @@
 <template>
-  <CnDialog v-bind="dialogProps" ref="dialogRef">
-    <el-tabs v-if="!batchType" v-model="activeName">
+  <CnDialog v-bind="dialogProps" ref="dialogRef" type="tabs">
+    <el-tabs v-if="!batchType" v-model="activeName" type="card">
       <el-tab-pane label="基本信息" name="first">
         <base-infor :data="baseData" />
         <!-- 可以和工单信息合并 -->
@@ -41,7 +41,7 @@ import baseInfor from './baseInfor.vue'
 import orderInfor from './orderInfor.vue'
 import process from './process.vue'
 import orderForm from './orderForm.vue'
-import { orderBaseDetail, orderAudit, orderRepulse, type orderItemTs  } from '@/api/order'
+import { orderBaseDetail, orderAudit, orderRepulse, type orderItemTs } from '@/api/order'
 import { useLoginStore } from '@/stores'
 import { ElMessage } from 'element-plus'
 import useDictionary from '@/hooks/useDictionary'
@@ -90,7 +90,7 @@ const submitting = ref(false)
 const baseData = ref()
 const workAuditType = ref()
 
-const open = (type: string, data: orderItemTs , AuditType: string, batch: boolean) => {
+const open = (type: string, data: orderItemTs, AuditType: string, batch: boolean) => {
   activeName.value = 'first'
   homeData.value = data
   hdType.value = type
@@ -108,7 +108,7 @@ const queryDetail = (id: string) => {
       if (res.code === '200') {
         baseData.value = {
           ...res.data,
-          ...res.data.detail,
+          ...res.data.detail
         }
       }
     })

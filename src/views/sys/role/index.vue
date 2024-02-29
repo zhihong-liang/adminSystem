@@ -22,10 +22,19 @@
         <div class="role-desc">{{ item.description }}</div>
       </div>
       <div class="card-footer">
-        <div class="card-footer-item card-show pointer" @click="handleModify(item, 'view')">
+        <el-button type="primary" @click="handleModify(item, 'view')">查看</el-button>
+
+        <el-button type="warning" @click="handleModify(item, 'modify')" v-if="item.id !== 1">
+          修改
+        </el-button>
+        <el-button type="danger" @click="handleDet(item)" v-if="item.isSys !== '1'">
+          删除
+        </el-button>
+
+        <!--<div class="card-footer-item card-show pointer" @click="handleModify(item, 'view')">
           查看
         </div>
-        <div
+    <div
           class="card-footer-item card-edit pointer"
           @click="handleModify(item, 'modify')"
           v-if="item.id !== 1"
@@ -38,7 +47,7 @@
           v-if="item.isSys !== '1'"
         >
           删除
-        </div>
+        </div> -->
       </div>
     </div>
   </div>
@@ -206,11 +215,10 @@ onUnmounted(() => {
   .card-footer {
     height: 30%;
     display: flex;
-    justify-content: space-between;
+    justify-content: space-around;
     align-items: center;
     box-sizing: border-box;
     text-align: center;
-    gap: 10px;
 
     .card-footer-item {
       flex: 1;
