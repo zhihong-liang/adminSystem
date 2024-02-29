@@ -88,6 +88,7 @@ export function getEditActionDialogConfig(params: getDialogConfigParams): CnPage
         matterInfo: [{ required: true, message: '请选择事项' }],
         processingConditions: [{ required: true, message: '请填写办理条件' }]
       },
+      colSpan: 24,
       labelWidth: 80
     },
     onSuccess: dialogSubmitSuccess
@@ -107,8 +108,8 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
         { label: '事项名称', prop: 'matterName' },
         { label: '事项别名', prop: 'matterAlias' },
         { label: '系统办理范围', prop: 'sysCoverage' },
-        { label: '办理须知状态', prop: 'status', component: 'slot' },
-        { label: '办理材料', prop: 'detailNoticeFileList', component: 'slot' },
+        { label: '办理须知状态', prop: 'status', component: 'slot', readonly: true },
+        { label: '办理材料', prop: 'detailNoticeFileList', component: 'slot', span: 24, readonly: true },
         {
           label: '办理条件',
           prop: 'processingConditions',

@@ -58,9 +58,7 @@ import {
   orderAddConsumable,
   orderAddInstallation,
   orderAddUpgrade,
-  getOrderType,
-  type typeItem,
-  type dictTs
+  type typeItem
 } from '@/api/order'
 import { devBaseInfoListPage } from '@/api/device'
 import { useLoginStore } from '@/stores'
@@ -72,6 +70,7 @@ interface baseTs {
   submitterName?: string
   submitterPhone?: string
   urgencyLevel: string
+  workTypeName: string
 }
 interface wordTs {
   installationCount: string
@@ -91,7 +90,6 @@ const wordRef = ref()
 
 const propData = ref({} as typeItem)
 const activeName = ref('first')
-const orderList = ref<dictTs[]>([])
 const numSelect = ref([] as any)
 const submitting = ref(false)
 
@@ -105,12 +103,7 @@ const baseForm = reactive({
   items: [
     {
       label: '工单类型',
-      prop: 'workTypeId',
-      component: 'select',
-      props: {
-        options: computed(() => orderList.value),
-        disabled: true
-      }
+      prop: 'workTypeName'
     },
     { label: '工单来源', prop: 'orderSource', component: 'select', dict: 'ORDER_SOURCE' },
     { label: '提交人', prop: 'submitterName' },
@@ -171,10 +164,10 @@ const open = (data: typeItem) => {
   wordForm.model = {} as wordTs
   propData.value = data
   baseForm.model.workTypeId = data.id
+  baseForm.model.workTypeName = data.workTypeName
   baseForm.model.submitterName = userInfo.name
   baseForm.model.submitterPhone = userInfo.telephone
   baseForm.model.urgencyLevel = '1'
-  queryOrderType()
   queryDevNum()
   dialogRef.value.open()
 }
@@ -261,21 +254,6 @@ const handleSubmit = () => {
       .finally(() => {
         submitting.value = false
       })
-  })
-}
-
-const queryOrderType = () => {
-  getOrderType({
-    page: 1,
-    size: 1000,
-    obj: {}
-  }).then((res) => {
-    if (res.code === '200') {
-      orderList.value = res.rows.map((v) => ({
-        label: v.workTypeName,
-        value: v.id
-      }))
-    }
   })
 }
 

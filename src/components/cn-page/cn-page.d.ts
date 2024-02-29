@@ -181,6 +181,7 @@ declare namespace CnPage {
     | FormItemGroupProps
     | FormItemSlotProps
     | FormItemEditorProps
+    | FormItemImageProps
 
   type FormItemProps = {
     -readonly [K in keyof ElFormItemProps]?: ElFormItemProps[K]
@@ -190,6 +191,7 @@ declare namespace CnPage {
     prop?: string | string[]
     span?: number
     display?: string
+    readonly?: boolean
     /**
      * 字典
      */
@@ -310,6 +312,13 @@ declare namespace CnPage {
       toolbarConfig?: Partial<IToolbarConfig>
       editorConfig?: Partial<IEditorConfig>
     }
+  }
+
+  /**
+   * 图片展示
+   */
+  interface FormItemImageProps extends FormItemProps {
+    component: 'image'
   }
 
   /**

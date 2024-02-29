@@ -4,13 +4,14 @@ import type { FormInstance } from 'element-plus'
 import CnFormItem from './CnFormItem.vue'
 import CnAdministrativeDivision from './CnAdministrativeDivision.vue'
 import CnEditor from './CnEditor.vue'
+import CnSubtitle from './CnSubtitle.vue'
 
 const props = defineProps({
   model: { type: Object, default: () => ({}) },
   readonly: Boolean,
   labelWidth: [String, Number],
   labelPosition: { type: String, default: 'top' }, // 弃用，本属性不支持自定义配置
-  colSpan: { type: Number, default: 24 },
+  colSpan: { type: Number, default: 12 },
   footerSpan: { type: Number, default: 24 },
   rules: Object,
   items: Array as PropType<UnwrapNestedRefs<CnPage.FormItem>[]>
@@ -49,9 +50,15 @@ watchEffect(() => {
       model[last] = []
     }
     // 选择框支持多选，且非独占一行，默认折叠标签
-    if (item.component === 'select' && item.props?.multiple && (item.span === undefined ? props.colSpan !== 24 : item.span !== 24)) {
-      item.props.collapseTags = item.props.collapseTags === undefined ? true : item.props.collapseTags
-      item.props.collapseTagsTooltip = item.props.collapseTagsTooltip === undefined ? true : item.props.collapseTagsTooltip
+    if (
+      item.component === 'select' &&
+      item.props?.multiple &&
+      (item.span === undefined ? props.colSpan !== 24 : item.span !== 24)
+    ) {
+      item.props.collapseTags =
+        item.props.collapseTags === undefined ? true : item.props.collapseTags
+      item.props.collapseTagsTooltip =
+        item.props.collapseTagsTooltip === undefined ? true : item.props.collapseTagsTooltip
     }
 
     // 设置组件的双向绑定
@@ -101,8 +108,9 @@ defineExpose({ formRef })
       >
         <el-form-item
           v-bind="rest"
+          :class="{ lookLabel: readonly || !component || component === 'image' || rest.readonly }"
           :rules="readonly ? undefined : rest.rules"
-          v-if="rest.visible!()"
+          v-if="rest.visible!() && component !== 'subtitle'"
         >
           <slot v-if="component === 'slot'" :name="rest.prop" />
           <CnAdministrativeDivision
@@ -121,9 +129,11 @@ defineExpose({ formRef })
             v-model="modelValue[rest.prop as string]"
             :component="component"
             :dict="dict"
-            :readonly="readonly"
+            :readonly="readonly || rest.readonly"
           />
         </el-form-item>
+
+        <CnSubtitle v-if="rest.visible!() && component === 'subtitle'" :subtitle="rest.label" />
       </el-col>
 
       <el-col v-if="$slots.footer" :span="footerSpan" class="footer-col">
@@ -165,5 +175,9 @@ defineExpose({ formRef })
 
 .footer-col {
   align-self: flex-end;
+}
+
+.lookLabel :deep(.el-form-item__label) {
+  color: #a7b0be;
 }
 </style>

@@ -36,6 +36,7 @@ const dialogProps = reactive<CnPage.DialogProps<UnitTypeReq>>({
         dict: 'DATA_PERMISSION_POLICY'
       }
     ],
+    colSpan: 24,
     labelWidth: 120,
     rules: {
       unitTypeName: [{ required: true, message: '请输入单位类型' }],

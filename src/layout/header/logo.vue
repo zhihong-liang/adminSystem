@@ -1,5 +1,5 @@
 <template>
-  <router-link to="/home">
+  <router-link to="/system/usercenter">
     <div class="logo-root ofh">
       <img src="@/assets/images/logo.png" alt="自助政务服务平台" />
       <h1 class="title">自助政务服务平台</h1>

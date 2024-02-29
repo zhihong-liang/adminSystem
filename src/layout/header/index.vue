@@ -14,7 +14,8 @@ import User from './userInfo.vue'
 <style lang="scss" scoped>
 .home_header {
     height: 100%;
-    background: var(--system-header-background);
+    // background: var(--system-header-background);
+    background: linear-gradient( 90deg, #015DD8 0%, #1191ED 100%);
 }
 
 </style>

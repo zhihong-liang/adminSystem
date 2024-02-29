@@ -20,6 +20,7 @@ export function getAddOrEditActionConfig(params: getDialogConfigParams): CnPage.
     formProps: {
       model: model!,
       labelPosition: 'left',
+      colSpan: 24,
       items: [
         {
           label: '公告标题',
@@ -173,6 +174,7 @@ export function getEditOrEditActionConfig(params: getDialogConfigParams): CnPage
           prop: 'pushDate'
         }
       ],
+      colSpan: 24,
       labelWidth: 120
     }
   }

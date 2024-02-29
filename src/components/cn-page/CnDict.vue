@@ -1,8 +1,8 @@
 <template>
-  <CnSelect v-if="component === 'select'" v-model="value" :options="dictionary" />
+  <CnReadonly v-if="!component || props.readonly" v-model="label" />
+  <CnSelect v-else-if="component === 'select'" v-model="value" :options="dictionary" />
   <CnCheckbox v-else-if="component === 'checkbox'" v-model="value" :options="dictionary" />
   <CnRadio v-else-if="component === 'radio'" v-model="value" :options="dictionary" />
-  <CnReadonly v-else v-model="label" />
 </template>
 
 <script lang="ts" setup>
@@ -13,14 +13,14 @@ import CnCheckbox from './CnCheckbox.vue'
 import CnRadio from './CnRadio.vue'
 import CnReadonly from './CnReadonly.vue'
 
-const props = defineProps(['modelValue', 'dict', 'component', 'separator'])
+const props = defineProps(['modelValue', 'dict', 'component', 'separator', 'readonly'])
 
 const emits = defineEmits(['update:model-value'])
 
 const dictionary = useDictionary(props.dict)
 const label = ref()
 watchEffect(() => {
-  if (!props.component) {
+  if (!props.component || props.readonly) {
     label.value = props.modelValue ? useDictionary(props.dict, props.modelValue, props.separator).value : '--'
   }
 })
