@@ -39,7 +39,6 @@ const baseForm = reactive({
     { label: '派单员手机号码', prop: 'dispatcherPhone' }
   ],
   labelWidth: 100,
-  colSpan: 24,
   rules: {}
 })
 </script>

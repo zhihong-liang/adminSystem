@@ -15,7 +15,7 @@ import { reactive, ref } from 'vue'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import { getUserList, getUserSync } from '@/api/admin'
 import Detail from './child/detail.vue'
-import { ElMessage } from 'element-plus'
+import useConfirm from '@/hooks/useConfirm'
 
 const detailRef = ref()
 const tableSelection = ref([])
@@ -94,15 +94,18 @@ const props: CnPage.Props = reactive({
             label: '同步工作流',
             type: 'primary',
             visible: ({row}) => row.workflowSyncFlag !== '1',
-            onClick: ({row}) => {
-              getUserSync(row.id).then((res) => {
-                if (res.code === '200') {
-                  ElMessage.success(res.message)
+            onClick: ({ row }) => {
+              const opts = {
+                message: `确定要同步工作流？`,
+                title: '提示',
+                action: () => getUserSync(row.id),
+                success: () => {
                   props.refresh = Date.now()
                 }
-              })
+              }
+              useConfirm(opts)
             }
-          }
+          },
         ]
       }
     ],

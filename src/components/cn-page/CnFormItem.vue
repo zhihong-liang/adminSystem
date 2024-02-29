@@ -17,7 +17,7 @@ defineProps(['component', 'dict', 'readonly'])
 </script>
 
 <template>
-  <CnDict v-if="dict" :component="component" :dict="dict" />
+  <CnDict v-if="dict" :component="component" :dict="dict" :readonly="readonly" />
   <CnReadonly v-else-if="readonly || !component" />
   <CnInput v-else-if="component === 'input'" />
   <CnSelect v-else-if="component === 'select'" />

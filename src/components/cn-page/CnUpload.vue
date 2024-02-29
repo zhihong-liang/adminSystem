@@ -13,6 +13,7 @@
     :on-remove="handleRemove"
     :on-success="handleSuccess"
     :before-upload="handleBeforeUpload"
+    :on-error="handleError"
   >
     <el-icon><Plus /></el-icon>
   </el-upload>
@@ -80,6 +81,10 @@ const handleBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
     return false
   }
   return true
+}
+
+const handleError = () => {
+  ElMessage.error('文件上传失败！')
 }
 </script>
 

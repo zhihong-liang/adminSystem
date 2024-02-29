@@ -1,0 +1,47 @@
+<template>
+  <CnPage v-bind="pages" />
+</template>
+
+<script lang="ts" setup>
+import { reactive, ref } from 'vue'
+import CnPage from '@/components/cn-page/CnPage.vue'
+import { getUserList } from '@/api/admin'
+
+const pages: CnPage.Props = reactive({
+  params: {},
+  action: getUserList,
+  search: {
+    items: [
+      { label: '设备编号', prop: 'name', component: 'input' },
+      { label: '设备接入单位设备编号', prop: 'name1', component: 'input' },
+      { label: '设备类型', prop: 'name2', component: 'select' },
+      { label: '设备状态', prop: 'name2', component: 'select' },
+      { label: '行政区域', prop: 'name2', component: 'ad' },
+      { label: '部署场所', prop: 'name2', component: 'input' },
+      { label: '设备接入单位', prop: 'name2', component: 'select' },
+      { label: '办理时间', prop: 'name2', component: 'input' },
+    ]
+  },
+  toolbar: {
+    items: [
+      {
+        label: '导出',
+        type: 'primary'
+      }
+    ]
+  },
+  table: {
+    columns: [
+      { type: 'selection' },
+      { type: 'index', label: '序号', width: 60 },
+      { prop: 'name', label: '设备编号' },
+      { prop: 'name', label: '设备类型' },
+      { prop: 'name', label: '设备状态' },
+      { prop: 'name', label: '设备接入单位' },
+      { prop: 'name', label: '地址' },
+      { prop: 'name', label: '安装激活时间' },
+      { prop: 'name', label: '业务量' },
+    ]
+  }
+})
+</script>

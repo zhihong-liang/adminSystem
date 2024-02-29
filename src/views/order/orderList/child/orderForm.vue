@@ -292,6 +292,9 @@ const handleAddress = (data: any) => {
 :deep(.el-date-editor--datetime) {
   width: 100%;
 }
+:deep(.el-form-item .el-form-item) {
+  margin-bottom: 18px;
+}
 .chost {
   overflow: hidden;
   margin: 15px 0;

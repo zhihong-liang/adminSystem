@@ -16,5 +16,6 @@ function setText(val: unknown) {
   height: 100%;
   justify-content: flex-start;
   width: 100%;
+  color: #4E5969;
 }
 </style>

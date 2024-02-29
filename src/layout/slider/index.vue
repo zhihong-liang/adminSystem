@@ -42,7 +42,8 @@ const activeMenuItem = computed(() => route.path as string)
 
 <style lang="scss" scoped>
 .home_slider {
-  background-color: var(--system-slider-background-color);
+  // background-color: var(--system-slider-background-color);
+  background: linear-gradient( 180deg, #094387 0%, #0f60c1 100%);
   height: 100%;
 
   position: relative;
@@ -96,5 +97,9 @@ const activeMenuItem = computed(() => route.path as string)
     transform: rotate(360deg);
     transition: all 0.5s;
   }
+}
+
+:deep(.el-menu) {
+  background: none
 }
 </style>

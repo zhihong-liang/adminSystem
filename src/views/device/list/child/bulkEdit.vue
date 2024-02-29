@@ -18,20 +18,7 @@
       </div>
     </div>
     <div v-if="step1 === 2">
-      <CnForm ref="stpeTowBulkEditFromRef" v-bind="stpeTowBulkEditFrom">
-        <template #deviceInfo>
-          <h3>设备信息</h3>
-        </template>
-        <template #venueInfo>
-          <h3>设备场所信息</h3>
-        </template>
-        <template #networkInfo>
-          <h3>网络信息</h3>
-        </template>
-        <template #configInfo>
-          <h3>配置信息</h3>
-        </template>
-      </CnForm>
+      <CnForm ref="stpeTowBulkEditFromRef" v-bind="stpeTowBulkEditFrom"></CnForm>
     </div>
     <div v-if="step1 === 3">
       <!-- <el-form :model="stpeThreeFrom" label-width="120px">
@@ -46,23 +33,8 @@
             </span>
         </el-form> -->
       <CnForm ref="stpeThreeBulkEditFromRef" v-bind="stpeThreeBulkEditFrom">
-        <template #deviceInfo>
-          <h3>设备信息</h3>
-        </template>
-        <template #venueInfo>
-          <h3>设备场所信息</h3>
-        </template>
-        <template #networkInfo>
-          <h3>网络信息</h3>
-        </template>
-        <template #businessHoursSlot>
-          <h3>设备营业时间</h3>
-        </template>
         <template #timeSlot>
           <BusinessHours v-model="businessHoursWeek" />
-        </template>
-        <template #configInfo>
-          <h3>配置信息</h3>
         </template>
       </CnForm>
     </div>
@@ -201,8 +173,8 @@ const stpeTowBulkEditFrom: any = reactive({
   colSpan: 8,
   model: {},
   items: [
-    { label: "请勾选需要批量修改的字段", component: "divider", span: 24 },
-    { prop: "deviceInfo", component: "slot", span: 24 },
+    { label: "请勾选需要批量修改的字段", component: "subtitle", span: 24 },
+    { label: "设备信息", component: "subtitle", span: 24 },
     {
       prop: "deviceInfo",
       component: "checkbox",
@@ -216,7 +188,7 @@ const stpeTowBulkEditFrom: any = reactive({
         ],
       },
     },
-    { prop: "venueInfo", component: "slot", span: 24 },
+    { label: "设备场所信息", component: "subtitle", span: 24 },
     {
       prop: "venueInfo",
       component: "checkbox",
@@ -225,7 +197,7 @@ const stpeTowBulkEditFrom: any = reactive({
         options: venueInfoOptions,
       },
     },
-    { prop: "networkInfo", component: "slot", span: 24 },
+    { label: "网络信息", component: "subtitle", span: 24 },
     {
       prop: "networkPolicy",
       component: "checkbox",
@@ -235,7 +207,7 @@ const stpeTowBulkEditFrom: any = reactive({
       //   dict: "NETWORD_POLICY",
       span: 24,
     },
-    { prop: "configInfo", component: "slot", span: 24 },
+    { label: "配置信息", component: "subtitle", span: 24 },
     {
       prop: "configInfo",
       component: "checkbox",
@@ -259,8 +231,6 @@ const stpeThreeBulkEditFrom: any = reactive({
     supportingUnit: [{ required: true, message: "请选择设备管理单位" }],
     devModelNo: [{ required: true, message: "请输入设备型号" }],
     hardware: [{ required: true, message: "请选择硬件模块" }],
-    operationPersonName: [{ required: true, message: "请输入运维人员名称" }],
-    operationPersonContact: [{ required: true, message: "请输入运维人员联系方式" }],
     groupId: [{ required: true, message: "请选择设备分组" }],
     provinceCode: [{ required: true, message: "请选择行政区划" }],
     detailAddress: [{ required: true, message: "请输入详细地址" }],
@@ -272,8 +242,8 @@ const stpeThreeBulkEditFrom: any = reactive({
   },
   items: [
     {
-      prop: "deviceInfo",
-      component: "slot",
+      label: "设备信息",
+      component: "subtitle",
       span: 24,
       visible: () => stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
     },
@@ -283,7 +253,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       dict: 'UNIT_LIST',
-      visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.includes('devManageUnit')
     },
     {
       label: "设备技术支撑单位",
@@ -291,14 +261,14 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       dict: 'UNIT_LIST',
-      visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.includes('supportingUnit')
     },
     {
       label: "设备型号",
       prop: "devModelNo",
       component: "input",
       span: 24,
-      visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.includes('devModelNo')
     },
     {
       label: "硬件模块",
@@ -307,21 +277,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       span: 24,
       props: { multiple: true },
       dict: "HARDWARE_MODULE",
-      visible: () => false, //stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
-    },
-    {
-      label: "运维人员",
-      prop: "operationPersonName",
-      component: "input",
-      span: 24,
-      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
-    },
-    {
-      label: "运维人员联系方式",
-      prop: "operationPersonContact",
-      component: "input",
-      span: 24,
-      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.deviceInfo.includes('hardware')
     },
     // {
     //   label: "设备分组",
@@ -332,8 +288,8 @@ const stpeThreeBulkEditFrom: any = reactive({
     //   visible: () => stpeTowBulkEditFrom.model?.deviceInfo.length > 0,
     // },
     {
-      prop: "venueInfo",
-      component: "slot",
+      label: "设备场所信息",
+      component: "subtitle",
       span: 24,
       visible: () => stpeTowBulkEditFrom.model?.venueInfo.length > 0,
     },
@@ -342,28 +298,28 @@ const stpeThreeBulkEditFrom: any = reactive({
       prop: "provinceCode",
       component: "ad",
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('provinceCode')
     },
     {
       label: "详细地址",
       prop: "detailAddress",
       component: "input",
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('detailAddress')
     },
     {
       label: "地理坐标",
       prop: "pointLatLng",
       component: "input",
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('pointLatLng')
     },
     {
       label: "部署场所名称",
       prop: "siteName",
       component: "input",
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('siteName')
     },
     {
       label: "部署场所类型",
@@ -371,7 +327,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       dict: "DEV_SITE_TYPE",
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('siteType')
     },
     {
       label: "设备用途",
@@ -379,7 +335,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       dict: "DEV_USAGE",
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('devUsage')
     },
     {
       label: "自助终端管理员",
@@ -402,11 +358,11 @@ const stpeThreeBulkEditFrom: any = reactive({
         // }
       },
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('managePersonName')
     },
     {
-      prop: "businessHoursSlot",
-      component: "slot",
+      label: "设备营业时间",
+      component: "subtitle",
       span: 24,
       visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
     },
@@ -416,7 +372,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       dict: "DEV_BUSINESS_HOURS",
       span: 24,
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('businessHours')
     },
     {
       prop: "timeSlot",
@@ -430,11 +386,11 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       dict: "YES_NO",
-      visible: () => false, // stpeTowBulkEditFrom.model?.venueInfo.length > 0,
+      visible: () => stpeTowBulkEditFrom.model?.venueInfo.includes('timerOnOff')
     },
     {
-      prop: "networkInfo",
-      component: "slot",
+      label: "网络信息",
+      component: "subtitle",
       span: 24,
       visible: () => stpeTowBulkEditFrom.model?.networkPolicy.length > 0,
     },
@@ -447,8 +403,8 @@ const stpeThreeBulkEditFrom: any = reactive({
       visible: () => stpeTowBulkEditFrom.model?.networkPolicy.length > 0,
     },
     {
-      prop: "configInfo",
-      component: "slot",
+      label: "配置信息",
+      component: "subtitle",
       span: 24,
       visible: () => stpeTowBulkEditFrom.model?.configInfo.length > 0,
     },
@@ -470,7 +426,7 @@ const stpeThreeBulkEditFrom: any = reactive({
           }
         }
       },
-      visible: () => false,
+      visible: () => stpeTowBulkEditFrom.model?.configInfo.includes('groupId')
     },
     {
       label: "方案",
@@ -478,7 +434,7 @@ const stpeThreeBulkEditFrom: any = reactive({
       component: "select",
       span: 24,
       props: { options: matList },
-      visible: () => false,
+      visible: () => stpeTowBulkEditFrom.model?.configInfo.includes('programmeId')
     },
   ],
 });
@@ -544,17 +500,17 @@ const nextStep = () => {
         message: "请勾选要编辑的项目",
       });
     } else {
-      stpeThreeBulkEditFrom.items.map((item: any) => {
-        for (const name in stpeTowBulkEditFrom.model) {
-          if (stpeTowBulkEditFrom.model[name].length > 0) {
-            stpeTowBulkEditFrom.model[name].map((i: any) => {
-              if (i === item.prop) {
-                item.visible = () => true;
-              }
-            });
-          }
-        }
-      });
+      // stpeThreeBulkEditFrom.items.map((item: any) => {
+      //   for (const name in stpeTowBulkEditFrom.model) {
+      //     if (stpeTowBulkEditFrom.model[name].length > 0) {
+      //       stpeTowBulkEditFrom.model[name].map((i: any) => {
+      //         if (i === item.prop) {
+      //           item.visible = () => true;
+      //         }
+      //       });
+      //     }
+      //   }
+      // });
       step1.value = step1.value + 1;
     }
   } else {

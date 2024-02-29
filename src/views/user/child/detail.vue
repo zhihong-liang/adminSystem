@@ -2,19 +2,25 @@
   <CnDialog v-bind="dialogProps" width="900px" ref="dialogRef">
     <template #add>
       <div class="sqtitle">
-        <span>授权信息</span>
-        <el-button size="small" :icon="Plus" type="primary" @click="addAuth" class="sqtitle-but"
+        <span class="subtitle">授权信息</span>
+        <el-button
+          v-if="titleType !== 'look'"
+          size="small"
+          :icon="Plus"
+          type="primary"
+          @click="addAuth"
+          class="sqtitle-but"
           >增加授权</el-button
         >
       </div>
     </template>
 
     <template #authSlot>
-      <el-form :model="model" ref="authRef" :disabled="titleType === 'look'">
+      <el-form :model="model" ref="authRef" :disabled="titleType === 'look'" style="width: 100%">
         <div v-for="(item, index) in model.authList" :key="index">
           <div>
-            授权{{ index + 1
-            }}<span
+            <span style="font-weight: bold">授权{{ index + 1 }}</span>
+            <span
               v-if="index !== 0 && titleType !== 'look'"
               style="float: right; color: red; cursor: pointer"
               @click="delAuth(index)"
@@ -26,10 +32,18 @@
               <el-form-item
                 label="单位类型"
                 :prop="'authList.' + index + '.unitType'"
-                :rules="{ required: true, message: '请选择单位类型', trigger: 'change' }"
+                :rules="{
+                  required: titleType !== 'look' ? true : false,
+                  message: '请选择单位类型',
+                  trigger: 'change'
+                }"
                 style="margin-bottom: 18px"
               >
+                <div v-if="titleType === 'look'">
+                  {{ unitTypeList.find((v: any) => v.id === item.unitType).unitTypeName }}
+                </div>
                 <el-select
+                  v-else
                   clearable
                   filterable
                   placeholder="请选择"
@@ -49,10 +63,16 @@
               <el-form-item
                 label="单位"
                 :prop="'authList.' + index + '.unitId'"
-                :rules="{ required: true, message: '请选择单位', trigger: 'change' }"
+                :rules="{
+                  required: titleType !== 'look' ? true : false,
+                  message: '请选择单位',
+                  trigger: 'change'
+                }"
                 style="margin-bottom: 18px"
               >
+                <div v-if="titleType === 'look'">{{ item.unitName }}</div>
                 <el-select
+                  v-else
                   clearable
                   filterable
                   placeholder="请选择"
@@ -72,10 +92,16 @@
               <el-form-item
                 label="角色"
                 :prop="'authList.' + index + '.roleId'"
-                :rules="{ required: true, message: '请选择角色', trigger: 'change' }"
+                :rules="{
+                  required: titleType !== 'look' ? true : false,
+                  message: '请选择角色',
+                  trigger: 'change'
+                }"
                 style="margin-bottom: 18px"
               >
+                <div v-if="titleType === 'look'">{{ item.roleName }}</div>
                 <el-select
+                  v-else
                   clearable
                   filterable
                   placeholder="请选择"
@@ -93,7 +119,8 @@
             </el-col>
             <el-col :span="12">
               <el-form-item label="岗位" style="margin-bottom: 18px">
-                <el-select clearable filterable placeholder="请选择" v-model="item.postId">
+                <div v-if="titleType === 'look'">{{ item.postName }}</div>
+                <el-select v-else clearable filterable placeholder="请选择" v-model="item.postId">
                   <el-option
                     v-for="option in postList"
                     :key="option.id"
@@ -104,7 +131,7 @@
               </el-form-item>
             </el-col>
             <el-col :span="24">
-              <div>功能权限</div>
+              <div :style="{ color: titleType === 'look' ? '#a7b0be' : '' }">功能权限</div>
               <el-tree
                 :data="item.limitsList"
                 :props="defaultProps"
@@ -116,7 +143,7 @@
               />
             </el-col>
             <el-col :span="24">
-              <div>数据权限</div>
+              <div :style="{ color: titleType === 'look' ? '#a7b0be' : '' }">数据权限</div>
               <GetAuth :data="item.choseData" v-if="item.choseData?.length" />
               <el-tree
                 v-model="item.areaCode"
@@ -209,6 +236,9 @@ interface AuthTs {
   provinceCode?: string
   userAuthDataList?: any[]
   choseData: any[]
+  unitName: string
+  roleName: string
+  postName: string
 }
 
 const defaultProps = {
@@ -230,6 +260,7 @@ const dialogRef = ref<InstanceType<typeof CnDialog>>()
 const dialogProps = reactive<CnPage.DialogProps>({
   title: '新增用户',
   formProps: {
+    readonly: false,
     model: { position: [] },
     items: [
       { label: '基本信息', component: 'subtitle', span: 24 },
@@ -237,14 +268,8 @@ const dialogProps = reactive<CnPage.DialogProps>({
       { label: '用户名称', prop: 'name', component: 'input' },
       { label: '登录手机号', prop: 'phone', component: 'input' },
       { label: '联系电话', prop: 'telephone', component: 'input' },
-      { label: '电子邮箱', prop: 'email', span: 24, component: 'input' },
-      {
-        label: '状态',
-        prop: 'status',
-        span: 24,
-        component: 'radio',
-        dict: 'USER_STATUS'
-      },
+      { label: '电子邮箱', prop: 'email', component: 'input' },
+      { label: '状态', prop: 'status', component: 'radio', dict: 'USER_STATUS' },
       { prop: 'add', component: 'slot', span: 24 },
       { prop: 'authSlot', component: 'slot', span: 24 }
     ],
@@ -282,8 +307,8 @@ function open(type = 'add', data = {} as UserTs) {
   queryRoleList()
 
   model.authList = []
-  dialogProps.formProps.disabled = false
-  if (type === 'look') dialogProps.formProps.disabled = true
+  dialogProps.formProps!.readonly = false
+  if (type === 'look') dialogProps.formProps!.readonly = true
 
   dialogProps.title = type === 'add' ? '新增用户' : type === 'edit' ? '编辑用户' : '查看用户'
 
@@ -529,10 +554,9 @@ const changeDict = (index: number) => {
 
 <style lang="scss" scoped>
 .aublock {
-  background-color: #f8f8f8;
-  border: 1px dashed #eee;
   padding: 15px 15px 25px;
   margin-bottom: 15px;
+  background-color: #f6f7f8;
 }
 
 .tree_label {

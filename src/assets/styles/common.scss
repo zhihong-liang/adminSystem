@@ -18,3 +18,33 @@
   text-decoration: underline;
   cursor: pointer;
 }
+
+// table
+.el-table--striped .el-table__body tr.el-table__row--striped td.el-table__cell {
+  background: none !important;
+}
+.el-table__row--striped {
+  background: linear-gradient( 90deg, rgba(0,110,255,0.04) 0%, rgb(18, 177, 215, 0.07) 100%);
+}
+.el-table td.el-table__cell {
+  border-bottom: none !important
+}
+.el-table__inner-wrapper::before {
+  background: linear-gradient( 90deg, #006EFF 0%, #0AC666 100%);
+  height: 2px !important;
+}
+.el-table thead {
+  background: linear-gradient( 90deg, rgba(0,110,255,0.7) 0%, rgb(18, 177, 215, 0.9) 100%);
+  color: #fff !important;
+}
+.el-table thead tr,.el-table th.el-table__cell {
+  background: none !important
+}
+
+// subtitle小标题
+.subtitle {
+  font-size: 16px;
+  color: #1D2129;
+  margin-bottom: 18px;
+  font-weight: bold;
+}

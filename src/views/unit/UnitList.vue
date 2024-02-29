@@ -58,9 +58,9 @@ const handleCheckChange = (data: Division2, checked: boolean) => {
 }
 
 interface choseTs {
-  areaValue: string,
-  areaName: string,
-  authName: string[],
+  areaValue: string
+  areaName: string
+  authName: string[]
 }
 const choseData = ref([] as choseTs[])
 const changeDict = () => {
@@ -108,7 +108,22 @@ const dialogProps = reactive<CnPage.DialogProps>({
       orgType: [{ required: true, message: '请选择单位类' }],
       unitType: [{ required: true, message: '请选择单位类型' }],
       address: [{ required: true, message: '请输入单位地址' }],
-      status: [{ required: true, message: '请选择单位状态' }]
+      status: [{ required: true, message: '请选择单位状态' }],
+      auth: [
+        {
+          validator: (rule: any, value: any, callback: any) => {
+            if (
+              choseData.value.every((v) => v.authName.length !== 0) &&
+              choseData.value.length > 0 &&
+              choseData.value.length === areaCode.value.length
+            ) {
+              callback()
+            } else {
+              callback(new Error('授权信息不能为空'))
+            }
+          }
+        }
+      ]
     }
   }
 })

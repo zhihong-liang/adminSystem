@@ -19,7 +19,7 @@ const basisForm = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "view" ? true : false,
+  readonly: props.model.type === "view" ? true : false,
   rules: {
     proDevCode: [{ required: true, message: "请输入省统一设备编号" }],
     status: [{ required: true, message: "请选择状态" }],
@@ -36,8 +36,8 @@ const basisForm = reactive({
     installActivateTime: [{ required: true, message: "请选择安装激活时间" }],
   },
   items: [
-    { label: "省统一设备编号", prop: "proDevCode", component: "input", props: {disabled: true}  },
-    { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS", props: {disabled: true}  },
+    { label: "省统一设备编号", prop: "proDevCode", component: "input", readonly: true  },
+    { label: "状态", prop: "status", component: "select", dict: "DEV_STATUS", readonly: true },
     { label: "设备接入单位设备编号", prop: "unitDevCode", component: "input", },
     { label: "设备接入单位", prop: "devUnit", component: "select", props: { options: supList }},
     { label: "设备类型", prop: "devType", component: "select", dict: "DEV_TYPE" },
@@ -48,7 +48,7 @@ const basisForm = reactive({
     { label: "操作系统", prop: "operSystem", component: "select", dict: 'DEV_OPER_SYSTEM' },
     { label: "设备用途", prop: "devUsage", component: "select", dict: "DEV_USAGE"  },
     { label: "到货时间", prop: "comeTime", component: "datepicker", },
-    { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", props: { disabled: true }  },
+    { label: "安装激活时间", prop: "installActivateTime", component: "datepicker", readonly: true   },
   ],
 });
 const validateForm = () => {

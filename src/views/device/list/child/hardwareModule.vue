@@ -17,7 +17,7 @@ const hardwareForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === "view" ? true : false,
+  readonly: props.model.type === "view" ? true : false,
   rules: {
     hardware: [{ required: true, message: "请选择硬件模块" }],
   },

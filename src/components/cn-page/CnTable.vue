@@ -15,6 +15,7 @@ export default {
         {
           ...tableProps,
           ref: 'tableRef',
+          stripe: true,
           'onSelection-change': (selection) =>
             props.selectionChange && props.selectionChange(selection)
         },
