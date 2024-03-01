@@ -62,7 +62,7 @@ export function getDetailActionDialogConfig(params: getDialogConfigParams): CnPa
         { label: '标签名称', prop: 'lableName' },
         { label: '状态', prop: 'status' },
         { label: '备注', prop: 'remark' },
-        { label: '图标', prop: 'showLableIcon', component: 'slot' },
+        { label: '图标', prop: 'lableIcon', component: 'image' },
         { label: '使用事项数', prop: 'mattersCount' },
         { label: '创建人', prop: 'createUser' },
         { label: '创建时间', prop: 'createTime' }

@@ -117,6 +117,7 @@ defineExpose({ formRef })
             v-else-if="component === 'ad'"
             v-bind="props"
             :model="modelValue"
+            :readonly="readonly || rest.readonly"
           />
           <CnEditor
             v-else-if="component === 'editor'"
