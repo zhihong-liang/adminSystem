@@ -26,6 +26,7 @@ const unitList: any = ref([])
 const props: CnPage.Props = reactive({
   params: {},
   action: queryDevAuthListPageDev,
+  internal: true,
   search: {
     items: [
       { label: '设备编号', prop: 'proDevCode', component: 'input' },

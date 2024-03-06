@@ -28,7 +28,7 @@ const { tabList, activeTab } = storeToRefs(store)
 <style lang="scss" scoped>
 .tabs-root {
   height: 40px;
-  background-color: #fff;
-  border-bottom: 1px solid #e7eaef;
+  background-color: #93B2D1;
+  color: #4E5969;
 }
 </style>

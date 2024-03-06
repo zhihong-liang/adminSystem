@@ -1,5 +1,5 @@
 <template>
-  <div class="add">
+  <div class="add padding20">
     <CnForm v-bind="formProps" ref="formRefWrapper">
       <template #basicInfo>
         <div class="title">基本信息</div>

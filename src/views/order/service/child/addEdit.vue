@@ -36,13 +36,12 @@ const baseForm = reactive({
   model: computed(() => params.value),
   items: [
     { label: '更新时间', prop: 'updateTime' },
+    { label: '编号', prop: 'messageCode' },
     { label: '状态', prop: 'status', component: 'select', dict: 'MESSAGE_STATUS' },
     { label: '文案类型', prop: 'messageType', component: 'select', dict: 'MESSAGE_TYPE' },
-    { label: '编号', prop: 'messageCode' },
-    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' } }
+    { label: '备注', prop: 'remark', component: 'input', props: { type: 'textarea' }, span: 24 }
   ],
   labelWidth: 100,
-  colSpan: 24,
   rules: {
     status: [{ required: true, message: '请选择状态' }],
     messageType: [{ required: true, message: '请选择文案类型' }]

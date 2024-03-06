@@ -14,16 +14,16 @@
   display: flex;
   align-items: center;
 
-  height: 70px;
+  height: 64px;
 
   img {
-    max-height: 70%;
+    max-height: 64%;
     margin: 0px 15px;
   }
   .title {
     // width: 200px;
     color: var(--system-header-text-color);
-    font-size: 28px;
+    font-size: 20px;
     font-weight: 500;
   }
 }

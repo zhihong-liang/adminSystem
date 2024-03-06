@@ -79,6 +79,7 @@ const props: CnPage.Props = reactive({
   },
   table: {
     rowKey: 'id',
+    maxHeight: "600",
     columns: [
       { type: 'index', label: '序号', width: 60 },
       { prop: 'type', label: '主类' },

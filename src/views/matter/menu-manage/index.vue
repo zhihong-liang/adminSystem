@@ -85,6 +85,7 @@ const props: CnPage.Props = reactive({
   },
   table: {
     rowKey: 'id',
+    maxHeight: '530',
     columns: [
       { type: 'selection', width: '55' },
       { prop: 'menuName', label: '菜单名称' },

@@ -1,5 +1,5 @@
 <template>
-  <div class="detail" v-loading="loading">
+  <div class="detail padding20" v-loading="loading">
     <el-radio-group v-model="activeName" class="tab-con">
       <el-radio-button label="basicInfo">基本信息</el-radio-button>
       <el-radio-button label="nodeInfo">流程信息</el-radio-button>
@@ -90,6 +90,7 @@ const flowProps = reactive<CnPage.Props>({
     size: 10
   },
   action: devBaseInfoHisList,
+  internal: true,
   search: getSearchConfig(),
   table: flowTableConfig,
   pagination: {

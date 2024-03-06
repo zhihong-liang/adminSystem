@@ -5,7 +5,7 @@
     :headers="{ Authorization: getToken() }"
     :data="(rawFile: UploadRawFile) => ({ path: rawFile.name })"
     :key="key"
-    accept=".png,.jpeg,.jpg"
+    accept=".png,.jpeg,.jpg,.svg"
     :limit="limit"
     :class="{ limitClass: fileList.length === limit }"
     list-type="picture-card"
@@ -73,8 +73,8 @@ const handlePictureCardPreview: UploadProps['onPreview'] = (uploadFile) => {
 }
 
 const handleBeforeUpload: UploadProps['beforeUpload'] = (rawFile) => {
-  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
-    ElMessage.error('请上传jpg/jpeg/png格式的文件')
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png' && rawFile.type !== 'image/svg+xml') {
+    ElMessage.error('请上传jpg/jpeg/png/svg格式的文件')
     return false
   } else if (rawFile.size / 1024 / 1024 > 5) {
     ElMessage.error('文件大小不能超过5MB!')

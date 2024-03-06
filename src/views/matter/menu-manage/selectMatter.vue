@@ -92,6 +92,7 @@ const enterUnitList = ref<any>([]) // 菜单进驻单位列表
 const pageProps: CnPage.Props = reactive({
   params: {},
   action: queryMatterMenuRelation,
+  internal: true,
   search: {
     items: [
       { label: '事项编号', prop: 'matterCode', component: 'input' },
@@ -248,4 +249,8 @@ onBeforeMount(() => {
 })
 </script>
 
-<style scoped></style>
+<style scoped>
+.Matter-Menu-Manage-add-root {
+  padding: 20px;
+}
+</style>

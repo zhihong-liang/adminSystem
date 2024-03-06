@@ -51,18 +51,18 @@ export const DEFAILT_ITEM = [
     model: ['add', 'edit', 'copy']
   },
   { label: '补充说明', prop: 'description', component: 'input', model: ['add', 'edit', 'copy'] },
-  {
-    label: '备注',
-    prop: 'remark',
-    component: 'input',
-    props: { type: 'textarea', maxlength: 200, showWordLimit: true },
-    model: ['add', 'edit', 'copy']
-  },
   { label: '背景颜色', prop: 'backColor', component: 'input', model: ['add', 'edit', 'copy'] },
   {
     label: '上级菜单',
     prop: 'parentId',
     component: 'slot',
+    model: ['add', 'edit', 'copy']
+  },
+  {
+    label: '备注',
+    prop: 'remark',
+    component: 'input',
+    props: { type: 'textarea', maxlength: 200, showWordLimit: true },
     model: ['add', 'edit', 'copy']
   },
   { label: '图标', prop: 'menuIcon', component: 'slot', model: ['add', 'edit', 'copy'] }

@@ -68,8 +68,8 @@ $--breadcrumb-height: 40px;
 }
 
 .container {
-  padding: $--content-padding;
-  height: calc(100% - (($--content-padding * 2) + $--breadcrumb-height));
+  // padding: $--content-padding;
+  height: calc(100% - ($--breadcrumb-height));
 
   background-color: #fff;
 }

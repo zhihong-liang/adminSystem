@@ -1,7 +1,7 @@
 <template>
   <div class="baseLayout">
     <el-container style="flex: none">
-      <el-header height="70px">
+      <el-header height="64px">
         <Header />
       </el-header>
     </el-container>
@@ -33,7 +33,7 @@ import Tabs from '@/layout/tabs/index.vue'
 const store = useHomeStore()
 const { collapse } = storeToRefs(store)
 
-const finalWidth = computed(() => (collapse.value ? '64px' : '280px'))
+const finalWidth = computed(() => (collapse.value ? '64px' : '240px'))
 </script>
 
 <style scoped>

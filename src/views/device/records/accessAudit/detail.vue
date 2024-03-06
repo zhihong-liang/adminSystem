@@ -1,5 +1,5 @@
 <template>
-  <div class="device-accessAudit-detail-root">
+  <div class="device-accessAudit-detail-root" style="padding: 20px">
     <el-tabs v-model="activeName" type="card" class="demo-tabs">
       <el-tab-pane label="基本信息" name="base" lazy>
         <h2 class="mb-lg">设备接入单位信息</h2>
@@ -99,6 +99,7 @@ const formProps: CnPage.FormProps = reactive({
 const pageProps: CnPage.Props = reactive({
   params: {},
   action: queryDevAccessListPage,
+  internal: true,
   search: {
     items: [
       { label: '设备接入单位', prop: 'unitDevCode', component: 'input' },

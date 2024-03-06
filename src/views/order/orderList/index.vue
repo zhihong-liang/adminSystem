@@ -32,7 +32,7 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from 'vue'
-import { orderListPageAll, orderQueryWorkTimeout } from '@/api/order'
+import { orderListPageAll, orderQueryWorkTimeout, orderInfoExport } from '@/api/order'
 import CnPage from '@/components/cn-page/CnPage.vue'
 import detail from './child/detail.vue'
 import useSearch from './hooks/useSearch'
@@ -66,12 +66,29 @@ const props: CnPage.Props = reactive({
       obj
     }
   },
+  toolbar: {
+    items: [
+      {
+        label: '导出',
+        type: 'primary',
+        exportProps: {
+          action: orderInfoExport,
+          fileName: '工单列表',
+          dict: 'WORK_EXPORT_COLUMN'
+          // options: [
+          //   {label: '标签1', value: '1'},
+          // ],
+          // otherParams: {}
+        }
+      }
+    ]
+  },
   table: {
     columns: [
       { type: 'selection' },
       { slot: 'codeSlot', label: '工单编号', width: 140 },
       { prop: 'workTypeIdText', label: '工单类型' },
-      { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS' },
+      { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS', width: 120 },
       { prop: 'orderSource', label: '工单来源', dict: 'ORDER_SOURCE' },
       { prop: 'description', label: '情况描述', dict: 'WORK_DESCIPTION' },
       { prop: 'devCode', label: '设备编号', width: 160 },
@@ -86,12 +103,11 @@ const props: CnPage.Props = reactive({
       {
         prop: 'action',
         label: '操作',
-        width: 220,
+        minWidth: 220,
         buttons: [
           {
             label: '补充',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'bc' }],
             onClick: ({ row }) => handleOpen('Supply', row, '95'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
@@ -99,7 +115,6 @@ const props: CnPage.Props = reactive({
           {
             label: '分拨',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'fb' }],
             onClick: ({ row }) => handleOpen('Allocation', row, '2'),
             visible: ({ row }) => row.bpmNodeCode === '1001'
@@ -107,7 +122,6 @@ const props: CnPage.Props = reactive({
           {
             label: '派单',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'pd' }],
             onClick: ({ row }) => handleOpen('Dispatch', row, '3'),
             visible: ({ row }) => row.bpmNodeCode === '1100'
@@ -115,7 +129,6 @@ const props: CnPage.Props = reactive({
           {
             label: '转派',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'zp' }],
             onClick: ({ row }) => handleOpen('Transfer', row, '4'),
             visible: ({ row }) => ['1200', '1300'].includes(row.bpmNodeCode)
@@ -123,7 +136,6 @@ const props: CnPage.Props = reactive({
           {
             label: '处理',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'cl' }],
             onClick: ({ row }) => handleOpen('Handle', row, '6'),
             visible: ({ row }) => row.bpmNodeCode === '1200'
@@ -131,7 +143,6 @@ const props: CnPage.Props = reactive({
           {
             label: '完成处理',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'wccl' }],
             onClick: ({ row }) => handleOpen('FinishDeal', row, '8'),
             visible: ({ row }) => row.bpmNodeCode === '1300'
@@ -139,7 +150,6 @@ const props: CnPage.Props = reactive({
           {
             label: '退回工单',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'thgd' }],
             onClick: ({ row }) => handleOpen('Back', row, '5'),
             visible: ({ row }) => ['1100', '1200'].includes(row.bpmNodeCode)
@@ -147,7 +157,6 @@ const props: CnPage.Props = reactive({
           {
             label: '关闭工单',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'gbgd' }],
             onClick: ({ row }) => handleOpen('Close', row, '0'),
             visible: ({ row }) => ['1001', '1100', '1200'].includes(row.bpmNodeCode)
@@ -155,7 +164,6 @@ const props: CnPage.Props = reactive({
           {
             label: '完成',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'wc' }],
             onClick: ({ row }) => handleOpen('Finish', row, '99'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
@@ -163,7 +171,6 @@ const props: CnPage.Props = reactive({
           {
             label: '评价',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'pj' }],
             onClick: ({ row }) => handleOpen('Evaluate', row, '96'),
             visible: ({ row }) => row.bpmNodeCode === '1500' && !row.customEvaluation
@@ -171,7 +178,6 @@ const props: CnPage.Props = reactive({
           {
             label: '回访',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'hf' }],
             onClick: ({ row }) => handleOpen('Visit', row, '97'),
             visible: ({ row }) => row.bpmNodeCode === '1500' && !row.followUp
@@ -179,7 +185,6 @@ const props: CnPage.Props = reactive({
           {
             label: '打回工单',
             type: 'primary',
-            text: true,
             directives: [{ label: 'permission', value: 'dhgd' }],
             onClick: ({ row }) => handleOpen('Repulse', row, '98'),
             visible: ({ row }) => row.bpmNodeCode === '1400'
@@ -187,7 +192,7 @@ const props: CnPage.Props = reactive({
         ]
       }
     ],
-    data: [{}]
+    maxHeight: '460'
   }
 })
 
@@ -207,7 +212,7 @@ const handleOpen = (type: string, data: any, workAuditType = '', all = false) =>
 
 <style lang="scss" scoped>
 .tip {
-  margin-bottom: 10px;
+  margin: 10px 0 10px 0;
   &_num {
     border: 1px solid #e5e5e5;
     line-height: 56px;

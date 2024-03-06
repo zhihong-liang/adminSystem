@@ -215,6 +215,7 @@ defineExpose({ formRef: formRef, model: baseForm.model })
 const pdPage: CnPage.Props = reactive({
   params: { status: '1', currentRoleId: '23', unitId: userInfo.unitId },
   action: getUserList,
+  internal: true,
   search: {
     items: [
       // { label: '行政区划', prop: 'regionName', component: 'input' },

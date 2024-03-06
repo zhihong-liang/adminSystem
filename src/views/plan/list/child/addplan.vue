@@ -55,7 +55,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from "vue";
+import { reactive, ref, computed } from "vue";
 import CnDialog from "@/components/cn-page/CnDialog.vue";
 import CnTable from "@/components/cn-page/CnTable.vue";
 import SelectionItems from "./selectionItems.vue";
@@ -99,13 +99,14 @@ const fromData: FromData = reactive({
 const dialogProps: CnPage.DialogProps = reactive({
   title: "新增",
   formProps: {
+    readonly: computed(() => isType.value === 'select'),
     model: {},
     items: [
       {
         label: "方案编号",
         prop: "programmeCode",
         component: "input",
-        props: { disabled: true },
+        readonly: true,
         visible: () => isType.value !== "add",
       },
       { label: "方案名称", prop: "programmeName", component: "input" },
@@ -129,28 +130,28 @@ const dialogProps: CnPage.DialogProps = reactive({
         label: "关联事项数",
         prop: "mattersCount",
         component: "input",
-        props: { disabled: true },
+        readonly: true,
         visible: () => isType.value !== "add",
       },
       {
         label: "关联设备数",
         prop: "devCount",
         component: "input",
-        props: { disabled: true },
+        readonly: true,
         visible: () => isType.value !== "add",
       },
       {
         label: "创建人",
         prop: "createUser",
         component: "input",
-        props: { disabled: true },
+        readonly: true,
         visible: () => isType.value !== "add",
       },
       {
         label: "创建时间",
         prop: "createTime",
         component: "input",
-        props: { disabled: true },
+        readonly: true,
         visible: () => isType.value !== "add",
       },
       // {
@@ -246,7 +247,6 @@ const open = async (data: any, _type: string) => {
     return res;
   });
   isType.value = _type;
-  dialogProps.formProps!.disabled = false;
   if (_type == "add") {
     // 新增
     dialogProps.formProps!.model = {};
@@ -265,7 +265,6 @@ const open = async (data: any, _type: string) => {
     const newData = JSON.parse(data)
     dialogProps.formProps!.model = newData;
     dialogProps.formProps!.colSpan = 12;
-    dialogProps.formProps!.disabled = true;
     // dialogProps.action = () => handleSubmit("select");
     dialogProps.title = "选择事项";
     const params: any = {

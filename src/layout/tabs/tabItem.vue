@@ -51,24 +51,26 @@ const handleCloseTab = () => {
 
   padding: 0 20px;
   max-width: 150px;
-  line-height: 40px;
-  border-right: 1px solid #e7eaef;
-  background-color: #fff;
+  height: 34px;
+  margin: 6px 0 0 6px;
+  background-color: #b1c7dd;
+  border-radius: 8px 8px 0 0;
 
   cursor: pointer;
 
   &:hover {
-    color: var(--system-primary-color);
+    color: #4E5969;
   }
   & a:hover {
-    color: var(--system-primary-color);
+    color: #4E5969;
   }
 
   &.active {
-    color: var(--system-primary-color);
+    color: #4E5969;
+    background-color: var(--system-container-background);
 
     & a {
-      color: var(--system-primary-color);
+      color: #4E5969;
     }
   }
   .tab-item-title {

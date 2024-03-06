@@ -4,6 +4,8 @@
       v-if="inited"
       v-bind="search"
       :model="params"
+      :internal="props.internal"
+      :class="{ cnsearch: !props.internal }"
       @search="handleQuery()"
       @reset="handleQuery()"
     >
@@ -17,20 +19,28 @@
         <slot :name="item.prop" />
       </template>
     </CnSearch>
-    <CnToolbar v-bind="toolbar" :params="paramsAll" />
-    <slot name="addition"></slot>
-    <CnTable v-bind="table" :data="data" ref="tableRef">
-      <template
-        v-for="(column, index) in table?.columns.filter(
-          (item: CnPage.TableColumnProps) => item.slot
-        )"
-        v-slot:[column.slot]="slotProps"
-        :key="index"
-      >
-        <slot v-bind="slotProps" :name="column.slot" />
-      </template>
-    </CnTable>
-    <CnPagination v-if="showPagination" v-bind="pagination" :total="total" @update="handleQuery" />
+
+    <div :class="{ cncontent: !props.internal }">
+      <CnToolbar v-bind="toolbar" :params="paramsAll" />
+      <slot name="addition"></slot>
+      <CnTable v-bind="table" :data="data" ref="tableRef">
+        <template
+          v-for="(column, index) in table?.columns.filter(
+            (item: CnPage.TableColumnProps) => item.slot
+          )"
+          v-slot:[column.slot]="slotProps"
+          :key="index"
+        >
+          <slot v-bind="slotProps" :name="column.slot" />
+        </template>
+      </CnTable>
+      <CnPagination
+        v-if="showPagination"
+        v-bind="pagination"
+        :total="total"
+        @update="handleQuery"
+      />
+    </div>
   </div>
 </template>
 
@@ -52,7 +62,8 @@ const props = defineProps([
   'params',
   'transformRequest',
   'transformResponse',
-  'refresh'
+  'refresh',
+  'internal'
 ])
 
 const inited = ref(false)
@@ -119,3 +130,13 @@ function initPageOpts() {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.cnsearch {
+  padding: 20px 20px 10px;
+  border-bottom: 20px solid var(--system-container-background);
+}
+.cncontent {
+  padding: 20px;
+}
+</style>

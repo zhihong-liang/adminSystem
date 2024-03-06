@@ -5,23 +5,23 @@
     </template>
 
     <template #footer="{ data, el }">
-      <el-button type="primary" @click="handleSearch(data)">搜索</el-button>
-      <el-button @click="handleReset(data, el)">重置</el-button>
+      <el-button type="primary" :icon="Search" @click="handleSearch(data)"></el-button>
+      <el-button :icon="RefreshLeft" @click="handleReset(data, el)"></el-button>
       <el-button @click="moreFun" v-if="showBtn">
         <span v-if="showMore">
-          更多
-          <ArrowDown style="width: 15px; height: 15px; margin-right: 8px" />
+          <el-icon><DArrowRight /></el-icon>
         </span>
         <span v-else>
-          收起
-          <ArrowUp style="width: 15px; height: 15px; margin-right: 8px" />
+          <el-icon><DArrowLeft /></el-icon>
         </span>
       </el-button>
+      <el-button v-if="!props.internal" :icon="Setting"></el-button>
     </template>
   </CnForm>
 </template>
 
 <script lang="ts" setup>
+import { Search, RefreshLeft, Setting } from '@element-plus/icons-vue'
 import { watchEffect, ref, type PropType, type UnwrapNestedRefs, onMounted } from 'vue'
 import type { FormInstance } from 'element-plus'
 import CnForm from './CnForm.vue'
@@ -35,7 +35,8 @@ const props = defineProps({
   items: {
     type: Array as PropType<UnwrapNestedRefs<CnPage.FormItem>[]>,
     default: () => []
-  }
+  },
+  internal: Boolean
 })
 
 const emits = defineEmits(['search', 'reset'])
@@ -89,3 +90,9 @@ function moreFun() {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+:deep(.el-icon) {
+  font-size: 18px;
+}
+</style>

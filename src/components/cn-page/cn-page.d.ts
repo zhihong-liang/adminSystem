@@ -79,6 +79,7 @@ declare namespace CnPage {
     label: string,
     visible?: (data: ElRenderRowData<Row>) => boolean,
     directives?: Recode<string, DirectiveArguments>
+    exportProps?: Record<string, any>
     onClick?: (data: ElRenderRowData<Row>, evt?: MouseEvent) => any
   }
 

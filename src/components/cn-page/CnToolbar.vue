@@ -12,7 +12,7 @@ export default {
       const exportRef = ref()
       const { items, params } = props
       if (items?.length) {
-        return h('div', { class: 'tool' }, [
+        return h('div', {}, [
           items.map((button: any) => {
             const elButton = h(
               ElButton,
@@ -61,8 +61,3 @@ export default {
     </el-button>
   </div>
 </template> -->
-<style lang="scss" scoped>
-.tool {
-  margin-bottom: 15px;
-}
-</style>

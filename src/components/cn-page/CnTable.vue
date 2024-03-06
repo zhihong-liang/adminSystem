@@ -16,6 +16,8 @@ export default {
           ...tableProps,
           ref: 'tableRef',
           stripe: true,
+          class: 'tooltb',
+          maxHeight: '500',
           'onSelection-change': (selection) =>
             props.selectionChange && props.selectionChange(selection)
         },
@@ -84,3 +86,9 @@ export default {
   }
 }
 </script>
+
+<style lang="scss" scoped>
+.tooltb {
+  margin-top: 15px
+}
+</style>
