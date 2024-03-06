@@ -47,10 +47,9 @@ const iconDialogRef = ref<InstanceType<typeof CnDialog>>()
 
 const icon = ref(props.value)
 
-const active = computed(() => (name: string = '') => {
-  if (icon.value === name) return true
-  return false
-})
+function active(name: string = '') {
+  return icon.value === name
+}
 
 function open() {
   iconDialogRef.value!.open()

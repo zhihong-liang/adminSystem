@@ -43,7 +43,7 @@ const pageProps: CnPage.Props = reactive({
       {
         label: '编辑有效期',
         type: 'primary',
-        disabled: computed(() => !selectedList.value.length),
+        disabled: computed(() => !selectedList.value.length) as any,
         onClick: () => handleEdit(selectedList.value)
       },
       {
