@@ -17,8 +17,8 @@
     <template #divider2>
       <h3>管理单位、技术支持单位</h3>
     </template>
-    <template #businessHours>
-      <BusinessHours v-model="businessHoursWeek" />
+    <template #businessHoursAll>
+      <BusinessHours v-model="businessHoursWeek" :titleType="props.model.type" @change="businessChange" />
     </template>
   </CnForm>
 </template>
@@ -37,13 +37,14 @@ const props = defineProps({
   }
 })
 
+const businessList = ref([])
 const basisRef = ref()
 const managePersonOptions = ref<UserTs[]>([])
 const basisForm: any = reactive({
   labelWidth: 120,
   colSpan: 12,
   model: {},
-  disabled: props.model.type === 'view' ? true : false,
+  readonly: props.model.type === 'view' ? true : false,
   rules: {
     regionDetail: [{ required: true, message: '请选择行政区域' }],
     detailAddress: [{ required: true, message: '请输入详细地址' }],
@@ -61,7 +62,23 @@ const basisForm: any = reactive({
     manufacturer: [{ required: true, message: '请输入生产厂商' }],
     supportingUnit: [{ required: true, message: '请输入设备技术支撑单位' }],
     operationPersonName: [{ required: true, message: '请输入运维人员' }],
-    operationPersonContact: [{ required: true, message: '请输入运维人员联系方式' }]
+    operationPersonContact: [{ required: true, message: '请输入运维人员联系方式' }],
+    businessHoursAll: [
+      {
+        required: true,
+        validator: (rule: any, value: any, callback: any) => {
+          const v1 = businessList.value.every((v: any) => !v.checked)
+          const v2 = businessList.value.some((v: any) => v.checked && (!v.startTime || !v.endTime))
+          if (v1) {
+            callback(new Error('请勾选营业时间'))
+          } else if (v2) {
+            callback(new Error('营业时间不能为空'))
+          } else {
+            callback()
+          }
+        }
+      }
+    ]
   },
   items: [
     {
@@ -136,7 +153,7 @@ const basisForm: any = reactive({
     },
     {
       label: '设备营业时间',
-      prop: 'businessHours',
+      prop: 'businessHoursAll',
       component: 'slot',
       span: 24,
       visible: () => basisForm.model?.businessHours === '3'
@@ -227,6 +244,10 @@ const getFormData = () => {
   }
 }
 defineExpose({ validateForm, getFormData })
+
+const businessChange = (data: any) => {
+  businessList.value = data
+}
 
 watchEffect(async () => {
   if (props.model) {

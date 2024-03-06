@@ -48,14 +48,14 @@
         </el-upload>
       </template>
       <!-- 显示图标 -->
-      <template #showLableIcon>
+      <!-- <template #showLableIcon>
         <img
           v-if="dialogProps.formProps?.model.lableIcon"
           :src="dialogProps.formProps?.model.lableIcon"
           class="avatar"
         />
         <div v-else>--</div>
-      </template>
+      </template> -->
 
       <template #footer>
         <!-- 新建标签 -->

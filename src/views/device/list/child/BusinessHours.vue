@@ -4,6 +4,7 @@
       <el-checkbox
         v-model="item.checked"
         :label="item.label"
+        :disabled="props.titleType === 'view'"
         size="large"
         @change="handleChange"
       />
@@ -11,6 +12,7 @@
         v-model="item.startTime"
         :max-time="item.endTime"
         placeholder="开始时间"
+        :disabled="props.titleType === 'view'"
         start="00:00"
         step="00:15"
         end="23:45"
@@ -21,6 +23,7 @@
         v-model="item.endTime"
         :min-time="item.startTime"
         placeholder="结束时间"
+        :disabled="props.titleType === 'view'"
         start="00:00"
         step="00:15"
         end="23:45"
@@ -45,7 +48,8 @@ interface Props {
 }
 
 const props = defineProps({
-  modelValue: Object as PropType<Props>
+  modelValue: Object as PropType<Props>,
+  titleType: String
 })
 onMounted(() => {
   if (props.modelValue) {
@@ -57,9 +61,10 @@ onMounted(() => {
       timeOptions[i].endTime = endTime
     })
   }
+  emits('change', timeOptions)
 })
 
-const emits = defineEmits(['update:model-value'])
+const emits = defineEmits(['update:model-value','change'])
 
 const timeOptions = reactive([
   { checked: true, startTime: "09:00", endTime: "17:00", label: "周一" },
@@ -77,6 +82,7 @@ function handleChange() {
     return acc
   }, {} as Props)
   emits('update:model-value', hours)
+  emits('change', timeOptions)
 }
 </script>
 
