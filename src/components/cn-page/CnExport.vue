@@ -25,7 +25,7 @@ import useDictionary from '@/hooks/useDictionary'
 import { ElMessage } from 'element-plus'
 
 const checkAll = ref(false)
-const isIndeterminate = ref(true)
+const isIndeterminate = ref(false)
 const checkAllValue = ref()
 
 interface dictTs {
@@ -57,6 +57,8 @@ const open = (data: any) => {
   paramType.value = data.paramType || 'columns'
   otherParams.value = data.otherParams
   fileName.value = data.fileName
+  checkAll.value = false
+  isIndeterminate.value = false
 
   dialogRef.value.open()
 }

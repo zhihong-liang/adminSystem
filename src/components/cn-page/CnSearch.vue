@@ -15,7 +15,7 @@
           <el-icon><DArrowLeft /></el-icon>
         </span>
       </el-button>
-      <el-button v-if="!props.internal" :icon="Setting"></el-button>
+      <el-button v-if="!props.internal" :icon="Setting" @click="handleSet"></el-button>
     </template>
   </CnForm>
 </template>
@@ -39,7 +39,7 @@ const props = defineProps({
   internal: Boolean
 })
 
-const emits = defineEmits(['search', 'reset'])
+const emits = defineEmits(['search', 'reset', 'tableSet'])
 const slots = ref<CnPage.FormItemSlotProps[]>([])
 
 watchEffect(() => {
@@ -52,10 +52,9 @@ onMounted(() => {
   if (props.items.length > 3) {
     showBtn.value = true
     props.items.map((item: any, index: number) => {
-      if (index >= 3) {
-        item.display = 'none'
-        // item.visible = () => false
-      }
+      if (props.items[0].component === 'subtitle') {
+        if (index > 3) item.display = 'none'
+      } else if (index >= 3) item.display = 'none'
     })
   }
 })
@@ -73,10 +72,9 @@ function moreFun() {
   showMore.value = !showMore.value
   if (showMore.value) {
     props.items.map((item: any, index: number) => {
-      if (index >= 3) {
-        item.display = 'none'
-        // item.visible = () => false
-      }
+      if (props.items[0].component === 'subtitle') {
+        if (index > 3) item.display = 'none'
+      } else if (index >= 3) item.display = 'none'
     })
   } else {
     props.items.map((item: any) => {
@@ -88,6 +86,10 @@ function moreFun() {
       }
     })
   }
+}
+
+function handleSet() {
+  emits('tableSet')
 }
 </script>
 

@@ -8,6 +8,7 @@
       :class="{ cnsearch: !props.internal }"
       @search="handleQuery()"
       @reset="handleQuery()"
+      @tableSet="handleTableSet()"
     >
       <template
         v-for="(item, index) in search?.items.filter(
@@ -23,9 +24,9 @@
     <div :class="{ cncontent: !props.internal }">
       <CnToolbar v-bind="toolbar" :params="paramsAll" />
       <slot name="addition"></slot>
-      <CnTable v-bind="table" :data="data" ref="tableRef">
+      <CnTable v-bind="tableAttrs" :data="data" ref="tableRef">
         <template
-          v-for="(column, index) in table?.columns.filter(
+          v-for="(column, index) in tableAttrs?.columns.filter(
             (item: CnPage.TableColumnProps) => item.slot
           )"
           v-slot:[column.slot]="slotProps"
@@ -41,6 +42,8 @@
         @update="handleQuery"
       />
     </div>
+
+    <CnColumnField ref="columnRef" @sumbit="columnChange" />
   </div>
 </template>
 
@@ -51,6 +54,7 @@ import CnSearch from './CnSearch.vue'
 import CnToolbar from './CnToolbar.vue'
 import CnTable from './CnTable.vue'
 import CnPagination from './CnPagination.vue'
+import CnColumnField from './CnColumnField.vue'
 
 const props = defineProps([
   'search',
@@ -66,6 +70,7 @@ const props = defineProps([
   'internal'
 ])
 
+const columnRef = ref()
 const inited = ref(false)
 const loading = ref(true)
 const data = ref<any[]>([])
@@ -74,6 +79,7 @@ const page = ref(1)
 const size = ref(10)
 const total = ref(0)
 
+const tableAttrs = ref(JSON.parse(JSON.stringify(props.table)))
 const tableRef = ref()
 const paramsAll = reactive({
   search: {},
@@ -128,6 +134,20 @@ function initPageOpts() {
     page.value = props.pagination.page || 1
     size.value = props.pagination.size || 10
   }
+}
+
+function handleTableSet() {
+  const arr = props.table?.columns.filter(
+    (v: { type: string; prop: string }) => !v.type && v.prop !== 'action'
+  )
+  columnRef.value.open(arr)
+}
+
+function columnChange(data: any) {
+  const list = props.table?.columns.filter(
+    (v: { prop: string }) => data.includes(v.prop) || !v.prop || v.prop === 'action'
+  )
+  tableAttrs.value.columns = list
 }
 </script>
 

@@ -86,7 +86,7 @@ const props: CnPage.Props = reactive({
   table: {
     columns: [
       { type: 'selection' },
-      { slot: 'codeSlot', label: '工单编号', width: 140 },
+      { prop: 'workOrderNumber', slot: 'codeSlot', label: '工单编号', width: 140 },
       { prop: 'workTypeIdText', label: '工单类型' },
       { prop: 'orderSourceOs', label: '工单来源系统', dict: 'ORDER_SOURCE_OS', width: 120 },
       { prop: 'orderSource', label: '工单来源', dict: 'ORDER_SOURCE' },

@@ -17,7 +17,6 @@ export default {
           ref: 'tableRef',
           stripe: true,
           class: 'tooltb',
-          maxHeight: '500',
           'onSelection-change': (selection) =>
             props.selectionChange && props.selectionChange(selection)
         },
