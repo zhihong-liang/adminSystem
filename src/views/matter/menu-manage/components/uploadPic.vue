@@ -70,12 +70,12 @@ async function handleBeforeUpload(rawFile: any) {
 }
 
 // 上传成功
-const handleUploadSuccess: UploadProps['onSuccess'] = (response, uploadFiles) => {
+const handleUploadSuccess: UploadProps['onSuccess'] = (response) => {
   if (response.code === '200') {
     emits('update:value', response.data)
     fileList.value.push({ url: response.data })
   } else {
-    ElMessage.error(response.message)
+    ElMessage.error(response.message || '操作失败')
   }
 }
 

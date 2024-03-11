@@ -1,12 +1,11 @@
 <template>
-  <CnPage v-bind="props"></CnPage>
+  <CnPage v-bind="props" ref="PageRef"></CnPage>
   <CnDialog
     v-bind="dialogProps"
     ref="dialogRef"
     @success="handleDialogSuccess"
     @close="() => (dialogProps.formProps!.model = {})"
-  >
-  </CnDialog>
+  />
 </template>
 
 <script setup lang="ts">
@@ -23,6 +22,7 @@ import CnPage from '@/components/cn-page/CnPage.vue'
 import CnDialog from '@/components/cn-page/CnDialog.vue'
 
 import type { Resolve } from 'element-plus/lib/components/cascader-panel/index.js'
+import { ElMessage } from 'element-plus'
 
 const cascaderProps = {
   checkStrictly: true,
@@ -83,6 +83,7 @@ const DEFAULT_ITEMS: any = [
   }
 ]
 
+const loadMap = new Map()
 const action = ref('add') // add / edit
 
 const dialogRef = ref()
@@ -102,7 +103,7 @@ const dialogProps: CnPage.DialogProps = reactive({
   action: handleDialogAction
 })
 
-const _resolve = ref()
+const PageRef = ref()
 const props: CnPage.Props = reactive({
   params: {},
   action: queryDevGroupList,
@@ -126,7 +127,10 @@ const props: CnPage.Props = reactive({
     ]
   },
   table: {
+    lazy: true,
     rowKey: 'id',
+    load: TableLoad,
+    treeProps: { children: 'children', hasChildren: 'open' },
     columns: [
       { prop: 'groupName', label: '设备分组' },
       { prop: 'groupRemark', label: '备注' },
@@ -149,32 +153,35 @@ const props: CnPage.Props = reactive({
           }
         ]
       }
-    ],
-    lazy: true,
-    load: TableLoad,
-    treeProps: { children: 'children', hasChildren: 'open' }
+    ]
   },
   pagination: false,
-  refresh: new Date().getTime(),
   transformRequest: (params) => ({ ...params }),
   transformResponse: (res) => ({ rows: res.data, total: 0 })
 })
 
-function handleTableResolve(pid: number | undefined, resolve: Function): void {
-  queryDevGroupList({ parentId: pid }).then((res: any) => {
-    resolve(res.data)
-  })
-}
+async function handleDialogSuccess() {
+  const { prevParentId, parentId } = dialogProps.formProps?.model as any
 
-function handleDialogSuccess() {
-  handleTableResolve(dialogProps.formProps?.model.prevParentId, _resolve.value)
+  if (action.value === 'add') {
+    await reloadTree(parentId)
+    props.refresh = new Date().getTime()
+  } else {
+    await reloadTree(parentId)
+
+    // 如果更改了父节点，前、后两个父节点都要 reload
+    if (prevParentId !== parentId) {
+      await reloadTree(prevParentId)
+      props.refresh = new Date().getTime()
+    }
+  }
 }
 
 function handleEdit({ row }: any) {
-  const prevParentId = row.parentId
   action.value = 'edit'
   dialogProps.formProps!.items = DEFAULT_ITEMS
-  dialogProps.formProps!.model = Object.assign({}, row, { prevParentId })
+  // 保存上一个父节点，后面要同时刷新两个父节点的数据
+  dialogProps.formProps!.model = Object.assign({}, row, { prevParentId: row.parentId })
   dialogRef.value.open()
 }
 
@@ -193,8 +200,25 @@ function TableLoad(
   treeNode: unknown,
   resolve: (date: DeviceInfo[]) => void
 ): void {
-  _resolve.value = resolve
-  handleTableResolve(row.id, resolve)
+  loadMap.set(row.id, { row, treeNode, resolve })
+  queryDevGroupList({ parentId: row.id })
+    .then((res: any) => resolve(res.data))
+    .catch(() => ElMessage.error('请求失败'))
+}
+
+// 重新加载子数据
+function reloadTree(parentId: number) {
+  if (loadMap.get(parentId) === undefined) return
+
+  const { row, treeNode, resolve } = loadMap.get(parentId)
+  const node = PageRef.value.$refs['tableRef'].$refs['tableRef']
+
+  // bugfix: 修复该节点只有一个子节点的情况下，删除和编辑操作不成功的bug
+  if (node.store.states.lazyTreeNodeMap.value[parentId].length <= 1) {
+    node.store.states.lazyTreeNodeMap.value[parentId] = []
+  }
+
+  TableLoad(row, treeNode, resolve)
 }
 
 function handleDeleteGroup({ row }: any) {
@@ -203,10 +227,9 @@ function handleDeleteGroup({ row }: any) {
     title: '删除',
     action: () => queryDeleteDevGroup(row.id || ''),
     success: () => {
-      if (!row.parentId) {
-        props.refresh = new Date().getTime()
-      } else {
-        handleTableResolve(row.parentId, _resolve.value)
+      props.refresh = new Date().getTime()
+      if (row.parentId) {
+        reloadTree(row.parentId)
       }
     }
   }

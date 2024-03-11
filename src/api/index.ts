@@ -27,7 +27,7 @@ axios.interceptors.response.use(
     if (data.code === '600') {
       router.replace('/login')
     }
-    ElMessage.error(data.message)
+    ElMessage.error(data.message || '服务器异常')
     return Promise.reject(data)
   },
   (err) => {
