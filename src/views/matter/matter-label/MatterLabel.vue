@@ -3,21 +3,22 @@
     <CnPage v-bind="props">
       <template #action="{ row }">
         <div class="btns">
-          <el-button type="text" @click="showDialog('edit', row)">编辑</el-button>
+          <el-button text type="primary" @click="showDialog('edit', row)">编辑</el-button>
           <el-button
             v-if="row.status === '1'"
-            type="text"
+            text
+            type="primary"
             @click="enableMatterLabelAction('deactivate', row)"
             >停用</el-button
           >
-          <el-button v-else type="text" @click="enableMatterLabelAction('enable', row)"
+          <el-button v-else text type="primary" @click="enableMatterLabelAction('enable', row)"
             >启用</el-button
           >
-          <el-button type="text" @click="showDialog('delete', row)">删除</el-button>
+          <el-button text type="primary" @click="showDialog('delete', row)">删除</el-button>
         </div>
       </template>
       <template #lableName="{ row }">
-        <el-button type="text" @click="showDialog('detail', row)">{{ row.lableName }}</el-button>
+        <el-button text type="primary" @click="showDialog('detail', row)">{{ row.lableName }}</el-button>
       </template>
       <template #status="{ row }">
         <span>{{ row.id }}</span>

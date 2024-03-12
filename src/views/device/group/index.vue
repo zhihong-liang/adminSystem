@@ -117,7 +117,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           action.value = 'add'
           dialogProps.formProps!.items = DEFAULT_ITEMS.filter((i: any) => i.prop !== 'status')

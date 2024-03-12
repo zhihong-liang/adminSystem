@@ -66,7 +66,7 @@ const props = reactive<CnPage.Props<UnitType, UnitTypeReq>>({
     items: [{ label: '单位类型', prop: 'unitTypeName', component: 'input' }]
   },
   toolbar: {
-    items: [{ label: '新增', type: 'primary', onClick: () => saveUnitType() }]
+    items: [{ label: '新增', type: 'success', onClick: () => saveUnitType() }]
   },
   table: {
     columns: [

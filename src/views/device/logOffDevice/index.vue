@@ -72,7 +72,7 @@ const props = reactive<CnPage.Props>({
       },
       {
         label: '导出',
-        type: 'primary',
+        type: 'warning',
         onClick: () => {
           dialogRef.value?.open()
           dialogProps.action = () => handleSubmit('add')

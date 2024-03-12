@@ -70,7 +70,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '导出',
-        type: 'primary',
+        type: 'warning',
         exportProps: {
           action: orderInfoExport,
           fileName: '工单列表',

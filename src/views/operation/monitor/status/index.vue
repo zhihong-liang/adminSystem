@@ -260,7 +260,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '导出',
-        type: 'primary',
+        type: 'warning',
         onClick: () => {
           monitorCodeExport(searchParams.value).then((res: any) => {
             let blob = new Blob([res.data], {

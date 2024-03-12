@@ -6,7 +6,7 @@ export default function getTollbarConifg(
     items: [
       {
         label: '新建',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           clickCb('add')
         }
@@ -20,14 +20,14 @@ export default function getTollbarConifg(
       },
       {
         label: '删除标签',
-        type: '',
+        type: 'danger',
         onClick: () => {
           clickCb('delLabel')
         }
       },
       {
         label: '导出',
-        type: '',
+        type: 'warning',
         onClick: () => {
           clickCb('export')
         }

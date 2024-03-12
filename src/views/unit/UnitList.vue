@@ -211,7 +211,7 @@ const props = reactive<CnPage.Props>({
     ]
   },
   toolbar: {
-    items: [{ label: '新增', type: 'primary', onClick: () => saveUnit() }]
+    items: [{ label: '新增', type: 'success', onClick: () => saveUnit() }]
   },
   table: {
     columns: [

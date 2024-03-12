@@ -66,7 +66,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         directives: [{ label: 'permission', value: 'button:add' }],
         onClick: () => {
           dialogProps.model = 'add'
@@ -76,8 +76,7 @@ const props: CnPage.Props = reactive({
       },
       {
         label: '删除',
-        type: 'primary',
-        plain: true,
+        type: 'danger',
         directives: [{ label: 'permission', value: 'button:delete' }],
         onClick: () => handleDelete(selectedList.value)
       }

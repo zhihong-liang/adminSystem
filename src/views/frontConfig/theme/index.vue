@@ -72,7 +72,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           dealRef.value?.open('', 'add')
           // dialogProps.formProps!.model = {}

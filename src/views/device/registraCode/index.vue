@@ -48,6 +48,7 @@ const pageProps: CnPage.Props = reactive({
       },
       {
         label: '导出',
+        type: 'warning',
         onClick: handleExport
         // onClick: () => {}
       }

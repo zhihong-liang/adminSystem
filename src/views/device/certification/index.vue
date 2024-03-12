@@ -109,7 +109,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           dialogProps.title = '新增'
           model.value = 'add'

@@ -29,7 +29,7 @@ const props = reactive<CnPage.Props>({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           console.log('新增')
         }

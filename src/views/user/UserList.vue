@@ -33,7 +33,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           detailRef.value.open('add', {})
         }
@@ -78,14 +78,13 @@ const props: CnPage.Props = reactive({
         buttons: [
           {
             label: '查看',
-            type: 'primary',
             onClick: ({ row }) => {
               detailRef.value.open('look', row)
             }
           },
           {
             label: '编辑',
-            type: 'warning',
+            type: 'primary',
             onClick: ({ row }) => {
               detailRef.value.open('edit', row)
             }

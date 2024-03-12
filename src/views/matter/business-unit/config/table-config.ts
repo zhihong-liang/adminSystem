@@ -20,14 +20,14 @@ export default function getTableConfig(
         buttons: [
           {
             label: '编辑',
-            type: 'text',
+            type: 'primary',
             onClick: (params: any) => {
               tableClickCb('edit', params.row)
             }
           },
           {
             label: '删除',
-            type: 'text',
+            type: 'primary',
             onClick: (params: any) => {
               tableClickCb('delete', params.row)
             }

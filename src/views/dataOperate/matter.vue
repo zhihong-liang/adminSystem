@@ -31,7 +31,7 @@
       items: [
         {
           label: '导出',
-          type: 'primary'
+          type: 'warning'
         }
       ]
     },

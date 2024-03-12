@@ -108,7 +108,7 @@ const toolBtn: any[] = [
   // { label: '打回工单', type: 'primary', onClick: () => handleOpen('Repulse', {}, '', true), show: ['Handled'] },
   {
     label: '导出',
-    type: 'primary',
+    type: 'warning',
     show: ['Allocation', 'Dispatch', 'NotHandle', 'InHandle', 'Handled', 'History'],
     exportProps: {
       action: orderInfoExport,

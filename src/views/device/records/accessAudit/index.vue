@@ -1,7 +1,7 @@
 <template>
   <CnPage v-bind="props">
     <template #action="{ row }">
-      <el-button plain type="primary" text @click="handleAction(row, 'check')">查看</el-button>
+      <el-button plain text @click="handleAction(row, 'check')">查看</el-button>
       <el-button
         v-if="row.auditCurrentStep === '100'"
         plain

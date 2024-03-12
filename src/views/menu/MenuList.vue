@@ -127,7 +127,7 @@ const props: CnPage.Props = reactive({
     items: [
       {
         label: '新增',
-        type: 'primary',
+        type: 'success',
         onClick: () => {
           step.value = 'add'
           dialogRef.value?.open()

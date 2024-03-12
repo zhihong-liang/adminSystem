@@ -117,7 +117,7 @@ const pageProps: CnPage.Props = reactive({
       },
       {
         label: '删除',
-        type: 'primary',
+        type: 'danger',
         plain: true,
         onClick: () => handleDeleteMatter(selectedList.value)
       }

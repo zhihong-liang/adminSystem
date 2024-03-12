@@ -26,7 +26,7 @@ const pages: CnPage.Props = reactive({
     items: [
       {
         label: '导出',
-        type: 'primary'
+        type: 'warning'
       }
     ]
   },

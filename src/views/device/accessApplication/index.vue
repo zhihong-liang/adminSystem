@@ -5,10 +5,10 @@
         {{ getUnitName(row.devAccessUnit) }}
       </template>
       <template #action="{ row }">
-        <el-button type="text" @click="handleAction('detail', row)"> 查看 </el-button>
+        <el-button text @click="handleAction('detail', row)"> 查看 </el-button>
         <el-button
           v-if="row.auditCurrentStep === '100'"
-          type="text"
+          text="true"
           @click="handleAction('revoke', row)"
         >
           撤回

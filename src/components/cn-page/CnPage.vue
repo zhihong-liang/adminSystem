@@ -79,7 +79,9 @@ const page = ref(1)
 const size = ref(10)
 const total = ref(0)
 
-const tableAttrs = ref(JSON.parse(JSON.stringify(props.table)))
+const tableAttrs = reactive({
+  ...props.table
+})
 const tableRef = ref()
 const paramsAll = reactive({
   search: {},
@@ -147,7 +149,7 @@ function columnChange(data: any) {
   const list = props.table?.columns.filter(
     (v: { prop: string }) => data.includes(v.prop) || !v.prop || v.prop === 'action'
   )
-  tableAttrs.value.columns = list
+  tableAttrs.columns = list
 }
 </script>
 
